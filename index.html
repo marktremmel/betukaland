@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Betűkaland · Typing Adventure</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="game"></div>
+<div id="overlay" style="display:none"></div>
+<noscript>Ehhez a játékhoz JavaScript kell.</noscript>
+
+<script src="vendor/phaser.min.js"></script>
+<script src="assets/manifest.js"></script>
+<script>
+  // Opened straight from disk (double-click)? Browsers block file loading there,
+  // so load the bundle that holds every asset inside one script.
+  if (location.protocol === 'file:') document.write('<script src="assets/pack.js"><\/script>');
+</script>
+<script src="data/words_hu.js"></script>
+<script src="data/words_en.js"></script>
+<script src="src/config.js"></script>
+<script src="src/strings_hu.js"></script>
+<script src="src/util.js"></script>
+<script src="src/adaptive.js"></script>
+<script src="src/wordbank.js"></script>
+<script src="src/save.js"></script>
+<script src="src/audio.js"></script>
+<script src="src/ui.js"></script>
+<script src="src/keyboard_view.js"></script>
+<script src="src/typing.js"></script>
+<script src="src/hero.js"></script>
+<script src="src/encounters.js"></script>
+<script src="src/levelgen.js"></script>
+<script src="src/scenes/common.js"></script>
+<script src="src/scenes/boot.js"></script>
+<script src="src/scenes/title.js"></script>
+<script src="src/scenes/profiles.js"></script>
+<script src="src/scenes/placement.js"></script>
+<script src="src/scenes/map.js"></script>
+<script src="src/scenes/practice.js"></script>
+<script src="src/scenes/level.js"></script>
+<script src="src/scenes/results.js"></script>
+<script src="src/scenes/overlays.js"></script>
+<script src="src/scenes/teacher.js"></script>
+<script src="src/main.js"></script>
+</body>
+</html>
