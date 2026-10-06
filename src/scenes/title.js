@@ -21,16 +21,22 @@ BK.TitleScene = class extends Phaser.Scene {
 
     BK.ui.button(this, 42, 202, BK.T.teacher, function () { s.scene.start('Teacher'); }, { w: 66, h: 18 });
     BK.ui.button(this, BK.W - 42, 202, BK.T.credits, function () { s.scene.start('Credits'); }, { w: 66, h: 18 });
-    if (BK.DEBUG) BK.ui.text(this, BK.W / 2, 140, 'TESZT MÓD: minden pálya nyitva', { origin: [0.5, 0.5], color: 0xff9a7a });
+    // interface language: Magyar / English (the button shows the other one)
+    var lb = BK.ui.button(this, BK.W - 36, 14, BK.T.language, function () {
+      BK.applyUiLang(BK.uiLang === 'en' ? 'hu' : 'en', null);
+      s.scene.restart();
+    }, { w: 60, h: 18 });
+    lb.zone.on('pointerdown', function () { s.langClick = true; });
+    if (BK.DEBUG) BK.ui.text(this, BK.W / 2, 140, BK.L('TESZT MÓD: minden pálya nyitva', 'TEST MODE: every level open'), { origin: [0.5, 0.5], color: 0xff9a7a });
     BK.ui.text(this, BK.W / 2, 208, 'v' + BK.VERSION, { origin: [0.5, 0.5], color: 0xfff2dc }).setAlpha(0.6);
 
     BK.audio.music(BK.MUSIC.title);
     var go = function () { if (s.leaving) return; s.leaving = true; BK.audio.sfx('chime'); s.scene.start('Profiles'); };
     this.input.keyboard.once('keydown', function (e) { if (e.key !== 'Tab') go(); });
-    var zone = this.add.zone(BK.W / 2, 100, BK.W, 150).setInteractive();
-    zone.on('pointerup', go);
+    var zone = this.add.zone(BK.W / 2, 110, BK.W, 150).setInteractive();
+    zone.on('pointerup', function () { if (!s.langClick) go(); });
     if (!BK.save.storageOk()) {
-      BK.ui.text(this, BK.W / 2, 140, 'A böngésző nem enged menteni. A haladás nem marad meg.', { origin: [0.5, 0.5], color: 0xff9a7a });
+      BK.ui.text(this, BK.W / 2, 140, BK.L('A böngésző nem enged menteni. A haladás nem marad meg.', 'This browser does not allow saving. Progress will be lost.'), { origin: [0.5, 0.5], color: 0xff9a7a });
     }
   }
 };
@@ -46,10 +52,12 @@ BK.CreditsScene = class extends Phaser.Scene {
     BK.ui.nine(this, 14, 4, BK.W - 28, 190, 'ui_panel2');
     BK.ui.text(this, BK.W / 2, 36, BK.T.creditsTitle, { outline: false, size: 2, origin: [0.5, 0.5] });
     var y = 48;
+    var EN = { 'Grafika': 'Graphics', 'Felület': 'Interface', 'Ikonok': 'Icons', 'Effektek': 'Effects', 'Égbolt': 'Skies',
+      'Betűtípus': 'Font', 'Zene': 'Music', 'Hangok': 'Sounds', 'Motor': 'Engine' };
     (window.BK_CREDITS || []).forEach(function (c) {
-      BK.ui.text(s, 34, y, c[0], { outline: false, color: 0x9a3d1a });
+      BK.ui.text(s, 34, y, BK.uiLang === 'en' ? (EN[c[0]] || c[0]) : c[0], { outline: false, color: 0x9a3d1a });
       var t = BK.ui.text(s, 100, y, c[1], { outline: false, width: 250 });
-      y += 10;
+      y += 11;
     });
     
     BK.ui.button(this, BK.W / 2, 204, BK.T.back, function () { s.scene.start('Title'); }, { w: 70, h: 18, key: 'ESC' });

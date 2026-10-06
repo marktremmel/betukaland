@@ -218,6 +218,8 @@ BK.save = (function () {
       persist();
     },
     setLast: function (id) { load().lastProfile = id; persist(); },
+    font: function (v) { if (v !== undefined) { load().font = v; persist(); } return load().font || 'andika'; },
+    uiLang: function (v) { if (v !== undefined) { load().uiLang = v; persist(); } return load().uiLang || 'hu'; },
     regionOpen: regionOpen, regionCleared: regionCleared, levelUnlocked: levelUnlocked,
     totalStars: totalStars, currentRegion: currentRegion, recordLevel: recordLevel,
     encode: encode, decode: decode,

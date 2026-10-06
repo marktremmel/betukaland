@@ -10,7 +10,7 @@ BK.OverlayBase = class extends Phaser.Scene {
     this.add.rectangle(0, 0, BK.W, BK.H, 0x000000, 0.5).setOrigin(0, 0).setInteractive();
     var x = (BK.W - w) / 2, y = (BK.H - h) / 2;
     BK.ui.nine(this, x, y, w, h, 'ui_panel2');
-    BK.ui.text(this, BK.W / 2, y + 28, title, { outline: false, size: 2, origin: [0.5, 0.5] });
+    BK.ui.text(this, BK.W / 2, y + 30, title, { outline: false, size: 2, origin: [0.5, 0.5] });
     BK.ui.button(this, BK.W / 2, y + h - 16, BK.T.back + ' (Esc)', function () { s.close(); }, { w: 80, h: 18, key: 'ESC' });
     this.box = { x: x, y: y, w: w, h: h };
     this.dyn = [];
@@ -57,8 +57,8 @@ BK.ShopScene = class extends BK.OverlayBase {
       s.keepD(BK.ui.text(s, x + 43, y + 4, it.name, { outline: false, origin: [0.5, 0] }));
       var owned = s.tab === 0 ? P.outfits.indexOf(it.id) >= 0 : P.pets.indexOf(it.id) >= 0;
       var wearing = s.tab === 0 ? P.outfit === it.id : P.pet === it.id;
-      if (!owned) s.keepD(BK.ui.text(s, x + 58, y + 20, it.price + ' érme', { outline: false, origin: [0.5, 0], color: 0x9a3d1a }));
-      var label = wearing ? (s.tab === 1 ? 'Hazaküld' : BK.T.wearing) : (owned ? BK.T.wear : BK.T.buy);
+      if (!owned) s.keepD(BK.ui.text(s, x + 58, y + 20, it.price + ' ' + BK.L('érme', 'coins'), { outline: false, origin: [0.5, 0], color: 0x9a3d1a }));
+      var label = wearing ? (s.tab === 1 ? BK.L('Hazaküld', 'Send home') : BK.T.wearing) : (owned ? BK.T.wear : BK.T.buy);
       var btn = s.keepD(BK.ui.button(s, x + 58, y + 42, label, function () { s.act(it, owned, wearing); }, { w: 56, h: 16, disabled: wearing && s.tab === 0 }));
     });
   }
@@ -89,7 +89,7 @@ BK.BagScene = class extends BK.OverlayBase {
     var b = this.box;
     var have = BK.ITEMS.filter(function (it) { return P.items[it.id]; });
     if (!have.length) {
-      BK.ui.text(this, BK.W / 2, BK.H / 2, BK.T.empty + ' Nyiss ki kincsesládákat!', { outline: false, origin: [0.5, 0.5] });
+      BK.ui.text(this, BK.W / 2, BK.H / 2, BK.T.empty + ' ' + BK.L('Nyiss ki kincsesládákat!', 'Open treasure chests!'), { outline: false, origin: [0.5, 0.5] });
     }
     BK.ITEMS.forEach(function (it, i) {
       var col = i % 8, row = Math.floor(i / 8);
@@ -100,7 +100,7 @@ BK.BagScene = class extends BK.OverlayBase {
       if (!n) icon.setTint(0x302828).setAlpha(0.6);
       else BK.ui.text(s, x + 12, y + 4, 'x' + n, { origin: [1, 0], color: 0xffffff });
     });
-    BK.ui.text(this, BK.W / 2, b.y + b.h - 36, have.length + ' / ' + BK.ITEMS.length + ' kincs', { outline: false, origin: [0.5, 0.5], color: 0x6b3a20 });
+    BK.ui.text(this, BK.W / 2, b.y + b.h - 36, have.length + ' / ' + BK.ITEMS.length + ' ' + BK.L('kincs', 'treasures'), { outline: false, origin: [0.5, 0.5], color: 0x6b3a20 });
   }
 };
 
@@ -118,7 +118,7 @@ BK.SettingsScene = class extends BK.OverlayBase {
       ['sfx', BK.T.sound], ['speedRun', BK.T.speedRun],
     ];
     rows.forEach(function (r, i) {
-      var y = b.y + 50 + i * 18;
+      var y = b.y + 47 + i * 15;
       s.keepD(BK.ui.text(s, b.x + 22, y - 4, r[1], { outline: false }));
       var on = !!P.settings[r[0]];
       s.keepD(BK.ui.button(s, b.x + b.w - 50, y, on ? BK.T.on : BK.T.off, function () {
@@ -126,12 +126,28 @@ BK.SettingsScene = class extends BK.OverlayBase {
         BK.save.persist();
         BK.audio.apply(P.settings);
         s.draw();
-      }, { w: 44, h: 16, color: on ? 0x2e7d3e : 0x8a3a2a }));
+      }, { w: 44, h: 14, color: on ? 0x2e7d3e : 0x8a3a2a }));
     });
-    var y = b.y + 50 + rows.length * 18;
+    var y = b.y + 47 + rows.length * 15;
     s.keepD(BK.ui.text(s, b.x + 22, y - 4, BK.T.wordLang, { outline: false }));
     s.keepD(BK.ui.button(s, b.x + b.w - 50, y, P.lang === 'en' ? BK.T.langEn : BK.T.langHu, function () {
       P.lang = P.lang === 'en' ? 'hu' : 'en'; BK.save.persist(); s.draw();
-    }, { w: 60, h: 16 }));
+    }, { w: 66, h: 14 }));
+    // interface language: menus and tips (Magyar / English)
+    y += 15;
+    s.keepD(BK.ui.text(s, b.x + 22, y - 4, BK.T.uiLang, { outline: false }));
+    s.keepD(BK.ui.button(s, b.x + b.w - 50, y, BK.uiLang === 'en' ? 'English' : 'Magyar', function () {
+      BK.applyUiLang(BK.uiLang === 'en' ? 'hu' : 'en', P);
+      s.scene.restart(s.data0);
+    }, { w: 66, h: 14 }));
+    // font: Andika / Atkinson / Lexend (the button shows the current one)
+    y += 15;
+    var cur = BK.FONTS.filter(function (f) { return f.id === BK.fontId; })[0] || BK.FONTS[0];
+    s.keepD(BK.ui.text(s, b.x + 22, y - 4, BK.T.font, { outline: false }));
+    s.keepD(BK.ui.button(s, b.x + b.w - 50, y, cur.name, function () {
+      var i = BK.FONTS.indexOf(cur);
+      BK.applyFont(BK.FONTS[(i + 1) % BK.FONTS.length].id, P);
+      s.scene.restart(s.data0);
+    }, { w: 66, h: 14 }));
   }
 };

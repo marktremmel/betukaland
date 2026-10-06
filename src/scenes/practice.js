@@ -17,7 +17,7 @@ BK.PracticeScene = class extends Phaser.Scene {
     BK.menuBackground(this, 3, { groundY: 200 });
     BK.audio.music(BK.MUSIC.map);
     BK.ui.nine(this, 16, 4, 352, 182, 'ui_panel2');
-    BK.ui.text(this, 192, 32, BK.T.practiceTitle, { outline: false, size: 2, origin: [0.5, 0.5] });
+    BK.ui.text(this, 192, 34, BK.T.practiceTitle, { outline: false, size: 2, origin: [0.5, 0.5] });
 
     this.open = BK.REGIONS.filter(function (r) { return r.playable && BK.save.regionOpen(P, r.id); }).map(function (r) { return r.id; });
     if (this.sentRegion === undefined || this.open.indexOf(this.sentRegion) < 0) this.sentRegion = this.open[this.open.length - 1] || 1;
@@ -100,7 +100,7 @@ BK.PracticeScene = class extends Phaser.Scene {
           if (i === s.storySel) s.keep(s.add.rectangle(192, y + 5, 318, rh, 0xf6c88a, 0.8));
           s.keep(BK.ui.text(s, x0 + 4, y, story.title, { outline: false, color: open ? 0x4a2c1c : 0x9a8a80 }));
           if (open) s.keep(BK.ui.stars(s, 330, y + 5, (P.stories || {})[story.id] || 0, 3, 10));
-          else s.keep(BK.ui.text(s, 346, y, BK.T.pStoryLocked + ' ' + BK.REGIONS[story.region - 1].name, { outline: false, origin: [1, 0], color: 0x9a8a80 }));
+          else s.keep(BK.ui.text(s, 346, y, BK.T.pStoryLocked + ' ' + BK.REGIONS[story.region - 1].name, { outline: false, origin: [1, 0], color: 0x9a8a80, px: 9 }));
           var z = s.keep(s.add.zone(192, y + 5, 318, rh).setInteractive({ useHandCursor: true }));
           z.on('pointerup', function () {
             if (s.storySel === i) { s.go(); return; }

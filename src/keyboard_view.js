@@ -27,7 +27,7 @@ BK.KeyboardView = class {
       row.keys.forEach(function (k, i) {
         var x = x0 + row.offset + i * (KW + G), y = self.y0 + 4 + r * (KH + G);
         self.keys[k] = { x: x, y: y, w: KW, h: KH, k: k };
-        var t = scene.add.bitmapText(x + KW / 2, y + KH / 2 - 1, 'm5x7', k, 16).setOrigin(0.5, 0.5).setDepth(302);
+        var t = BK.ui.text(scene, x + KW / 2, y + KH / 2 - 1, k, { outline: false, px: 10, bold: true, origin: [0.5, 0.5] }).setDepth(302);
         self.keys[k].t = t;
       });
     });
@@ -39,10 +39,10 @@ BK.KeyboardView = class {
     this.keys[' '] = { x: x0 + 3 * (KW + G) + 3, y: r3y + KH + G, w: 6 * (KW + G), h: 9, k: ' ' };
     ['shiftL', 'shiftR'].forEach(function (s) {
       var K = self.keys[s];
-      K.t = scene.add.bitmapText(K.x + K.w / 2, K.y + K.h / 2 - 1, 'm5x7', 'shift', 16).setOrigin(0.5, 0.5).setDepth(302);
+      K.t = BK.ui.text(scene, K.x + K.w / 2, K.y + K.h / 2 - 1, 'shift', { outline: false, px: 8, bold: true, origin: [0.5, 0.5] }).setDepth(302);
     });
     // finger hint text on the right
-    this.hint = BK.ui.text(scene, BK.W - 4, BK.H - 3, '', { origin: [1, 1], color: 0xffe9c8 }).setDepth(303);
+    this.hint = BK.ui.text(scene, BK.W - 4, BK.H - 2, '', { origin: [1, 1], color: 0xffe9c8, px: 9 }).setDepth(303);
     this.next = null; this.shiftNeeded = null; this.flash = null; this.flashT = 0; this.pulse = 0;
     this.draw();
   }

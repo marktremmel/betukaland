@@ -39,7 +39,8 @@ BK.Encounter = class {
     this.bubble = new BK.WordBubble(this.scene, text, bx, this.bubbleY(), { maxWidth: this.def.maxWidth || 220 });
     // keep wide bubbles on screen
     var half = this.bubble.w / 2 + 4;
-    this.bubble.moveTo(BK.util.clamp(bx, half, BK.W - half), this.bubbleY());
+    // and below the top bar (tall two-line bubbles)
+    this.bubble.moveTo(BK.util.clamp(bx, half, BK.W - half), Math.max(this.bubbleY(), this.bubble.h + 20));
   }
   get next() { return this.bubble ? this.bubble.next : null; }
   // returns 'bad' | 'ok' | 'chunk' | 'done'
@@ -355,7 +356,7 @@ BK.Boss = class extends BK.Mini {
     BK.audio.sfx('v_wow', { volume: 0.8 });
     BK.fx.confetti(s, this.spr.x, this.spr.y - 40);
     BK.fx.coins(s, this.spr.x, this.spr.y - 30, this.coins);
-    BK.ui.toast(s, BK.W / 2, 60, this.def.outro || 'Barátok lettetek!', 0xffd23c, 2);
+    BK.ui.toast(s, BK.W / 2, 60, this.def.outro || BK.L('Barátok lettetek!', 'You made friends!'), 0xffd23c, 2);
     return new Promise(function (ok) {
       s.tweens.add({ targets: self.spr, x: BK.W + 80, duration: 1400, delay: 600, ease: 'Quad.easeIn', onComplete: ok });
       self.spr.setFlipX(!self.spr.flipX);

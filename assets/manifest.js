@@ -867,16 +867,7 @@ window.BK_MANIFEST = {
   "m_sky": "assets/audio/m_sky.mp3",
   "m_final": "assets/audio/m_final.mp3"
  },
- "fonts": {
-  "m5x7": {
-   "png": "assets/fonts/m5x7.png",
-   "xml": "assets/fonts/m5x7.xml"
-  },
-  "m5x7o": {
-   "png": "assets/fonts/m5x7o.png",
-   "xml": "assets/fonts/m5x7o.xml"
-  }
- },
+ "fonts": {},
  "backdrops": {
   "beach": [
    {
@@ -1048,4 +1039,4 @@ window.BK_MANIFEST = {
   ]
  }
 };
-window.BK_CREDITS = [["Grafika", "Ansimuz: Sunny Land, Tiny RPG, Gothicvania"], ["Grafika", "Crabby Beach, Berie's Adventure: Seaside"], ["Felület", "Complete UI Essential: Crusenho, CC BY 4.0"], ["Ikonok", "Addin's RPG Icon Packs: Addin"], ["Effektek", "Effect and FX Pixel"], ["Égbolt", "Free Sky with Clouds: CraftPix.net"], ["Betűtípus", "m5x7: Daniel Linssen"], ["Zene", "Music by Clement Panchout"], ["Hangok", "Pixel Combat SFX: Helton Yan"], ["Hangok", "Super Dialogue: Dillon Becker, CC BY 4.0"], ["Motor", "Phaser 3 (phaser.io), MIT licence"]];
+window.BK_CREDITS = [["Grafika", "Ansimuz: Sunny Land, Tiny RPG, Gothicvania"], ["Grafika", "Crabby Beach, Berie's Adventure: Seaside"], ["Felület", "Complete UI Essential: Crusenho, CC BY 4.0"], ["Ikonok", "Addin's RPG Icon Packs: Addin"], ["Effektek", "Effect and FX Pixel"], ["Égbolt", "Free Sky with Clouds: CraftPix.net"], ["Betűtípus", "Andika (SIL), Atkinson Hyperlegible, Lexend: OFL 1.1"], ["Zene", "Music by Clement Panchout"], ["Hangok", "Pixel Combat SFX: Helton Yan"], ["Hangok", "Super Dialogue: Dillon Becker, CC BY 4.0"], ["Motor", "Phaser 3 (phaser.io), MIT licence"]];

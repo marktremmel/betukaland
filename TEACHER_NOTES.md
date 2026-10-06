@@ -1,6 +1,6 @@
 # Betűkaland (Typing Adventure): teacher notes
 
-Version 0.4: all seven regions are playable, each with three levels and a boss, plus a practice corner with free sentence practice and a storybook. Title screen, player profiles with a choice of six figures, placement test, world map, shop, rest spots, results with stars and a chart, saving with a code and a file, the teacher screen with CSV export, and credits.
+Version 0.5: all seven regions are playable, each with three levels and a boss, plus a practice corner with free sentence practice and a storybook. The menus can be Hungarian or English, and the text uses a font made for young readers (three to choose from). Title screen, player profiles with a choice of six figures, placement test, world map, shop, rest spots, results with stars and a chart, saving with a code and a file, the teacher screen with CSV export, and credits.
 
 ## Running it
 
@@ -67,7 +67,28 @@ Coins from every creature, chest and boss; treasures (fruit and sweets icons) in
 
 ## Settings (per child)
 
-On-screen keyboard on or off, finger colours on or off, music, sounds, speed-run mode (a visible timer and best times, off by default; for older students), word language.
+On-screen keyboard on or off, finger colours on or off, music, sounds, speed-run mode (a visible timer and best times, off by default; for older students), word language, interface language and font.
+
+## Language: menus and words are separate
+
+Two different settings, so foreign students can follow the game:
+
+- Interface language (Nyelv / Language): every menu, button, tip, region and boss name, the finger names and the save-code screen, in Hungarian or English. The title screen has a "English" / "Magyar" button in the top right corner, so a child can switch before even picking a profile. Each profile remembers its own choice, and the computer remembers the last one used.
+- Word language (Szavak nyelve / Word language): what the child types. Hungarian or English word lists, chosen when the profile is made and changeable in Settings.
+
+Any mix works: English menus with Hungarian words is the usual set-up for an international student learning Hungarian typing; Hungarian menus with English words suits a Hungarian child practising English. The teacher screen stays in English.
+
+The game still expects the Hungarian keyboard layout (the on-screen keyboard is QWERTZ, and Region 5 teaches á é í ó ö ő ú ü ű). On a machine set to a US/UK layout the child sees the "this computer does not seem to use the Hungarian layout" tip.
+
+## Fonts
+
+All text is drawn in a real font, sharp at any screen size (the art stays pixel art). Settings → Betűtípus / Font cycles through three, all with every Hungarian letter:
+
+- Andika (default): made by SIL for children learning to read. Single-storey a and g like handwriting taught in school, I, l and 1 easy to tell apart.
+- Atkinson Hyperlegible: made by the Braille Institute for low-vision readers; every letter shaped to be unmistakable.
+- Lexend: wide, airy letters designed for reading fluency; some children with reading difficulties find it easier.
+
+The choice is saved per child. The font files are embedded in `assets/fonts/fonts.js` (so they work offline); the licences (SIL Open Font License) are in the same folder. Adding another font: put its regular and bold files in `fonts.js` under a new key and add a line to `BK.FONTS` in `src/config.js`. It needs the letters ő and ű, which many fonts lack.
 
 ## Saving
 
@@ -99,13 +120,13 @@ If you want more, the full Sunny Land collection by Ansimuz (itch.io) has more c
 
 Word lists: `data/words_hu.js` and `data/words_en.js`. Add words separated by spaces; the game filters them per region automatically. `python3 tools/check_words.py` reports how many words each region gets.
 
-Child-facing text: `src/strings_hu.js`. Numbers (star thresholds, speed targets, level length, prices): `src/config.js`.
+Child-facing text: `src/strings_hu.js` and `src/strings_en.js` (same keys); English names of regions, bosses, outfits and treasures: `src/i18n.js`. Numbers (star thresholds, speed targets, level length, prices): `src/config.js`.
 
-Assets: `tools/build_assets.py` copies what the game uses from the Game Assets library (it never changes the library), packs sprite strips, converts sounds to MP3 and bakes the font. Then `tools/build_pack.py` rebuilds the offline bundle.
+Assets: `tools/build_assets.py` copies what the game uses from the Game Assets library (it never changes the library), packs sprite strips and converts sounds to MP3. The fonts are not from the library; they live in `assets/fonts/`. Then `tools/build_pack.py` rebuilds the offline bundle.
 
 ## Known limits of this version
 
-Music was picked by title, not by listening: swap tracks in `tools/build_assets.py` (MUSIC table). The voice praise clips are English words ("Great!", "Wow!"); all on-screen praise is Hungarian.
+Music was picked by title, not by listening: swap tracks in `tools/build_assets.py` (MUSIC table). The voice praise clips are English words ("Great!", "Wow!"); on-screen praise follows the interface language.
 
 ## Testing everything quickly
 

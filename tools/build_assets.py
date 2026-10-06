@@ -4,9 +4,8 @@ Betűkaland asset builder.
 
 Copies ONLY the assets the game uses from the Game Assets library into ./assets,
 packs frame sequences into horizontal spritesheet strips, makes recoloured
-variants (outfits, bosses), converts WAV audio to MP3, bakes the m5x7 pixel
-font into a bitmap font (with redrawn ő ű Ő Ű, which are identical to ö ü Ö Ü
-in the original font), and writes assets/manifest.js for the game loader.
+variants (outfits, bosses), converts WAV audio to MP3, and writes assets/manifest.js for the game loader.
+Text uses the Andika font (assets/fonts/andika.js), which is not from the library.
 
 The library is never modified.
 
@@ -40,7 +39,6 @@ SKY = "03_2D_Parallax_Backgrounds/free-sky-with-clouds-background-pixel-art-set/
 HY = "10_Audio_SFX/Helton Yan's Pixel Combat - Single Files/"
 SD = "10_Audio_SFX/Super Dialogue Audio Pack v1/Step 2 - Audio Files/"
 CP = "09_Audio_Music/Clement_Panchout/"
-FONT = "05_2D_UI_Icons_Fonts/Pixel_Fonts/m5x7.ttf"
 
 # ---------------------------------------------------------------------------
 # SPRITES: key -> spec. Every sprite ends up as a horizontal strip.
@@ -227,17 +225,12 @@ CREDITS = [
     ["Ikonok", "Addin's RPG Icon Packs: Addin"],
     ["Effektek", "Effect and FX Pixel"],
     ["Égbolt", "Free Sky with Clouds: CraftPix.net"],
-    ["Betűtípus", "m5x7: Daniel Linssen"],
+    ["Betűtípus", "Andika (SIL), Atkinson Hyperlegible, Lexend: OFL 1.1"],
     ["Zene", "Music by Clement Panchout"],
     ["Hangok", "Pixel Combat SFX: Helton Yan"],
     ["Hangok", "Super Dialogue: Dillon Becker, CC BY 4.0"],
     ["Motor", "Phaser 3 (phaser.io), MIT licence"],
 ]
-
-FONT_CHARS = (
-    "".join(chr(c) for c in range(32, 127))
-    + "áéíóöőúüűÁÉÍÓÖŐÚÜŰ·×€°"
-)
 
 # ---------------------------------------------------------------------------
 
@@ -316,79 +309,6 @@ def recolour(img, hue_deg, sat, val):
 
 
 # ---------------------------------------------------------------------------
-# Font: m5x7 baked to a bitmap font. ő ű Ő Ű get redrawn double acutes.
-# ---------------------------------------------------------------------------
-PATCH = {"ő": "ö", "ű": "ü", "Ő": "Ö", "Ű": "Ü"}
-
-
-def glyph_bitmap(font, c):
-    def raw(ch):
-        im = Image.new("L", (12, 16), 0)
-        d = ImageDraw.Draw(im)
-        d.fontmode = "1"
-        d.text((1, 0), ch, font=font, fill=255)
-        return [[im.getpixel((x, y)) > 0 for x in range(12)] for y in range(16)]
-    if c in PATCH:
-        b = raw(PATCH[c])
-        rows = [y for y in range(16) if any(b[y])]
-        top = rows[0]
-        b[top] = [False] * 12           # remove the two dots
-        b[top][2] = b[top][4] = True    # lower half of the double acute
-        b[top - 1][3] = b[top - 1][5] = True  # upper half, shifted right
-        return b
-    return raw(c)
-
-
-def build_font(lib):
-    font = ImageFont.truetype(os.path.join(lib, FONT), 16)
-    chars = FONT_CHARS
-    cols = 16
-    rows = (len(chars) + cols - 1) // cols
-    CW, CH = 14, 18          # cell with 1 px padding for the outline variant
-    plain = Image.new("RGBA", (cols * CW, rows * CH))
-    outl = Image.new("RGBA", (cols * CW, rows * CH))
-    meta = []
-    for i, c in enumerate(chars):
-        b = glyph_bitmap(font, c)
-        cx, cy = (i % cols) * CW, (i // cols) * CH
-        on = [(x, y) for y in range(16) for x in range(12) if b[y][x]]
-        for x, y in on:
-            plain.putpixel((cx + 1 + x, cy + 1 + y), (255, 255, 255, 255))
-        # outline: dark pixels around every lit pixel
-        lit = set(on)
-        for x, y in on:
-            for dx in (-1, 0, 1):
-                for dy in (-1, 0, 1):
-                    q = (x + dx, y + dy)
-                    if q not in lit:
-                        outl.putpixel((cx + 1 + q[0], cy + 1 + q[1]), (43, 26, 20, 255))
-        for x, y in on:
-            outl.putpixel((cx + 1 + x, cy + 1 + y), (255, 255, 255, 255))
-        if c == " ":
-            adv = 4
-        else:
-            xs = [x for x, _ in on]
-            adv = (max(xs) + 1) if xs else 4   # glyph starts at x=1 inside its 12 px box
-        meta.append((c, cx, cy, adv))
-    os.makedirs(os.path.join(OUT, "fonts"), exist_ok=True)
-    for name, img in (("m5x7", plain), ("m5x7o", outl)):
-        img.save(os.path.join(OUT, "fonts", name + ".png"))
-        lines = ['<?xml version="1.0"?>', "<font>",
-                 '<info face="%s" size="16"/>' % name,
-                 '<common lineHeight="13" base="12" scaleW="%d" scaleH="%d" pages="1"/>' % (img.width, img.height),
-                 '<pages><page id="0" file="%s.png"/></pages>' % name,
-                 '<chars count="%d">' % len(meta)]
-        for c, cx, cy, adv in meta:
-            lines.append('<char id="%d" x="%d" y="%d" width="%d" height="%d" xoffset="-1" yoffset="-3" xadvance="%d" page="0" chnl="15"/>'
-                         % (ord(c), cx, cy, CW, CH, adv))
-        lines += ["</chars>", "</font>"]
-        with open(os.path.join(OUT, "fonts", name + ".xml"), "w", encoding="utf-8") as f:
-            f.write("\n".join(lines))
-    shutil.copy(os.path.join(lib, FONT), os.path.join(OUT, "fonts", "m5x7.ttf"))
-    log("font: %d glyphs" % len(meta))
-
-
-# ---------------------------------------------------------------------------
 
 def to_mp3(src, dst, bitrate, mono=False, trim=False):
     # -map 0:a drops embedded cover images (some WAVs carry one, which bloats the MP3)
@@ -464,9 +384,8 @@ def main():
         manifest["backdrops"][name] = urls
     log("backdrops:", ", ".join(BACKDROPS))
 
-    build_font(lib)
-    for name in ("m5x7", "m5x7o"):
-        manifest["fonts"][name] = dict(png="assets/fonts/%s.png" % name, xml="assets/fonts/%s.xml" % name)
+    # Text uses the Andika font (SIL, OFL), embedded in assets/fonts/andika.js.
+    # It is not part of the asset library, so this script leaves it alone.
 
     os.makedirs(os.path.join(OUT, "audio"), exist_ok=True)
     for key, src in SOUNDS.items():

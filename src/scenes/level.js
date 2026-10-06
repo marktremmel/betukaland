@@ -163,8 +163,8 @@ BK.LevelScene = class extends Phaser.Scene {
     if (this.profile.settings.speedRun) {
       this.timerText = BK.ui.text(this, BK.W - 6, 16, '0.0', { origin: [1, 0], color: 0xffd23c }).setDepth(260);
     }
-    this.pauseBtn = BK.ui.text(this, 6, 18, 'Esc: szünet', { color: 0xfff2dc }).setDepth(260).setAlpha(0.7);
-    if (BK.DEBUG) BK.ui.text(this, 6, 29, 'TESZT: Tab = szó kész, Ctrl+Enter = pálya kész', { color: 0xff9a7a }).setDepth(260);
+    this.pauseBtn = BK.ui.text(this, 6, 18, BK.L('Esc: szünet', 'Esc: pause'), { color: 0xfff2dc }).setDepth(260).setAlpha(0.7);
+    if (BK.DEBUG) BK.ui.text(this, 6, 29, BK.L('TESZT: Tab = szó kész, Ctrl+Enter = pálya kész', 'TEST: Tab = word done, Ctrl+Enter = level done'), { color: 0xff9a7a }).setDepth(260);
   }
 
   addCoins(n) {
@@ -368,7 +368,7 @@ BK.LevelScene = class extends Phaser.Scene {
     var now = performance.now();
     if (this.shiftTipAt && now - this.shiftTipAt < 20000) return;
     this.shiftTipAt = now;
-    BK.ui.toast(this, BK.W / 2, 92, want === 'ShiftRight' ? 'Tipp: ehhez a jobb oldali Shift kell!' : 'Tipp: ehhez a bal oldali Shift kell!', 0xffd23c);
+    BK.ui.toast(this, BK.W / 2, 92, want === 'ShiftRight' ? BK.L('Tipp: ehhez a jobb oldali Shift kell!', 'Tip: use the right Shift for this one!') : BK.L('Tipp: ehhez a bal oldali Shift kell!', 'Tip: use the left Shift for this one!'), 0xffd23c);
   }
 
   // Test mode (?debug): Tab finishes the current word, Ctrl+Enter ends the level
@@ -430,7 +430,7 @@ BK.LevelScene = class extends Phaser.Scene {
     this.tweens.pauseAll(); this.anims.pauseAll();
     var shade = this.add.rectangle(0, 0, BK.W, BK.H, 0x000000, 0.45).setOrigin(0, 0).setDepth(900);
     var panel = BK.ui.nine(this, 122, 40, 140, 112, 'ui_panel2').setDepth(901);
-    var t = BK.ui.text(this, 192, 70, 'Szünet', { outline: false, size: 2, origin: [0.5, 0.5] }).setDepth(902);
+    var t = BK.ui.text(this, 192, 70, BK.L('Szünet', 'Paused'), { outline: false, size: 2, origin: [0.5, 0.5] }).setDepth(902);
     var b1 = BK.ui.button(this, 192, 96, 'Folytatom', function () { s.togglePause(); }, { w: 90 }).setDepth(902);
     var b2 = BK.ui.button(this, 192, 120, BK.T.map, function () { s.scene.start('Map'); }, { w: 90 }).setDepth(902);
     this.pauseUi = [shade, panel, t, b1, b2, b1.zone, b2.zone];

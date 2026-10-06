@@ -33,7 +33,7 @@ BK.PlacementScene = class extends Phaser.Scene {
     this.keep(BK.ui.text(this, 192, 44, BK.T.placeTitle, { outline: false, size: 2, origin: [0.5, 0.5] }));
     this.keep(BK.ui.text(this, 192, 72, BK.T.placeIntro, { outline: false, origin: [0.5, 0.5], width: 220, align: 1 }));
     this.keep(BK.ui.button(this, 140, 104, BK.T.start + ' (Enter)', function () { s.startStage(0); }, { w: 96 }));
-    this.keep(BK.ui.button(this, 248, 104, 'Kihagyom', function () { s.finish(1); }, { w: 80 }));
+    this.keep(BK.ui.button(this, 248, 104, BK.L('Kihagyom', 'Skip'), function () { s.finish(1); }, { w: 80 }));
   }
 
   startStage(i) {
@@ -118,7 +118,7 @@ BK.PlacementScene = class extends Phaser.Scene {
     var reg = BK.REGIONS[Math.min(7, region) - 1];
     this.keep(BK.ui.text(this, 192, 60, region + '. ' + reg.name, { outline: false, size: 2, origin: [0.5, 0.5], color: 0x9a3d1a }));
     if (!reg.playable) {
-      this.keep(BK.ui.text(this, 192, 80, 'Ez a vidék még épül. Addig gyakorolj a Napos réten!', { outline: false, origin: [0.5, 0.5], width: 220, align: 1, color: 0x6b3a20 }));
+      this.keep(BK.ui.text(this, 192, 80, BK.L('Ez a vidék még épül. Addig gyakorolj a Napos réten!', 'This region is still being built. Practise in the Sunny Meadow until then!'), { outline: false, origin: [0.5, 0.5], width: 220, align: 1, color: 0x6b3a20 }));
     }
     this.keep(BK.ui.button(this, 192, 104, BK.T.map + ' (Enter)', function () { s.goMap(); }, { w: 96 }));
   }

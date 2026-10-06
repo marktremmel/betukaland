@@ -20,6 +20,9 @@ Licences: several asset packs (Berie's Adventure, Crabby Beach, Helton Yan's SFX
 index.html, style.css     page and HTML overlays
 src/config.js             regions, keys, fingers, stars, speed targets, shop
 src/strings_hu.js         every child-facing text (Hungarian)
+src/strings_en.js         the same in English
+src/i18n.js               interface language switch, English names
+assets/fonts/fonts.js     Andika, Atkinson Hyperlegible, Lexend (embedded, OFL)
 src/wordbank.js           filters words by unlocked keys; phases; adaptive picks
 src/adaptive.js           per-key accuracy and speed
 src/save.js               localStorage profiles, save codes, save files

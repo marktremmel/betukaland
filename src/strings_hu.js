@@ -1,8 +1,9 @@
 /*
  * All child-facing text, in Hungarian. Keep it short: the screen is small and
- * the readers are 8-12. Teacher screens (HTML overlays) are in English.
+ * the readers are 8-12. English versions: strings_en.js (same keys).
+ * Teacher screens (HTML overlays) are in English.
  */
-BK.T = {
+BK.STR.hu = {
   title: 'Betűkaland',
   subtitle: 'Typing Adventure',
   pressKey: 'Nyomj meg egy gombot!',
@@ -107,11 +108,14 @@ BK.T = {
   sound: 'Hangok',
   speedRun: 'Gyorsasági mód',
   wordLang: 'Szavak nyelve',
+  uiLang: 'Nyelv',
+  font: 'Betűtípus',
   on: 'Be',
   off: 'Ki',
 
   saved: 'Mentve',
   creditsTitle: 'Készítők',
+  language: 'English',
 };
 
 BK.pick = function (arr) { return arr[Math.floor(Math.random() * arr.length)]; };

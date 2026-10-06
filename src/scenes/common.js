@@ -7,7 +7,30 @@ BK.state = { profile: null };
 
 BK.setProfile = function (p) {
   BK.state.profile = p;
-  if (p) { BK.save.setLast(p.id); BK.audio.apply(p.settings); }
+  if (p) {
+    BK.save.setLast(p.id); BK.audio.apply(p.settings);
+    // each child keeps the interface language they chose
+    if (p.settings.ui) BK.applyUiLang(p.settings.ui, null);
+    else { p.settings.ui = BK.uiLang; BK.save.persist(); }
+    if (p.settings.font) BK.applyFont(p.settings.font, null);
+    else { p.settings.font = BK.fontId; BK.save.persist(); }
+  }
+};
+
+// Switch the font (Settings) and remember it, like the language
+BK.applyFont = function (id, p) {
+  if (!BK.FONTS.some(function (f) { return f.id === id; })) id = BK.FONTS[0].id;
+  BK.fontId = id;
+  var ov = document.getElementById('overlay'); if (ov) ov.style.fontFamily = BK.FONT;
+  if (p) p.settings.font = id;
+  BK.save.font(id);
+};
+
+// Switch the interface language and remember it (on this computer and, if given, for the child)
+BK.applyUiLang = function (lang, p) {
+  BK.setUiLang(lang);
+  if (p) p.settings.ui = BK.uiLang;
+  BK.save.uiLang(BK.uiLang);
 };
 
 // Sky + ground + a few trees; optional running bunny

@@ -36,9 +36,9 @@ BK.ProfilesScene = class extends Phaser.Scene {
       } else {
         var av = BK.avatarSprite(s, x + 39, y + 44, it.p.avatar, it.p);
         s.cards.push(av);
-        s.cards.push(BK.ui.text(s, x + 39, y + 48, it.p.nick, { outline: false, origin: [0.5, 0] }));
-        s.cards.push(s.add.image(x + 30, y + 64, 'star_on'));
-        s.cards.push(BK.ui.text(s, x + 38, y + 58, String(BK.save.totalStars(it.p)), { outline: false }));
+        s.cards.push(BK.ui.text(s, x + 39, y + 45, it.p.nick, { outline: false, origin: [0.5, 0] }));
+        s.cards.push(s.add.image(x + 30, y + 63, 'star_on'));
+        s.cards.push(BK.ui.text(s, x + 38, y + 63, String(BK.save.totalStars(it.p)), { outline: false, origin: [0, 0.5] }));
       }
       var z = s.add.zone(x + 39, y + 36, 78, 72).setInteractive({ useHandCursor: true });
       s.cards.push(z);
@@ -108,7 +108,7 @@ BK.NewProfileScene = class extends Phaser.Scene {
           if (s.avatar === i) s.nextStep(); else { s.avatar = i; s.draw(); }
         });
       });
-      this.keep(BK.ui.text(this, 172, 186, '<- -> és Enter', { origin: [0.5, 0.5], color: 0xfff2dc }));
+      this.keep(BK.ui.text(this, 172, 186, BK.L('<- -> és Enter', '<- -> and Enter'), { origin: [0.5, 0.5], color: 0xfff2dc }));
       this.keep(BK.ui.button(this, 300, 186, BK.T.next, function () { s.nextStep(); }, { w: 64, h: 16 }));
     } else if (this.step === 2) {
       this.keep(BK.ui.text(this, 192, 54, BK.T.chooseGrade, { outline: false, size: 2, origin: [0.5, 0.5] }));
@@ -158,7 +158,9 @@ BK.NewProfileScene = class extends Phaser.Scene {
     BK.audio.sfx('chime');
     this.step++;
     if (this.step > 3) {
-      var p = BK.save.add(BK.save.newProfile(this.nick, this.avatar, this.grade, this.lang));
+      var p = BK.save.newProfile(this.nick, this.avatar, this.grade, this.lang);
+      p.settings.ui = BK.uiLang;
+      BK.save.add(p);
       BK.setProfile(p);
       this.scene.start('Placement');
       return;

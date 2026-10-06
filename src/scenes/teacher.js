@@ -1,7 +1,7 @@
 /*
  * HTML screens: save code / save file, and the teacher screen.
  * Teacher-facing text is in English; the save-code screen (children use it)
- * is in Hungarian.
+ * follows the interface language.
  */
 
 BK.SaveCodeUI = {
@@ -9,19 +9,19 @@ BK.SaveCodeUI = {
     var esc = BK.html.esc, html = '';
     if (profile) {
       var code = BK.save.encode(profile);
-      html += '<h2>Mentőkód</h2>' +
-        '<p>Írd le vagy másold ki ezt a kódot. Egy másik gépen a „Mentőkód” gombbal folytathatod a játékot.</p>' +
+      html += '<h2>' + BK.L('Mentőkód', 'Save code') + '</h2>' +
+        '<p>' + BK.L('Írd le vagy másold ki ezt a kódot. Egy másik gépen a „Mentőkód” gombbal folytathatod a játékot.', 'Write down or copy this code. On another computer, press “Save code” to carry on playing.') + '</p>' +
         '<div class="code" id="bk-code">' + esc(code) + '</div>' +
-        '<div class="row"><button id="bk-copy">Másolás</button><button id="bk-dl">Mentés fájlba</button></div>' +
-        '<p class="small">A fájl mindent megőriz. A kód a haladást, az érméket, a ruhákat és a gyengébb billentyűket.</p><hr>';
+        '<div class="row"><button id="bk-copy">' + BK.L('Másolás', 'Copy') + '</button><button id="bk-dl">' + BK.L('Mentés fájlba', 'Save to file') + '</button></div>' +
+        '<p class="small">' + BK.L('A fájl mindent megőriz. A kód a haladást, az érméket, a ruhákat és a gyengébb billentyűket.', 'The file keeps everything. The code keeps your progress, coins, outfits and the keys you find harder.') + '</p><hr>';
     }
-    html += '<h2>Betöltés</h2>' +
-      '<p>Másold be a kódot, vagy válaszd ki a mentett fájlt.</p>' +
-      '<textarea id="bk-in" rows="2" placeholder="pl. 4ABC-D12E-..."></textarea>' +
-      '<div class="row"><button id="bk-load">Kód betöltése</button><button id="bk-file">Fájl megnyitása</button>' +
+    html += '<h2>' + BK.L('Betöltés', 'Load') + '</h2>' +
+      '<p>' + BK.L('Másold be a kódot, vagy válaszd ki a mentett fájlt.', 'Paste your code, or choose your save file.') + '</p>' +
+      '<textarea id="bk-in" rows="2" placeholder="' + BK.L('pl.', 'e.g.') + ' 4ABC-D12E-..."></textarea>' +
+      '<div class="row"><button id="bk-load">' + BK.L('Kód betöltése', 'Load code') + '</button><button id="bk-file">' + BK.L('Fájl megnyitása', 'Open file') + '</button>' +
       '<input type="file" id="bk-fileinput" accept=".json,application/json" style="display:none"></div>' +
       '<p id="bk-msg" class="msg"></p>' +
-      '<div class="row"><button id="bk-close" class="secondary">Bezárás</button></div>';
+      '<div class="row"><button id="bk-close" class="secondary">' + BK.L('Bezárás', 'Close') + '</button></div>';
     var el = BK.html.show(html);
     var msg = function (t, ok) { var m = el.querySelector('#bk-msg'); m.textContent = t; m.className = 'msg ' + (ok ? 'ok' : 'err'); };
     var finish = function () { BK.html.hide(); if (onDone) onDone(); };
@@ -29,12 +29,12 @@ BK.SaveCodeUI = {
       el.querySelector('#bk-copy').onclick = function () {
         var c = el.querySelector('#bk-code').textContent;
         if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText(c).then(function () { msg('Kimásolva!', true); }, function () { msg('Jelöld ki és másold ki kézzel.', false); });
-        } else msg('Jelöld ki és másold ki kézzel.', false);
+          navigator.clipboard.writeText(c).then(function () { msg(BK.L('Kimásolva!', 'Copied!'), true); }, function () { msg(BK.L('Jelöld ki és másold ki kézzel.', 'Select it and copy it by hand.'), false); });
+        } else msg(BK.L('Jelöld ki és másold ki kézzel.', 'Select it and copy it by hand.'), false);
       };
       el.querySelector('#bk-dl').onclick = function () {
         BK.util.download('betukaland-' + profile.nick.replace(/[^\p{L}0-9]+/gu, '_') + '-' + BK.util.today() + '.json', BK.save.toFile(profile), 'application/json');
-        msg('Fájl letöltve.', true);
+        msg(BK.L('Fájl letöltve.', 'File downloaded.'), true);
       };
     }
     var importProfile = function (p) {
@@ -50,19 +50,19 @@ BK.SaveCodeUI = {
         BK.save.add(p);
       }
       BK.setProfile(p);
-      msg('Betöltve: ' + p.nick, true);
+      msg(BK.L('Betöltve: ', 'Loaded: ') + p.nick, true);
       setTimeout(finish, 700);
     };
     el.querySelector('#bk-load').onclick = function () {
       try { importProfile(BK.save.decode(el.querySelector('#bk-in').value)); }
-      catch (e) { msg('Ez a kód nem jó. Nézd át még egyszer!', false); }
+      catch (e) { msg(BK.L('Ez a kód nem jó. Nézd át még egyszer!', 'This code is not right. Check it once more!'), false); }
     };
     var fi = el.querySelector('#bk-fileinput');
     el.querySelector('#bk-file').onclick = function () { fi.click(); };
     fi.onchange = function () {
       var f = fi.files[0]; if (!f) return;
       f.text().then(function (t) {
-        try { importProfile(BK.save.fromFile(t)); } catch (e) { msg('Ez nem Betűkaland mentés.', false); }
+        try { importProfile(BK.save.fromFile(t)); } catch (e) { msg(BK.L('Ez nem Betűkaland mentés.', 'This is not a Typing Adventure save file.'), false); }
       });
     };
     el.querySelector('#bk-close').onclick = finish;

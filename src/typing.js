@@ -9,49 +9,48 @@ BK.WordBubble = class {
     this.scene = scene;
     this.text = text;
     this.i = 0;
-    var size = opts.size || (text.length <= 14 ? 2 : 1);
-    this.size = size;
+    // big letters for words, slightly smaller for sentences (they wrap to two lines)
+    var px = opts.px || (text.length <= 14 ? 22 : 16);
+    this.px = px;
+    this.size = px / 11;
     var maxW = opts.maxWidth || 300;
     this.c = scene.add.container(x, y).setDepth(200);
     this.chars = [];
-    // lay out characters, wrapping at spaces if too wide
-    var adv = function (ch) {
-      var d = scene.cache.bitmapFont.get('m5x7').data.chars[ch.charCodeAt(0)];
-      return (d ? d.xAdvance : 5) * size;
-    };
+    var adv = function (str) { return BK.ui.measure(str, px, true); };
+    // lay out words into lines, wrapping at spaces if too wide
     var words = text.split(' '), lines = [[]], lineW = [0], spaceW = adv(' ');
-    words.forEach(function (w, wi) {
-      var ww = 0; for (var k = 0; k < w.length; k++) ww += adv(w[k]);
-      var cur = lines.length - 1;
+    words.forEach(function (w) {
+      var ww = adv(w), cur = lines.length - 1;
       if (lineW[cur] > 0 && lineW[cur] + spaceW + ww > maxW) { lines.push([]); lineW.push(0); cur++; }
-      if (lineW[cur] > 0 || wi > 0 && lines[cur].length === 0 && cur === 0) { /* noop */ }
       lines[cur].push(w);
-      lineW[cur] += (lines[cur].length > 1 ? spaceW : 0) + ww;
+      lineW[cur] = adv(lines[cur].join(' '));
     });
-    var lineH = 13 * size, W = Math.max.apply(null, lineW) + 10, H = lines.length * lineH + 6;
+    var lineH = Math.round(px * 1.3), W = Math.ceil(Math.max.apply(null, lineW)) + 14, H = lines.length * lineH + 8;
     this.w = W; this.h = H;
     var g = scene.add.graphics();
     g.fillStyle(0x5a3426, 1).fillRoundedRect(-W / 2 - 1, -H - 1, W + 2, H + 2, 4);
     g.fillStyle(0xfffaeb, 1).fillRoundedRect(-W / 2, -H, W, H, 3);
     var tail = scene.add.image(0, 3, 'tail').setOrigin(0.5, 1);
     this.c.add([g, tail]);
-    this.under = scene.add.rectangle(0, 0, 4, size, 0xe0742c).setOrigin(0, 0);
-    var self = this, idx = 0;
+    this.under = scene.add.rectangle(0, 0, 4, Math.max(2, Math.round(px / 9)), 0xe0742c).setOrigin(0, 0);
+    var self = this;
     lines.forEach(function (line, li) {
-      var lx = -lineW[li] / 2, ly = -H + 3 + li * lineH;
+      var x0 = -lineW[li] / 2, ly = -H + 4 + li * lineH;
       var str = line.join(' ');
+      // x of every letter from the width of the text before it (keeps the font's spacing)
       for (var k = 0; k < str.length; k++) {
-        var ch = str[k];
-        var t = scene.add.bitmapText(lx, ly - 2 * size, 'm5x7', ch, 16).setScale(size).setTint(0x4a2c1c);
-        t.baseY = t.y;
-        self.c.add(t);
-        self.chars.push({ t: t, ch: ch, x: lx, y: ly, w: adv(ch) });
-        lx += adv(ch);
-        idx++;
+        var ch = str[k], lx = x0 + adv(str.slice(0, k)), cw = adv(str.slice(0, k + 1)) - adv(str.slice(0, k));
+        var t = null;
+        if (ch !== ' ') {
+          t = BK.ui.text(scene, lx, ly, ch, { outline: false, px: px, bold: true, color: 0x4a2c1c });
+          t.baseY = t.y;
+          self.c.add(t);
+        }
+        self.chars.push({ t: t, ch: ch, x: lx, y: ly, w: cw });
       }
       // the space between lines is still a character to type
       if (li < lines.length - 1) {
-        self.chars.push({ t: null, ch: ' ', x: lx, y: ly, w: spaceW });
+        self.chars.push({ t: null, ch: ' ', x: x0 + lineW[li], y: ly, w: spaceW });
       }
     });
     this.c.add(this.under);
@@ -67,8 +66,8 @@ BK.WordBubble = class {
     var c = this.chars[this.i];
     if (!c) { this.under.setVisible(false); return; }
     this.under.setVisible(true);
-    this.under.x = c.x; this.under.y = c.y + 10 * this.size;
-    this.under.width = Math.max(2, c.w - this.size);
+    this.under.x = c.x + 0.5; this.under.y = c.y + Math.round(this.px * 1.12);
+    this.under.width = Math.max(3, c.w - 1);
   }
 
   // returns true if the key was correct

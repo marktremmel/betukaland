@@ -1,5 +1,5 @@
 /*
- * UI helpers: pixel text, 9-slice wood panels, buttons, stars, toasts.
+ * UI helpers: text, 9-slice wood panels, buttons, stars, toasts.
  * Everything is drawn in base resolution (384x216) and scaled by the camera.
  */
 BK.ui = {};
@@ -51,21 +51,46 @@ BK.ui.nine = function (scene, x, y, w, h, key) {
 };
 
 /**
- * Pixel text. opts: { size: 1|2|3, color: 0xffffff, outline: true, align: 0|1|2, origin: [x,y], width }
- * Outlined text (default) reads on any background; plain text is for panels.
+ * Text in the chosen font (BK.FONT; Andika by default: made for children
+ * learning to read, every Hungarian letter, clear I/l/1, single-storey a and g).
+ * opts: { size: 1|2|3|4, px (exact size), bold,
+ *         color: 0xffffff, outline: true, align: 0|1|2, origin: [x,y], width }
+ * Outlined text (default) reads on any background; outline: false is for panels.
+ * Rendered at BK.RES, so it stays sharp at any zoom.
  */
+BK.ui.PX = 11;
 BK.ui.text = function (scene, x, y, str, opts) {
   opts = opts || {};
-  var font = opts.outline === false ? 'm5x7' : 'm5x7o';
-  var t = scene.add.bitmapText(x, y, font, str, 16, opts.align || 0);
-  t.setScale(opts.size || 1);
+  var size = opts.size || 1;
+  // size 1 = 11 px body text, 2 = 16 px headings, 3 = 24, 4 = 32 (titles)
+  var px = opts.px || (size === 1 ? BK.ui.PX : 8 * size);
+  var outline = opts.outline !== false;
+  var bold = opts.bold !== undefined ? opts.bold : (size >= 2 || outline);
+  var style = {
+    fontFamily: BK.FONT, fontSize: px + 'px', fontStyle: bold ? 'bold' : 'normal', color: '#ffffff',
+    align: ['left', 'center', 'right'][opts.align || 0],
+  };
+  if (outline) { style.stroke = '#2b1a14'; style.strokeThickness = Math.max(2, Math.round(px / 6)); }
+  if (opts.width) style.wordWrap = { width: opts.width, useAdvancedWrap: true };
+  var t = scene.add.text(x, y, str, style);
+  t.setResolution(BK.RES || 1);
+  t.setLineSpacing(-Math.round(px * 0.22));
   if (opts.color !== undefined) t.setTint(opts.color);
-  else if (opts.outline === false) t.setTint(0x4a2c1c);
+  else if (!outline) t.setTint(0x4a2c1c);
   var o = opts.origin || [0, 0];
   t.setOrigin(o[0], o[1]);
-  if (opts.width) t.setMaxWidth(opts.width / (opts.size || 1));
   return t;
 };
+
+// Width of a string in the game font (world pixels)
+BK.ui.measure = (function () {
+  var ctx = null;
+  return function (str, px, bold) {
+    if (!ctx) ctx = document.createElement('canvas').getContext('2d');
+    ctx.font = (bold ? 'bold ' : '') + px + 'px ' + BK.FONT;
+    return ctx.measureText(str).width;
+  };
+})();
 
 /**
  * Wood button. (x, y) is the centre. opts: { w, h, small, key (keyboard key name
@@ -77,7 +102,8 @@ BK.ui.button = function (scene, x, y, label, onClick, opts) {
   var c = scene.add.container(x - w / 2, y - h / 2);
   var up = BK.ui.nine(scene, 0, 0, w, h, 'ui_btn');
   var down = BK.ui.nine(scene, 0, 1, w, h - 1, 'ui_btn_down').setVisible(false);
-  var txt = BK.ui.text(scene, w / 2, h / 2 - 1, label, { outline: false, origin: [0.5, 0.5], color: opts.color || 0x4a2c1c });
+  var lift = h >= 18 ? 3 : (h >= 16 ? 1 : 0);      // the font's accent room sits above the letters
+  var txt = BK.ui.text(scene, w / 2, h / 2 - lift, label, { outline: false, origin: [0.5, 0.5], color: opts.color || 0x4a2c1c });
   c.add([up, down, txt]);
   c.setSize(w, h);
   var zone = scene.add.zone(x, y, w, h).setInteractive({ useHandCursor: true });
@@ -86,9 +112,9 @@ BK.ui.button = function (scene, x, y, label, onClick, opts) {
   var press = function () {
     if (c.disabled) return;
     BK.audio.sfx('ui');
-    up.setVisible(false); down.setVisible(true); txt.y = h / 2;
+    up.setVisible(false); down.setVisible(true); txt.y = h / 2 - lift + 1;
     scene.time.delayedCall(90, function () {
-      up.setVisible(true); down.setVisible(false); txt.y = h / 2 - 1;
+      up.setVisible(true); down.setVisible(false); txt.y = h / 2 - lift;
       onClick();
     });
   };

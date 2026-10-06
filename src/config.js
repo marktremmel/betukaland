@@ -6,7 +6,7 @@
  */
 window.BK = window.BK || {};
 
-BK.VERSION = '0.4.1';
+BK.VERSION = '0.5.0';
 
 // Test mode for the teacher: open the game with ?debug at the end of the address.
 // Every region and level is open; in a level Tab finishes the current word and
@@ -114,6 +114,19 @@ BK.speedTarget = function (band, regionId) {
 // Placement test: pass a stage with this accuracy (and minimum WPM by band)
 BK.PLACEMENT_ACC = 0.9;
 BK.PLACEMENT_WPM = { '3-4': 4, '5-6': 6 };
+
+// Fonts a child can choose in Settings. All three have every Hungarian letter.
+// The files are embedded in assets/fonts/fonts.js (key = id).
+BK.FONTS = [
+  { id: 'andika', name: 'Andika', family: 'Andika' },                       // made for beginning readers (default)
+  { id: 'atkinson', name: 'Atkinson', family: 'Atkinson Hyperlegible' },    // maximum legibility, low vision
+  { id: 'lexend', name: 'Lexend', family: 'Lexend' },                       // wide, airy letters for reading fluency
+];
+BK.fontId = 'andika';
+Object.defineProperty(BK, 'FONT', { get: function () {
+  var f = BK.FONTS.filter(function (x) { return x.id === BK.fontId; })[0] || BK.FONTS[0];
+  return '"' + f.family + '", "Trebuchet MS", Verdana, sans-serif';
+} });
 
 // Scene music
 BK.MUSIC = { title: 'm_title', map: 'm_map', boss: 'm_boss', chill: 'm_chill', test: 'm_test' };

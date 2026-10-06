@@ -6,7 +6,7 @@ canvas { image-rendering: pixelated; image-rendering: crisp-edges; }
 #overlay {
   position: fixed; inset: 0; background: rgba(20, 12, 8, 0.72);
   display: flex; align-items: center; justify-content: center; z-index: 10;
-  font: 16px/1.45 -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color: #2b1a14;
+  font: 17px/1.45 Andika, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color: #2b1a14;
 }
 .ov-card {
   background: #fff4e2; max-width: min(1150px, 96vw); max-height: 90vh; overflow: auto;
@@ -30,7 +30,7 @@ canvas { image-rendering: pixelated; image-rendering: crisp-edges; }
 }
 .ov-card .row { display: flex; gap: 10px; flex-wrap: wrap; margin: 10px 0; }
 .ov-card button {
-  font: 600 16px -apple-system, "Segoe UI", Roboto, Arial, sans-serif; color: #fff; cursor: pointer;
+  font: 700 16px Andika, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; color: #fff; cursor: pointer;
   background: #2f7fe0; border: 0; padding: 9px 16px; border-radius: 4px; box-shadow: 0 3px 0 #1b4f99;
 }
 .ov-card button:active { transform: translateY(2px); box-shadow: 0 1px 0 #1b4f99; }

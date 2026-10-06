@@ -82,7 +82,7 @@ BK.levelgen = {
         if (sp.kind === 'chest') { def.texts = [picker.get(harder())]; def.item = rng.pick(BK.ITEMS).id; def.coins = 3; }
         if (sp.kind === 'gate') def.texts = [picker.get(li === 0 ? 'syllables' : 'words')];
         if (sp.kind === 'bridge') def.texts = [li === 0 ? picker.get('syllables') + ' ' + picker.get('syllables') : picker.pair()];
-        if (sp.kind === 'shop') def.texts = [lang === 'en' ? 'shop' : BK.T.shopWord];
+        if (sp.kind === 'shop') def.texts = [lang === 'en' ? 'shop' : 'bolt'];
         if (sp.kind === 'rest') {
           var pd = BK.PETS.find(function (p) { return p.id === ownedPet; }) || rng.pick(BK.PETS);
           def.pet = pd.id;
@@ -110,7 +110,7 @@ BK.levelgen = {
       var chunks = [], per = Math.ceil(sent.length / (sent.length > 4 ? 3 : 2));
       for (var i = 0; i < sent.length; i += per) chunks.push(sent.slice(i, i + per).join(' '));
       out.push({ kind: 'mini', creature: reg.mini, tint: reg.miniTint, texts: chunks, coins: 6,
-        intro: (BK.CREATURE_NAMES[reg.mini] || 'Valaki') + ' állja az utat!' });
+        intro: BK.L((BK.CREATURE_NAMES[reg.mini] || 'Valaki') + ' állja az utat!', (BK.CREATURE_NAMES[reg.mini] || 'Someone') + ' blocks the way!') });
     }
 
     var music = daily ? 'm_level3' : (reg.music ? reg.music[li % reg.music.length] : 'm_level1');
