@@ -107,47 +107,51 @@ BK.BagScene = class extends BK.OverlayBase {
 BK.SettingsScene = class extends BK.OverlayBase {
   constructor() { super('Settings'); }
   create() {
-    this.frame(BK.T.settings, 260, 196);
+    this.frame(BK.T.settings, 356, 200);
     this.draw();
   }
+  // Two columns: on/off switches on the left, choices (cycle through) on the right
   draw() {
     var s = this, P = this.P, b = this.box;
     this.clearD();
-    var rows = [
+    var toggles = [
       ['keyboard', BK.T.keyboardHints], ['fingers', BK.T.fingerColours], ['music', BK.T.music],
       ['sfx', BK.T.sound], ['speedRun', BK.T.speedRun],
     ];
-    rows.forEach(function (r, i) {
-      var y = b.y + 47 + i * 15;
-      s.keepD(BK.ui.text(s, b.x + 22, y - 4, r[1], { outline: false }));
+    toggles.forEach(function (r, i) {
+      var y = b.y + 56 + i * 22;
+      s.keepD(BK.ui.text(s, b.x + 20, y, r[1], { outline: false, origin: [0, 0.5] }));
       var on = !!P.settings[r[0]];
-      s.keepD(BK.ui.button(s, b.x + b.w - 50, y, on ? BK.T.on : BK.T.off, function () {
+      s.keepD(BK.ui.button(s, b.x + 158, y, on ? BK.T.on : BK.T.off, function () {
         P.settings[r[0]] = !P.settings[r[0]];
         BK.save.persist();
         BK.audio.apply(P.settings);
         s.draw();
-      }, { w: 44, h: 14, color: on ? 0x2e7d3e : 0x8a3a2a }));
+      }, { w: 34, h: 18, color: on ? 0x2e7d3e : 0x8a3a2a }));
     });
-    var y = b.y + 47 + rows.length * 15;
-    s.keepD(BK.ui.text(s, b.x + 22, y - 4, BK.T.wordLang, { outline: false }));
-    s.keepD(BK.ui.button(s, b.x + b.w - 50, y, P.lang === 'en' ? BK.T.langEn : BK.T.langHu, function () {
-      P.lang = P.lang === 'en' ? 'hu' : 'en'; BK.save.persist(); s.draw();
-    }, { w: 66, h: 14 }));
-    // interface language: menus and tips (Magyar / English)
-    y += 15;
-    s.keepD(BK.ui.text(s, b.x + 22, y - 4, BK.T.uiLang, { outline: false }));
-    s.keepD(BK.ui.button(s, b.x + b.w - 50, y, BK.uiLang === 'en' ? 'English' : 'Magyar', function () {
-      BK.applyUiLang(BK.uiLang === 'en' ? 'hu' : 'en', P);
-      s.scene.restart(s.data0);
-    }, { w: 66, h: 14 }));
-    // font: Andika / Atkinson / Lexend (the button shows the current one)
-    y += 15;
-    var cur = BK.FONTS.filter(function (f) { return f.id === BK.fontId; })[0] || BK.FONTS[0];
-    s.keepD(BK.ui.text(s, b.x + 22, y - 4, BK.T.font, { outline: false }));
-    s.keepD(BK.ui.button(s, b.x + b.w - 50, y, cur.name, function () {
-      var i = BK.FONTS.indexOf(cur);
-      BK.applyFont(BK.FONTS[(i + 1) % BK.FONTS.length].id, P);
-      s.scene.restart(s.data0);
-    }, { w: 66, h: 14 }));
+    var font = BK.FONTS.filter(function (f) { return f.id === BK.fontId; })[0] || BK.FONTS[0];
+    var lay = BK.layoutOf(P);
+    var choices = [
+      // word language: what the child types
+      [BK.T.wordLang, P.lang === 'en' ? BK.T.langEn : BK.T.langHu, function () { P.lang = P.lang === 'en' ? 'hu' : 'en'; BK.save.persist(); s.draw(); }],
+      // interface language: menus and tips
+      [BK.T.uiLang, BK.uiLang === 'en' ? 'English' : 'Magyar', function () { BK.applyUiLang(BK.uiLang === 'en' ? 'hu' : 'en', P); s.scene.restart(s.data0); }],
+      [BK.T.font, font.name, function () {
+        BK.applyFont(BK.FONTS[(BK.FONTS.indexOf(font) + 1) % BK.FONTS.length].id, P); s.scene.restart(s.data0);
+      }],
+      // keyboard layout of the computer: Hungarian QWERTZ or English QWERTY
+      [BK.T.kbLayout, lay.name, function () {
+        var ids = Object.keys(BK.LAYOUTS);
+        P.settings.layout = ids[(ids.indexOf(lay.id) + 1) % ids.length]; BK.setLayout(P.settings.layout); BK.save.persist(); s.draw();
+      }],
+    ];
+    choices.forEach(function (c, i) {
+      var y = b.y + 56 + i * 22;
+      s.keepD(BK.ui.text(s, b.x + 186, y, c[0], { outline: false, origin: [0, 0.5] }));
+      s.keepD(BK.ui.button(s, b.x + b.w - 50, y, c[1], c[2], { w: 70, h: 18 }));
+    });
+    if (lay.id !== 'hu') {
+      s.keepD(BK.ui.text(s, b.x + 186, b.y + 56 + 4 * 22 - 2, BK.T.kbLayoutNote, { outline: false, width: 140, px: 9, color: 0x6b3a20 }));
+    }
   }
 };

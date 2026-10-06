@@ -98,7 +98,7 @@ BK.ui.measure = (function () {
  */
 BK.ui.button = function (scene, x, y, label, onClick, opts) {
   opts = opts || {};
-  var w = opts.w || 80, h = opts.h || 20;
+  var w = opts.w || 80, h = Math.max(16, opts.h || 20);   // the wood art needs 16 px
   var c = scene.add.container(x - w / 2, y - h / 2);
   var up = BK.ui.nine(scene, 0, 0, w, h, 'ui_btn');
   var down = BK.ui.nine(scene, 0, 1, w, h - 1, 'ui_btn_down').setVisible(false);
@@ -142,10 +142,10 @@ BK.ui.stars = function (scene, x, y, n, max, spacing) {
 };
 
 // A short message that floats up and fades
-BK.ui.toast = function (scene, x, y, str, color, size) {
+BK.ui.toast = function (scene, x, y, str, color, size, hold) {
   var t = BK.ui.text(scene, x, y, str, { size: size || 1, color: color || 0xffffff, origin: [0.5, 0.5] });
   t.setDepth(500);
-  scene.tweens.add({ targets: t, y: y - 18, alpha: 0, duration: 1100, ease: 'Cubic.easeIn', onComplete: function () { t.destroy(); } });
+  scene.tweens.add({ targets: t, y: y - 18, alpha: 0, delay: hold || 0, duration: 1100, ease: 'Cubic.easeIn', onComplete: function () { t.destroy(); } });
   return t;
 };
 
@@ -178,4 +178,31 @@ BK.ui.makeTextures = function (scene) {
   draw('px', ['#'], { '#': '#ffffff' });
   // small dark speech-bubble tail
   draw('tail', ['#####', '#www#', '.#w#.', '..#..'], { '#': '#5a3426', 'w': '#fffaeb' });
+  // crown (mastery) and flame (streak)
+  var crown = [
+    '#...#...#',
+    '#y.#y#.y#',
+    '#yy#y#yy#',
+    '#yyyyyyy#',
+    '#yryyyry#',
+    '#yyyyyyy#',
+    '#########',
+  ];
+  draw('crown_on', crown, { '#': '#7a3b10', 'y': '#ffd23c', 'r': '#e04848' });
+  draw('crown_off', crown, { '#': '#5a4a44', 'y': '#a8988c', 'r': '#8a7a70' });
+  draw('flame', [
+    '...#....',
+    '..#o#...',
+    '..#oo#..',
+    '.#oyo#..',
+    '.#oyyo#.',
+    '#oyyyyo#',
+    '#oywwyo#',
+    '#oywwyo#',
+    '.#oyyo#.',
+    '..####..',
+  ], { '#': '#7a2a10', 'o': '#f07028', 'y': '#ffd23c', 'w': '#fff6c8' });
+  draw('flame_off', [
+    '...#....', '..#o#...', '..#oo#..', '.#oyo#..', '.#oyyo#.', '#oyyyyo#', '#oywwyo#', '#oywwyo#', '.#oyyo#.', '..####..',
+  ], { '#': '#5a4a44', 'o': '#8a7a70', 'y': '#a8988c', 'w': '#c8bcb4' });
 };

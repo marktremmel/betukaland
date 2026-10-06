@@ -14,7 +14,8 @@ BK.LevelScene = class extends Phaser.Scene {
     this.regionId = data.region || 1;
     this.levelIdx = data.level === undefined ? 0 : data.level;
     this.daily = this.levelIdx === 'daily';
-    this.practiceMode = (this.levelIdx === 'practice' || this.levelIdx === 'story') ? this.levelIdx : null;
+    this.practiceMode = ['practice', 'story', 'weak', 'endless'].indexOf(this.levelIdx) >= 0 ? this.levelIdx : null;
+    this.endless = this.levelIdx === 'endless';
     this.storyId = data.storyId || null;
     this.profile = BK.state.profile;
     var seed = data.seed !== undefined ? data.seed : Math.floor(Math.random() * 1e9);
@@ -36,6 +37,10 @@ BK.LevelScene = class extends Phaser.Scene {
     this.capsWarned = false;
     this.speed = 76;          // world scroll, pixels per second
     this.startedAt = 0;
+    if (this.endless) {
+      this.hearts = BK.ENDLESS.hearts;
+      this.runSpeed = BK.ENDLESS.speed0[this.profile.grade] || BK.ENDLESS.speed0['3-4'];
+    }
   }
 
   create() {
@@ -153,13 +158,20 @@ BK.LevelScene = class extends Phaser.Scene {
     this.coinIcon = this.add.sprite(12, 9, 'coin').setDepth(260); this.coinIcon.play('coin');
     this.coinText = BK.ui.text(this, 22, 3, '0', { color: 0xffe9a0 }).setDepth(260);
     var label = this.daily ? BK.T.daily : this.practiceMode === 'story' ? this.plan.storyTitle :
+      this.practiceMode === 'weak' ? BK.T.weak + ': ' + this.plan.storyTitle :
+      this.endless ? BK.T.endless + ' · 0 ' + BK.T.wordsUnit :
       this.practiceMode ? BK.T.practice + ' · ' + BK.REGIONS[this.regionId - 1].name : (BK.REGIONS[this.regionId - 1].name + ' · ' +
       (this.levelIdx === 3 ? BK.T.boss : this.regionId + '-' + (this.levelIdx + 1)));
     this.add.rectangle(BK.W / 2, 9, 140, 13, 0x2b1a14, 0.45).setDepth(259);
-    BK.ui.text(this, BK.W / 2, 3, label, { origin: [0.5, 0], color: 0xfff2dc }).setDepth(260);
+    this.hudLabel = BK.ui.text(this, BK.W / 2, 3, label, { origin: [0.5, 0], color: 0xfff2dc }).setDepth(260);
+    if (this.endless) {
+      // hearts instead of the progress track
+      this.heartIcons = [];
+      for (var h = 0; h < this.hearts; h++) this.heartIcons.push(this.add.image(BK.W - 14 - h * 14, 9, 'heart').setDepth(260));
+    }
     // progress: little flag track
-    this.progBg = this.add.rectangle(BK.W - 60, 9, 100, 4, 0x2b1a14, 0.5).setDepth(259);
-    this.progFill = this.add.rectangle(BK.W - 110, 9, 0, 4, 0x8ee07a).setOrigin(0, 0.5).setDepth(260);
+    this.progBg = this.add.rectangle(BK.W - 60, 9, 100, 4, 0x2b1a14, 0.5).setDepth(259).setVisible(!this.endless);
+    this.progFill = this.add.rectangle(BK.W - 110, 9, 0, 4, 0x8ee07a).setOrigin(0, 0.5).setDepth(260).setVisible(!this.endless);
     if (this.profile.settings.speedRun) {
       this.timerText = BK.ui.text(this, BK.W - 6, 16, '0.0', { origin: [1, 0], color: 0xffd23c }).setDepth(260);
     }
@@ -180,6 +192,8 @@ BK.LevelScene = class extends Phaser.Scene {
     var focus = BK.wordbank.focus(this.regionId).join(' ');
     var msg = this.levelIdx === 3 ? BK.T.boss + '!' : (this.daily ? BK.T.daily : BK.T.ready);
     if (this.practiceMode === 'story') msg = this.plan.storyTitle;
+    if (this.practiceMode === 'weak') msg = BK.T.weak + ': ' + this.plan.storyTitle;
+    if (this.endless) msg = BK.T.endless;
     var t = BK.ui.text(this, BK.W / 2, 60, msg, { size: 2, origin: [0.5, 0.5], color: 0xfff2dc }).setDepth(400);
     this.time.delayedCall(1100, function () {
       t.destroy();
@@ -241,6 +255,7 @@ BK.LevelScene = class extends Phaser.Scene {
   }
 
   spawnNext() {
+    if (this.endless) { this.spawnEndless(); return; }
     var def = this.queue.shift();
     if (!def) { this.endLevel(); return; }
     var Cls = BK.ENCOUNTERS[def.kind] || BK.Walker;
@@ -269,6 +284,7 @@ BK.LevelScene = class extends Phaser.Scene {
     if (this.timerText && this.startedAt && this.state !== 'end') {
       this.timerText.setText(((performance.now() - this.startedAt) / 1000).toFixed(1));
     }
+    if (this.endless) { this.updateEndless(dt); return; }
     if (this.state !== 'walk') return;
 
     var dx = this.speed * dt / 1000;
@@ -404,7 +420,62 @@ BK.LevelScene = class extends Phaser.Scene {
     }
   }
 
+  // ------------------------------------------------------------ endless road
+  // Creatures keep coming. The word shows at once and can be typed while the
+  // creature comes closer; each one comes a little faster. A creature that
+  // reaches the hero costs a heart; no hearts left ends the run.
+  spawnEndless() {
+    var def = this.plan.gen(this.wordsDone + (this.bumps || 0));
+    var Cls = BK.ENCOUNTERS[def.kind] || BK.Walker;
+    this.enc = new Cls(this, def);
+    this.enc.spawn(BK.W + 24);
+    this.enc.showChunk();
+    this.state = 'type';
+    this.hero.run();
+    this.lastKeyAt = 0; this.idleMs = 0;
+    this.refreshNext();
+  }
+
+  updateEndless(dt) {
+    if (this.state === 'end' || this.state === 'start') return;
+    var dx = this.runSpeed * dt / 1000;
+    this.ground.tilePositionX += dx;
+    this.skyLayers.forEach(function (t) { t.tilePositionX += t.speed * dx; });
+    this.decor.forEach(function (d) { d.x -= dx * d.speed; });
+    this.decor = this.decor.filter(function (d) { if (d.x < -60) { d.destroy(); return false; } return true; });
+    var maxX = Math.max.apply(null, this.decor.map(function (d) { return d.x; }).concat([0]));
+    if (maxX < BK.W + 40) this.addDecor(maxX + 70 + Math.floor(this.rng() * 90));
+    if (this.enc && this.state === 'type') {
+      this.enc.moveBy(dx);
+      var b = this.enc.bubble;
+      if (b) {
+        var half = b.w / 2 + 4;
+        b.moveTo(BK.util.clamp(this.enc.x, half, BK.W - half), Math.max(this.enc.bubbleY(), b.h + 20));
+      }
+      if (this.enc.x <= BK.HERO_X + 26) this.bump();
+    }
+  }
+
+  bump() {
+    var s = this, enc = this.enc;
+    this.state = 'finish';
+    this.bumps = (this.bumps || 0) + 1;
+    this.hearts--;
+    var icon = this.heartIcons[this.hearts];
+    if (icon) this.tweens.add({ targets: icon, alpha: 0.2, scale: 0.6, duration: 300 });
+    BK.audio.sfx('boss_hit', { volume: 0.45 });
+    this.cameras.main.shake(140, 0.003);
+    this.kb.setNext(null);
+    if (enc.bubble) { enc.bubble.destroy(true); enc.bubble = null; }
+    var after = function () {
+      enc.destroy(); s.enc = null;
+      if (s.hearts <= 0) s.endLevel(); else s.time.delayedCall(500, function () { s.spawnNext(); });
+    };
+    if (enc.spr) enc.poof(enc.spr).then(after); else after();
+  }
+
   encounterDone() {
+    if (this.endless) this.runSpeed = Math.min(BK.ENDLESS.speedMax, this.runSpeed + BK.ENDLESS.speedUp);
     var s = this, enc = this.enc;
     this.state = 'finish';
     this.wordsDone++;
@@ -415,7 +486,8 @@ BK.LevelScene = class extends Phaser.Scene {
     enc.finish().then(function () {
       enc.destroy();
       s.doneCount++;
-      s.progFill.width = 100 * s.doneCount / s.total;
+      if (s.total) s.progFill.width = 100 * s.doneCount / s.total;
+      if (s.endless) s.hudLabel.setText(BK.T.endless + ' · ' + s.wordsDone + ' ' + BK.T.wordsUnit);
       s.enc = null;
       s.time.delayedCall(250, function () { s.spawnNext(); });
     });
@@ -431,7 +503,7 @@ BK.LevelScene = class extends Phaser.Scene {
     var shade = this.add.rectangle(0, 0, BK.W, BK.H, 0x000000, 0.45).setOrigin(0, 0).setDepth(900);
     var panel = BK.ui.nine(this, 122, 40, 140, 112, 'ui_panel2').setDepth(901);
     var t = BK.ui.text(this, 192, 70, BK.L('Szünet', 'Paused'), { outline: false, size: 2, origin: [0.5, 0.5] }).setDepth(902);
-    var b1 = BK.ui.button(this, 192, 96, 'Folytatom', function () { s.togglePause(); }, { w: 90 }).setDepth(902);
+    var b1 = BK.ui.button(this, 192, 96, BK.L('Folytatom', 'Continue'), function () { s.togglePause(); }, { w: 90 }).setDepth(902);
     var b2 = BK.ui.button(this, 192, 120, BK.T.map, function () { s.scene.start('Map'); }, { w: 90 }).setDepth(902);
     this.pauseUi = [shade, panel, t, b1, b2, b1.zone, b2.zone];
   }
@@ -460,8 +532,9 @@ BK.LevelScene = class extends Phaser.Scene {
     if (acc >= BK.STARS.two) stars = 2;
     if (acc >= BK.STARS.three && wpm >= target) stars = 3;
     var bonus = stars * (this.practiceMode ? 1 : 3) + (this.levelIdx === 3 ? 10 : 0);
-    var lcode = this.daily ? -1 : this.practiceMode === 'practice' ? -2 : this.practiceMode === 'story' ? -3 : this.levelIdx;
-    var res = { r: this.regionId, l: lcode, practice: this.practiceMode, storyId: this.plan.storyId, wpm: wpm, acc: acc, stars: stars,
+    var lcode = this.daily ? -1 : ({ practice: -2, story: -3, weak: -4, endless: -5 })[this.practiceMode] || this.levelIdx;
+    var res = { r: this.regionId, l: lcode, practice: this.practiceMode, storyId: this.plan.storyId,
+      chars: st.chars, words: this.wordsDone, weakKeys: this.plan.weakKeys, wpm: wpm, acc: acc, stars: stars,
       ms: Math.round(performance.now() - this.startedAt), coins: bonus, earned: this.levelCoins + bonus, bonus: bonus,
       daily: this.daily, target: target, levelCoins: this.levelCoins };
     if (P.settings.speedRun && !this.daily && !this.practiceMode) {

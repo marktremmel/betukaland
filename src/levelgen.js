@@ -9,7 +9,7 @@
  */
 BK.levelgen = {
   build: function (regionId, levelIdx, profile, rng, opts) {
-    if (levelIdx === 'practice' || levelIdx === 'story') return this.practice(regionId, levelIdx, profile, rng, opts || {});
+    if (levelIdx === 'practice' || levelIdx === 'story' || levelIdx === 'weak' || levelIdx === 'endless') return this.practice(regionId, levelIdx, profile, rng, opts || {});
     var reg = BK.REGIONS[regionId - 1];
     var band = (profile && profile.grade) || '3-4';
     var lang = (profile && profile.lang) || 'hu';
@@ -132,8 +132,41 @@ BK.levelgen = {
     var walkers = reg.walkers.filter(function (w) { return w !== me; });
     if (!walkers.length) walkers = reg.walkers;
     var flyers = (reg.flyers || []).filter(function (w) { return w !== me; });
-    var lines = [], title = null;
-    if (mode === 'story') {
+    var lines = [], title = null, weakKeys = null;
+    var letterOk = function (c) { return c !== ' ' && /\p{L}/u.test(c); };
+    if (mode === 'endless') {
+      // no list: the Level scene asks gen(i) for the i-th creature, for ever
+      var gen = function (i) {
+        var t = picker.get(i < 8 ? 'words' : (rng.chance(0.3) ? 'pairs' : 'words'));
+        var flyer = flyers.length > 0 && rng.chance(0.2);
+        return { kind: flyer ? 'flyer' : 'walker', creature: flyer ? 'gull' : rng.pick(walkers), texts: [t], coins: 1,
+          tint: flyer ? reg.flyerTint : reg.tint };
+      };
+      return { encounters: [], gen: gen, sky: reg.sky ? rng.pick(reg.sky) : null, bdTint: null, weather: 'clear',
+        music: reg.music ? reg.music[reg.music.length - 1] : 'm_level3', practice: 'endless' };
+    }
+    if (mode === 'weak') {
+      // the child's weakest keys (from the adaptive data) that this region allows
+      weakKeys = BK.adaptive.weakest(profile, 8).filter(function (k) { return picker.set[k] && letterOk(k); }).slice(0, 3);
+      if (weakKeys.length < 2) {
+        var f0 = BK.wordbank.focus(regionId).map(function (c) { return c.toLowerCase(); }).filter(function (c) { return picker.set[c]; });
+        if (f0.length < 2) f0 = Object.keys(picker.set).filter(letterOk).filter(function (c) { return c === c.toLowerCase(); });
+        rng.shuffle(f0); weakKeys = f0.slice(0, 3);
+      }
+      var has = function (w) { return weakKeys.some(function (k) { return w.toLowerCase().indexOf(k) >= 0; }); };
+      var pool = picker.words.filter(has);
+      var V = picker.vowels.length ? picker.vowels : ['a'];
+      // two warm-up drills made of the tricky keys, then real words that contain them
+      for (var d = 0; d < 2; d++) {
+        var toks = [];
+        for (var q = 0; q < 4; q++) { var k = weakKeys[(d * 4 + q) % weakKeys.length], v = rng.pick(V); toks.push(rng.chance(0.5) ? k + v : v + k); }
+        lines.push(toks.join(' '));
+      }
+      var nw = (band === '3-4' ? 8 : 10) - 2;
+      rng.shuffle(pool);
+      for (var j = 0; j < nw; j++) lines.push(pool.length ? pool[j % pool.length] : picker.get('words'));
+      title = weakKeys.join(' ');
+    } else if (mode === 'story') {
       var lib = BK.wordbank.storyLibrary(lang);
       var st = lib.find(function (x) { return x.id === opts.storyId; }) || lib[0];
       lines = st.lines.slice(); title = st.title;
@@ -152,6 +185,6 @@ BK.levelgen = {
     var bdTint = !reg.sky && reg.bdTint && rng.chance(0.5) ? rng.pick(reg.bdTint) : null;
     return { encounters: out, sky: sky, bdTint: bdTint, weather: rng.pick(['clear', 'clear', 'leaves', 'wind']),
       music: mode === 'story' ? 'm_chill' : (reg.music ? reg.music[0] : 'm_level1'),
-      practice: mode, storyTitle: title, storyLines: mode === 'story' ? lines : null, storyId: opts.storyId || null };
+      practice: mode, storyTitle: title, storyLines: mode === 'story' ? lines : null, storyId: opts.storyId || null, weakKeys: weakKeys };
   },
 };

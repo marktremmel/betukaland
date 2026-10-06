@@ -12,7 +12,8 @@ BK.ResultsScene = class extends Phaser.Scene {
     BK.menuBackground(this, 2, { groundY: 200 });
     BK.audio.music(BK.MUSIC.map);
     BK.ui.nine(this, 16, 4, 352, 182, 'ui_panel2');
-    var head = r.daily ? BK.T.daily + BK.L(': kész!', ': done!') : r.practice === 'practice' ? BK.T.practice + BK.L(': kész!', ': done!') : BK.T.results;
+    var modeName = { practice: BK.T.practice, weak: BK.T.weak, endless: BK.T.endless }[r.practice];
+    var head = r.daily ? BK.T.daily + BK.L(': kész!', ': done!') : modeName ? modeName + BK.L(': kész!', ': done!') : BK.T.results;
     BK.ui.text(this, 192, 35, head, { outline: false, size: 2, origin: [0.5, 0.5] });
 
     // stars pop in one by one
@@ -33,6 +34,11 @@ BK.ResultsScene = class extends Phaser.Scene {
       [BK.T.speed, (Math.round(r.wpm * 10) / 10) + ' ' + BK.T.wpm],
       [BK.T.coins, '+' + (r.earned !== undefined ? r.earned : r.coins)],
     ];
+    if (r.practice === 'endless') {
+      lines.unshift([BK.T.words, String(r.words || 0)]);
+      lines.push([BK.T.record, String(Math.max(r.words || 0, r.prevEndless || 0))]);
+      if ((r.words || 0) > (r.prevEndless || 0) && r.words > 0) r.newBest = true;
+    }
     if (r.ms && P.settings.speedRun) lines.push([BK.L('Idő', 'Time'), (r.ms / 1000).toFixed(1) + BK.L(' mp', ' s') + (r.prevBestTime && r.ms < r.prevBestTime ? BK.L('  rekord!', '  record!') : '')]);
     lines.forEach(function (l, i) {
       BK.ui.text(s, 34, 88 + i * 13, l[0] + ':', { outline: false });
@@ -44,7 +50,30 @@ BK.ResultsScene = class extends Phaser.Scene {
     else if (r.stars < 2) tip = BK.L('2 csillag: ', '2 stars: ') + Math.round(BK.STARS.two * 100) + BK.L('% pontosság', '% accuracy');
     else if (r.stars < 3) tip = BK.L('3 csillag: ', '3 stars: ') + Math.round(BK.STARS.three * 100) + BK.L('% és ', '% and ') + r.target + ' ' + BK.T.wpm;
     else tip = BK.pick(BK.L(['Tökéletes!', 'Hibátlan munka!', 'Csillagos ötös!'], ['Perfect!', 'Flawless work!', 'Top marks!']));
-    BK.ui.text(this, 34, 134, tip, { outline: false, color: 0x6b3a20, width: 156 });
+    if (r.practice === 'endless') tip = '';
+    // crowns: mastery on levels of a region whose boss is beaten
+    var crownable = r.l >= 0 && r.l <= 3 && !r.daily && BK.save.regionCleared(P, r.r);
+    if (r.crownNew) {
+      var cw = this.add.image(150, 66, 'crown_on').setScale(0);
+      this.tweens.add({ targets: cw, scale: 2, delay: 1400, duration: 300, ease: 'Back.easeOut',
+        onStart: function () { BK.audio.sfx('level_up', { volume: 0.5 }); } });
+      tip = BK.T.crown;
+    } else if (crownable && r.stars >= 3 && !(P.crowns[r.r] || [])[r.l]) {
+      tip = BK.T.crownTip.replace('{a}', Math.round(BK.CROWN.acc * 100)).replace('{w}', r.target + BK.CROWN.plus);
+    }
+    BK.ui.text(this, 34, Math.max(134, 90 + lines.length * 13), tip, { outline: false, color: 0x6b3a20, width: 156 });
+    // daily goals finished by this round
+    var G = r.goals;
+    if (G && (G.done.length || G.bonus)) {
+      var msgs = G.done.map(function (t) { return BK.T.goalDone + ' ' + t + '  +' + BK.goals.GOAL_COINS; });
+      if (G.bonus) msgs.push(BK.T.goalsAll.replace('{n}', BK.goals.BONUS));
+      msgs.forEach(function (m, i) {
+        s.time.delayedCall(1600 + i * 2600, function () {
+          BK.ui.toast(s, 192, 162, m, 0xffd23c, 1, 1400);
+          BK.audio.sfx('coin', { volume: 0.5 });
+        });
+      });
+    }
     if (r.newBest) {
       var nb = BK.ui.text(this, 72, 50, BK.T.newBest, { origin: [0.5, 0.5], color: 0xffd23c });
       this.tweens.add({ targets: nb, scale: 1.2, duration: 400, yoyo: true, repeat: -1 });
@@ -79,10 +108,11 @@ BK.ResultsScene = class extends Phaser.Scene {
     var s = this;
     var again = { region: r.r, level: r.daily ? 'daily' : r.practice, storyId: r.storyId,
       seed: r.daily ? BK.util.hash('daily:' + BK.util.today()) : undefined };
-    var tab = r.daily ? 'daily' : r.practice === 'story' ? 'story' : 'sent';
+    var tab = r.daily ? 'today' : r.practice === 'story' ? 'story' : 'practice';
+    var mode = r.practice === 'practice' ? 'sent' : r.practice;
     BK.ui.button(this, 78, 196, BK.T.retry, function () { s.scene.start('Level', again); }, { w: 66, h: 18 });
     BK.ui.button(this, 192, 196, BK.T.map, function () { s.scene.start('Map'); }, { w: 66, h: 18, key: 'ESC' });
-    BK.ui.button(this, 306, 196, BK.T.next + ' (Enter)', function () { s.scene.start('Practice', { tab: tab }); }, { w: 86, h: 18, key: 'ENTER' });
+    BK.ui.button(this, 306, 196, BK.T.next + ' (Enter)', function () { s.scene.start('Practice', { tab: tab, mode: mode }); }, { w: 86, h: 18, key: 'ENTER' });
   }
 
   // WPM line + accuracy bars for the last levels

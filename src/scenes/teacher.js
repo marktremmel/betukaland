@@ -122,6 +122,8 @@ BK.TeacherScene = class extends Phaser.Scene {
       best: p.best.wpm,
       weak: BK.adaptive.weakest(p, 5).join(' '),
       coins: p.coins,
+      streak: BK.goals.streak(p), crowns: Object.keys(p.crowns || {}).reduce(function (a, r) { return a + p.crowns[r].reduce(function (x, y) { return x + y; }, 0); }, 0),
+      endless: (p.best && p.best.endless) || 0,
       last: p.lastPlayed || '',
     };
   }
@@ -130,14 +132,14 @@ BK.TeacherScene = class extends Phaser.Scene {
     var s = this, esc = BK.html.esc;
     var rows = BK.save.profiles().map(function (p) {
       var m = s.summary(p);
-      return '<tr><td>' + esc(m.nick) + '</td><td>' + m.grade + '</td><td>' + esc(m.region) + '</td><td>' + m.stars + '</td><td>' + m.levels +
+      return '<tr><td>' + esc(m.nick) + '</td><td>' + m.grade + '</td><td>' + esc(m.region) + '</td><td>' + m.stars + '</td><td>' + m.crowns + '</td><td>' + m.streak + '</td><td>' + m.levels +
         '</td><td>' + (m.levels ? m.acc + '%' : '') + '</td><td>' + (m.levels ? m.wpm : '') + '</td><td>' + m.best + '</td><td class="keys">' + esc(m.weak) +
         '</td><td>' + m.last + '</td><td><button data-code="' + p.id + '" class="mini">Code</button> <button data-del="' + p.id + '" class="mini danger">Delete</button></td></tr>';
     }).join('');
     var el = BK.html.show('<h2>Teacher screen</h2>' +
       '<p class="small">Profiles saved in this browser on this computer. Accuracy and WPM are averages of each student\'s last 10 levels. Weakest keys are the five with the lowest rolling accuracy and speed (at least 5 presses).</p>' +
-      '<div class="tablewrap"><table><thead><tr><th>Nickname</th><th>Grade</th><th>Region</th><th>Stars</th><th>Levels</th><th>Accuracy</th><th>WPM</th><th>Best WPM</th><th>Weakest keys</th><th>Last played</th><th></th></tr></thead><tbody>' +
-      (rows || '<tr><td colspan="11">No profiles yet.</td></tr>') + '</tbody></table></div>' +
+      '<div class="tablewrap"><table><thead><tr><th>Nickname</th><th>Grade</th><th>Region</th><th>Stars</th><th>Crowns</th><th>Streak</th><th>Levels</th><th>Accuracy</th><th>WPM</th><th>Best WPM</th><th>Weakest keys</th><th>Last played</th><th></th></tr></thead><tbody>' +
+      (rows || '<tr><td colspan="13">No profiles yet.</td></tr>') + '</tbody></table></div>' +
       '<p id="msg" class="msg"></p>' +
       '<div class="row"><button id="csv">Export CSV</button><button id="imp">Import save files</button><input type="file" id="fi" multiple accept=".json" style="display:none">' +
       '<button id="pin" class="secondary">Change PIN</button><button id="close" class="secondary">Close</button></div>');
@@ -168,12 +170,12 @@ BK.TeacherScene = class extends Phaser.Scene {
 
   exportCsv() {
     var s = this;
-    var head = ['nickname', 'grade', 'word_language', 'current_region', 'placement_region', 'total_stars', 'levels_played',
+    var head = ['nickname', 'grade', 'word_language', 'current_region', 'placement_region', 'total_stars', 'crowns', 'streak_days', 'endless_record', 'levels_played',
       'avg_accuracy_pct', 'avg_wpm', 'best_wpm', 'weakest_keys', 'coins', 'last_played'];
     var lines = [head.join(';')];
     BK.save.profiles().forEach(function (p) {
       var m = s.summary(p);
-      var cells = [m.nick, m.grade, m.lang, m.region, m.placed, m.stars, m.levels, m.levels ? m.acc : '', m.levels ? m.wpm : '', m.best, m.weak, m.coins, m.last];
+      var cells = [m.nick, m.grade, m.lang, m.region, m.placed, m.stars, m.crowns, m.streak, m.endless, m.levels, m.levels ? m.acc : '', m.levels ? m.wpm : '', m.best, m.weak, m.coins, m.last];
       lines.push(cells.map(function (c) {
         c = String(c);
         if (/^\d+\.\d+$/.test(c)) c = c.replace('.', ',');  // Hungarian Excel expects a decimal comma

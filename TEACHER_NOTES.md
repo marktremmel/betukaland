@@ -1,6 +1,6 @@
 # Betűkaland (Typing Adventure): teacher notes
 
-Version 0.5: all seven regions are playable, each with three levels and a boss, plus a practice corner with free sentence practice and a storybook. The menus can be Hungarian or English, and the text uses a font made for young readers (three to choose from). Title screen, player profiles with a choice of six figures, placement test, world map, shop, rest spots, results with stars and a chart, saving with a code and a file, the teacher screen with CSV export, and credits.
+Version 0.6: all seven regions are playable, each with three levels and a boss, plus a practice corner (daily goals with a streak, sentence practice, a tricky-letter drill, the endless road, and a storybook) and crowns to win on every level of a finished region. The menus can be Hungarian or English, the text uses a font made for young readers (three to choose from), and the keyboard can be Hungarian or US English. Title screen, player profiles with a choice of six figures, placement test, world map, shop, rest spots, results with stars and a chart, saving with a code and a file, the teacher screen with CSV export, and credits.
 
 ## Running it
 
@@ -51,13 +51,27 @@ Every level is assembled fresh from a seeded random generator: the creature mix,
 
 ## Practice corner (Gyakorlás)
 
-The first button on the map. Nothing here unlocks anything or can be lost; it is extra typing for children who want more, for early finishers, or for a quiet ten minutes at the start of a lesson. Three tabs (keys 1, 2, 3):
+The first button on the map. Nothing here unlocks anything; it is extra typing for children who want more, for early finishers, for a quiet ten minutes at the start of a lesson, and for children who have finished every region. Three tabs (keys 1, 2, 3):
 
-- Kihívás: the daily challenge, as before (same level for the whole class that day, in the highest region the child has open).
+- Ma (Today): three small goals for the day and the streak, plus the daily challenge (Enter).
+- Gyakorlás (Practice): pick a region with the arrow keys (it decides which letters appear), then one of three modes (up/down):
+  - Mondatok (Sentences), see below.
+  - Nehéz betűk (Tricky letters): a drill built from the child's own three weakest keys, from the same per-key data as the teacher table. Two short warm-up rows of those keys, then real words that contain them. The keys are shown before starting. A brand-new player gets the region's new keys instead.
+  - Végtelen út (Endless road): creatures keep coming, each a little faster. The word shows at once and can be typed while the creature walks closer. One that reaches the hero costs a heart; three hearts, then the run ends. The record (words in one run) is kept per child. This is the only mode where something can be "lost", so it lives here as an optional challenge, never on the main path.
 - Mondatok: short, simple sentences from any region the child has opened, chosen with the arrow keys. 8 sentences for grades 3-4, 10 for grades 5-6, one per creature, last one opens a chest. Only keys the child already knows, so a Region 1 child gets "a kék sas fél" and a Region 7 child gets "Szép a virág." A sample sentence shows before starting.
 - Történetek: the storybook. Short everyday stories (getting up in the morning, the garden, the market, school, pancakes, the park, a birthday, the shop, a trip, a hamster, the rain, drawing...) typed sentence by sentence. When the last sentence is typed, the whole story appears on one page to read back. Each story keeps its best stars. A story opens as soon as the child has every key it needs: the first four (Regions 3, no capitals yet) are written in lower case, Region 5 adds accented ones, Region 6 opens the rest. 17 Hungarian stories, 7 English ones.
 
 Practice and story results go into the child's history and the teacher table like any level, and earn a few coins, but give no map stars.
+
+## Daily goals, streak and crowns: something to do after the last boss
+
+Daily goals: every day each child gets three small goals, one "amount" goal (type 250 letters, or 400 for grades 5-6; or finish 3 rounds) and two others drawn from: get 3 stars, reach 95% accuracy, type a whole story, do the tricky-letter drill, play the daily challenge, reach 15 (25) words on the endless road. They change every day, differ between children, and anything counts, including normal levels. Each goal pays 10 coins, all three a 15-coin bonus. Progress shows on the Today tab, and the map's top bar shows how many are done (the tick, 0/3 to 3/3); clicking it opens the Today tab.
+
+Streak: the flame on the map counts the days in a row on which the child finished at least one round. A day without play starts it again from 1 (play on Monday and Wednesday: Wednesday is day 1 again), so weekends break it. That is fine: it is a nudge, not a rule, and the game never scolds. The longest streak is remembered.
+
+Crowns: once a region's boss is beaten, every level in that region (boss included) gets a crown to win: 97% accuracy and a speed 4 WPM above that level's 3-star target. Empty crowns appear next to the stars on the map and turn gold when won. The results screen tells the child what the crown needs after a 3-star round. Numbers: `BK.CROWN` in `src/config.js`.
+
+The teacher table and the CSV now also show crowns, the current streak and the endless-road record.
 
 Adding a story: in `data/words_hu.js`, add an object to `BK_STORIES_HU` with an `id`, a `title` and `lines` (one sentence per line, 4 to 6 lines). The game works out by itself which region opens it.
 
@@ -67,7 +81,7 @@ Coins from every creature, chest and boss; treasures (fruit and sweets icons) in
 
 ## Settings (per child)
 
-On-screen keyboard on or off, finger colours on or off, music, sounds, speed-run mode (a visible timer and best times, off by default; for older students), word language, interface language and font.
+Two columns. On/off: on-screen keyboard, finger colours, music, sounds, speed-run mode (a visible timer and best times, off by default; for older students). Choices (click to cycle): word language, interface language, font, keyboard (Magyar / English (US)).
 
 ## Language: menus and words are separate
 
@@ -78,7 +92,7 @@ Two different settings, so foreign students can follow the game:
 
 Any mix works: English menus with Hungarian words is the usual set-up for an international student learning Hungarian typing; Hungarian menus with English words suits a Hungarian child practising English. The teacher screen stays in English.
 
-The game still expects the Hungarian keyboard layout (the on-screen keyboard is QWERTZ, and Region 5 teaches á é í ó ö ő ú ü ű). On a machine set to a US/UK layout the child sees the "this computer does not seem to use the Hungarian layout" tip.
+The keyboard setting (Settings → Billentyűzet / Keyboard) is a third, separate choice: see Keyboards below.
 
 ## Fonts
 
@@ -102,13 +116,18 @@ If school computers wipe browser data at logout, ask students to save a code at 
 
 "Tanári" on the title screen. The first time it asks you to choose a PIN (4 to 8 digits). The PIN keeps curious students out; it is not real security. Forgot it? Add `?resetpin` to the end of the address once; the PIN is cleared and every profile stays.
 
-The table shows for every profile on this computer: grade, current region, total stars, levels played, average accuracy and WPM over the last 10 levels, best WPM, the five weakest keys, and the date last played. "Export CSV" downloads a file that opens directly in Hungarian Excel (semicolons, decimal commas, UTF-8). "Import save files" pulls in students' save files, so you can collect a class onto your own computer. Each row also shows a student's save code and has a delete button.
+The table shows for every profile on this computer: grade, current region, total stars, crowns, current streak, levels played, average accuracy and WPM over the last 10 levels, best WPM, the five weakest keys, and the date last played. "Export CSV" downloads a file that opens directly in Hungarian Excel (semicolons, decimal commas, UTF-8). "Import save files" pulls in students' save files, so you can collect a class onto your own computer. Each row also shows a student's save code and has a delete button.
 
 ## Keyboards
 
-The on-screen keyboard is the standard magyar QWERTZ: 0 left of the 1, í left of the y, é á ű at the end of the home row. The game reads the character a key produces, not its position, so it works on any computer set to the Hungarian layout, Mac or PC.
+Each child chooses the keyboard in Settings:
 
-The game notices two common problems and tells the child gently: Caps Lock left on, and a computer set to an English layout (y and z swapped, no é). On Mac keyboards without the extra key next to the left Shift (US-shape keyboards), í sits elsewhere; check one machine before Region 5 arrives.
+- Magyar (default): the standard Hungarian QWERTZ. 0 left of the 1, í left of the y, é á ű at the end of the home row.
+- English (US): QWERTY, for a computer set to the US layout (or a student who uses one at home). The on-screen keyboard, the finger colours and the Shift tips follow it. Accented letters cannot be typed on it, so they are left out everywhere: words and sentences with á é í ó ö ő ú ü ű are skipped (Hungarian word lists still work, with fewer words: Region 1 has 17 instead of 26), Region 1 teaches a s d f j k l, Region 5 becomes a review of every letter so far, the placement test skips the accent stage, and stories that need accents are hidden.
+
+The game reads the character a key produces, not its position, so typing works whatever the computer is set to; the setting decides what the game teaches and shows.
+
+The game notices two common problems and tells the child gently: Caps Lock left on, and a computer whose layout does not match the game's (y and z swapped). The tip now points to Settings → Keyboard. On Mac keyboards without the extra key next to the left Shift (US-shape keyboards), í sits elsewhere; check one machine before Region 5 arrives.
 
 ## The bosses
 

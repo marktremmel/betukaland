@@ -6,7 +6,7 @@
  */
 window.BK = window.BK || {};
 
-BK.VERSION = '0.5.0';
+BK.VERSION = '0.6.0';
 
 // Test mode for the teacher: open the game with ?debug at the end of the address.
 // Every region and level is open; in a level Tab finishes the current word and
@@ -25,37 +25,64 @@ BK.HERO_X = 64;
 BK.TARGET_X = 236;      // where an encounter stops
 
 // ---------------------------------------------------------------------------
-// Keyboard: standard Hungarian QWERTZ (ISO). Mac magyar layout is the same for
-// every key the game teaches. The game reads the CHARACTER typed (event.key),
-// not the key position, so any machine works; this table is only for drawing.
+// Keyboards. The game reads the CHARACTER typed (event.key), not the key
+// position, so any machine works; the layout only decides what the on-screen
+// keyboard looks like, which finger is shown, and whether accented letters
+// can be taught. Each child picks it in Settings (Hungarian by default).
+//   hu: standard Hungarian QWERTZ (ISO). The Mac magyar layout is the same for
+//       every key the game teaches.
+//   us: English (US) QWERTY. No accented letters: every á é í ó ö ő ú ü ű is
+//       left out of the lessons, and Region 5 becomes a review region.
 // ---------------------------------------------------------------------------
-BK.KB_ROWS = [
-  { offset: 0,  keys: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'ö', 'ü', 'ó'] },
-  { offset: 8,  keys: ['q', 'w', 'e', 'r', 't', 'z', 'u', 'i', 'o', 'p', 'ő', 'ú'] },
-  { offset: 11, keys: ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'é', 'á', 'ű'] },
-  { offset: 3,  keys: ['í', 'y', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '-'] },
-];
-// Characters produced with Shift on a Hungarian layout: shifted char -> base key
-BK.SHIFT_MAP = {
-  '§': '0', "'": '1', '"': '2', '+': '3', '!': '4', '%': '5', '/': '6', '=': '7', '(': '8', ')': '9',
-  '?': ',', ':': '.', '_': '-',
+BK.LAYOUTS = {
+  hu: {
+    id: 'hu', name: 'Magyar', accents: true,
+    rows: [
+      { offset: 0,  keys: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'ö', 'ü', 'ó'] },
+      { offset: 8,  keys: ['q', 'w', 'e', 'r', 't', 'z', 'u', 'i', 'o', 'p', 'ő', 'ú'] },
+      { offset: 11, keys: ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'é', 'á', 'ű'] },
+      { offset: 3,  keys: ['í', 'y', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '-'] },
+    ],
+    // characters produced with Shift: shifted char -> base key
+    shift: { '§': '0', "'": '1', '"': '2', '+': '3', '!': '4', '%': '5', '/': '6', '=': '7', '(': '8', ')': '9',
+      '?': ',', ':': '.', '_': '-' },
+    // fingers: 0..3 left pinky..index, 4..7 right index..pinky, 8 thumbs
+    fingers: { 0: '0 1 q a í y', 1: '2 w s x', 2: '3 e d c', 3: '4 5 r t f g v b',
+      4: '6 7 z u h j n m', 5: '8 i k ,', 6: '9 o l .', 7: 'ö ü ó p ő ú é á ű -' },
+  },
+  us: {
+    id: 'us', name: 'English (US)', accents: false,
+    rows: [
+      { offset: 0,  keys: ['`', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '='] },
+      { offset: 8,  keys: ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']'] },
+      { offset: 11, keys: ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', "'"] },
+      { offset: 19, keys: ['z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/'] },
+    ],
+    shift: { '~': '`', '!': '1', '@': '2', '#': '3', '$': '4', '%': '5', '^': '6', '&': '7', '*': '8', '(': '9', ')': '0',
+      '_': '-', '+': '=', '{': '[', '}': ']', ':': ';', '"': "'", '<': ',', '>': '.', '?': '/' },
+    fingers: { 0: '` 1 q a z', 1: '2 w s x', 2: '3 e d c', 3: '4 5 r t f g v b',
+      4: '6 7 y u h j n m', 5: '8 i k ,', 6: '9 o l .', 7: "0 - = p [ ] ; ' /" },
+  },
 };
+BK.ACCENTS = 'áéíóöőúüűÁÉÍÓÖŐÚÜŰ';
+BK.layoutOf = function (p) { return BK.LAYOUTS[(p && p.settings && p.settings.layout) || 'hu'] || BK.LAYOUTS.hu; };
+// Make a layout the active one: BK.layout, BK.KB_ROWS, BK.SHIFT_MAP, BK.FINGER_OF
+BK.setLayout = function (id) {
+  var L = BK.LAYOUTS[id] || BK.LAYOUTS.hu;
+  BK.layout = L;
+  BK.KB_ROWS = L.rows;
+  BK.SHIFT_MAP = L.shift;
+  BK.FINGER_OF = { ' ': 8 };
+  Object.keys(L.fingers).forEach(function (f) {
+    L.fingers[f].split(' ').forEach(function (k) { if (k) BK.FINGER_OF[k] = +f; });
+  });
+};
+BK.setLayout('hu');
 
 // Fingers: 0..3 left pinky..index, 4..7 right index..pinky, 8 thumbs
 BK.FINGER_NAMES = ['bal kisujj', 'bal gyűrűsujj', 'bal középső ujj', 'bal mutatóujj',
   'jobb mutatóujj', 'jobb középső ujj', 'jobb gyűrűsujj', 'jobb kisujj', 'hüvelykujj'];
 BK.FINGER_COLOURS = [0xeb7896, 0xf5aa50, 0xf0dc5a, 0x78c86e, 0x64bedc, 0x8296f0, 0xbe82e6, 0xf08cc8, 0xc8bcb4];
-BK.FINGER_OF = {};
-(function () {
-  var map = {
-    0: '0 1 q a í y', 1: '2 w s x', 2: '3 e d c', 3: '4 5 r t f g v b',
-    4: '6 7 z u h j n m', 5: '8 i k ,', 6: '9 o l .', 7: 'ö ü ó p ő ú é á ű -', 8: ' ',
-  };
-  Object.keys(map).forEach(function (f) {
-    map[f].split(' ').forEach(function (k) { if (k) BK.FINGER_OF[k] = +f; });
-  });
-  BK.FINGER_OF[' '] = 8;
-})();
 
 // ---------------------------------------------------------------------------
 // Regions. "keys" are the NEW lowercase keys of the region; a region also
@@ -110,6 +137,14 @@ BK.SPEED_TARGET = { '3-4': 7, '5-6': 11 };
 BK.speedTarget = function (band, regionId) {
   return (BK.SPEED_TARGET[band] || 8) + (regionId - 1) * 2;
 };
+
+// Crowns: mastery goal on every level of a region whose boss is beaten
+BK.CROWN = { acc: 0.97, plus: 4 };      // accuracy, and WPM above the region's 3-star speed
+BK.crownEarned = function (res) { return res.acc >= BK.CROWN.acc && res.wpm >= (res.target || 0) + BK.CROWN.plus; };
+
+// Endless road: creatures keep coming, a little faster each time
+// speed: how fast the next creature comes closer (pixels per second; the road is 320 px)
+BK.ENDLESS = { hearts: 3, speed0: { '3-4': 20, '5-6': 26 }, speedUp: 0.8, speedMax: 70 };
 
 // Placement test: pass a stage with this accuracy (and minimum WPM by band)
 BK.PLACEMENT_ACC = 0.9;

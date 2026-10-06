@@ -44,7 +44,15 @@ BK.MapScene = class extends Phaser.Scene {
     this.coinText = BK.ui.text(this, 160, 3, String(P.coins), { color: 0xffe9a0 });
     this.add.image(206, 9, 'star_on');
     BK.ui.text(this, 214, 3, String(BK.save.totalStars(P)), { color: 0xffe9a0 });
-    if (P.best.wpm) BK.ui.text(this, BK.W - 6, 3, BK.L('Rekord: ', 'Best: ') + Math.round(P.best.wpm) + ' ' + BK.T.wpm, { origin: [1, 0], color: 0xfff2dc });
+    // streak (days in a row) and today's goals; both open the practice corner
+    var sd = BK.goals.streak(P), gd = BK.goals.doneCount(P);
+    this.add.image(258, 9, sd ? 'flame' : 'flame_off');
+    BK.ui.text(this, 266, 3, String(sd), { color: sd ? 0xffd23c : 0xfff2dc });
+    this.add.image(300, 9, 'ui_check').setAlpha(gd ? 1 : 0.5);
+    BK.ui.text(this, 308, 3, gd + '/3', { color: gd === 3 ? 0x9fe07a : 0xfff2dc });
+    var s = this;
+    var gz = this.add.zone(300, 9, 100, 18).setInteractive({ useHandCursor: true });
+    gz.on('pointerup', function () { BK.audio.sfx('chime'); s.scene.start('Practice', { tab: 'today' }); });
   }
 
   drawPath() {
@@ -100,8 +108,9 @@ BK.MapScene = class extends Phaser.Scene {
     var keep = function (o) { ui.push(o); if (o.zone) ui.push(o.zone); return o; };
     keep(BK.ui.nine(this, 4, 122, 246, 90, 'ui_panel'));
     keep(BK.ui.text(this, 127, 126, this.sel + '. ' + reg.name, { origin: [0.5, 0], color: 0xfff2dc }));
-    var keys = reg.capitals ? BK.L('nagybetűk (Shift)', 'capitals (Shift)') : (reg.stories ? BK.L('mondatok, történetek', 'sentences, stories') : reg.keys.split('').join(' '));
-    keep(BK.ui.text(this, 127, 150, BK.T.newKeys + ' ' + keys, { outline: false, origin: [0.5, 0.5], color: 0xfff2dc }));
+    var keys = reg.capitals ? BK.L('nagybetűk (Shift)', 'capitals (Shift)') : (reg.stories ? BK.L('mondatok, történetek', 'sentences, stories') :
+      (BK.wordbank.focus(this.sel).length ? reg.keys.split('').filter(function (c) { return BK.layout.accents || BK.ACCENTS.indexOf(c) < 0; }).join(' ') : BK.T.review));
+    keep(BK.ui.text(this, 127, 150, (keys === BK.T.review ? '' : BK.T.newKeys + ' ') + keys, { outline: false, origin: [0.5, 0.5], color: 0xfff2dc }));
     if (!BK.save.regionOpen(P, this.sel) || !reg.playable) {
       keep(BK.ui.text(this, 127, 180, reg.playable ? BK.L('Előbb győzd le az előző vidék főellenségét!', 'First beat the boss of the region before!') : BK.T.regionLocked,
         { outline: false, origin: [0.5, 0.5], color: 0xffe9c8, width: 220, align: 1 }));
@@ -116,6 +125,8 @@ BK.MapScene = class extends Phaser.Scene {
           { w: l === 3 ? 62 : 54, h: 18, disabled: !unlocked }));
         if (l === s.levelSel) keep(s.add.rectangle(x, y, (l === 3 ? 62 : 54) + 4, 22).setStrokeStyle(1, 0xffffff));
         keep(BK.ui.stars(s, x, 196, P.progress[s.sel].stars[l], 3, 10));
+        // crown goal, once the region's boss is beaten
+        if (BK.save.regionCleared(P, s.sel)) keep(s.add.image(x + 22, 195, (P.crowns[s.sel] || [])[l] ? 'crown_on' : 'crown_off'));
       })(l);
     }
   }

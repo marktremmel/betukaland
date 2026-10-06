@@ -1,5 +1,5 @@
 /*
- * On-screen Hungarian QWERTZ keyboard.
+ * On-screen keyboard in the child's layout (Hungarian QWERTZ or English QWERTY).
  * - keys colour-coded by finger (or plain when finger colours are off)
  * - keys not unlocked yet are dimmed
  * - the next key is outlined and gently pulses; Shift too when needed
@@ -33,8 +33,8 @@ BK.KeyboardView = class {
     });
     // Shift keys and space
     var r3y = this.y0 + 4 + 3 * (KH + G);
-    this.keys.shiftL = { x: x0 - 25, y: r3y, w: 27, h: KH, k: 'shiftL' };
-    var lastBottom = this.keys['-'];
+    var bottom = BK.KB_ROWS[3].keys, firstBottom = this.keys[bottom[0]], lastBottom = this.keys[bottom[bottom.length - 1]];
+    this.keys.shiftL = { x: x0 - 25, y: r3y, w: firstBottom.x - G - (x0 - 25), h: KH, k: 'shiftL' };
     this.keys.shiftR = { x: lastBottom.x + KW + G, y: r3y, w: 34, h: KH, k: 'shiftR' };
     this.keys[' '] = { x: x0 + 3 * (KW + G) + 3, y: r3y + KH + G, w: 6 * (KW + G), h: 9, k: ' ' };
     ['shiftL', 'shiftR'].forEach(function (s) {

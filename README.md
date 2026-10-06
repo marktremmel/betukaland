@@ -22,6 +22,7 @@ src/config.js             regions, keys, fingers, stars, speed targets, shop
 src/strings_hu.js         every child-facing text (Hungarian)
 src/strings_en.js         the same in English
 src/i18n.js               interface language switch, English names
+src/goals.js              daily goals and the streak
 assets/fonts/fonts.js     Andika, Atkinson Hyperlegible, Lexend (embedded, OFL)
 src/wordbank.js           filters words by unlocked keys; phases; adaptive picks
 src/adaptive.js           per-key accuracy and speed

@@ -41,7 +41,8 @@ BK.PlacementScene = class extends Phaser.Scene {
     var lang = this.P.lang;
     this.stage = i;
     // English word lists have no accents: that stage is skipped for English
-    if (lang === 'en' && BK.REGIONS[i].keys.indexOf('á') >= 0) { this.startStage(i + 1); return; }
+    // (also skipped on a keyboard without accent keys)
+    if ((lang === 'en' || !BK.layout.accents) && BK.REGIONS[i].keys.indexOf('á') >= 0) { this.startStage(i + 1); return; }
     if (i >= 6) { this.finish(7); return; }
     this.items = BK.wordbank.placementWords(i + 1, lang, 5, rng);
     if (!this.items.length) { this.startStage(i + 1); return; }

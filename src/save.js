@@ -69,6 +69,8 @@ BK.save = (function () {
     p.items = p.items || {}; p.keys = p.keys || {}; p.history = p.history || [];
     p.outfits = p.outfits || ['base']; p.pets = p.pets || [];
     p.best = p.best || { wpm: 0, acc: 0 }; p.bestTimes = p.bestTimes || {}; p.stories = p.stories || {};
+    p.best.endless = p.best.endless || 0;
+    p.crowns = p.crowns || {};             // regionId -> [l1, l2, l3, boss] 1 = crown earned
     if (!(p.avatar >= 0 && p.avatar < BK.HEROES.length)) p.avatar = 0;   // figure list changed in v0.2
     return p;
   }
@@ -103,6 +105,13 @@ BK.save = (function () {
     var pr = p.progress[res.r];
     if (res.l >= 0 && res.l <= 3 && !res.daily) pr.stars[res.l] = Math.max(pr.stars[res.l] || 0, res.stars);
     if (res.practice === 'story' && res.storyId) p.stories[res.storyId] = Math.max(p.stories[res.storyId] || 0, res.stars);
+    // crowns: a mastery goal on every level of a region whose boss is beaten
+    res.crownNew = false;
+    if (res.l >= 0 && res.l <= 3 && !res.daily && regionCleared(p, res.r) && BK.crownEarned(res)) {
+      var cr = p.crowns[res.r] || (p.crowns[res.r] = [0, 0, 0, 0]);
+      if (!cr[res.l]) { cr[res.l] = 1; res.crownNew = true; }
+    }
+    if (res.practice === 'endless') { res.prevEndless = p.best.endless; p.best.endless = Math.max(p.best.endless, res.words || 0); }
     p.coins = Math.min(16000, p.coins + (res.coins || 0));
     p.history.push({ d: BK.util.today(), r: res.r, l: res.l, wpm: Math.round(res.wpm * 10) / 10,
       acc: Math.round(res.acc * 1000) / 1000, stars: res.stars, ms: res.ms, daily: !!res.daily, practice: res.practice || undefined });
@@ -111,6 +120,7 @@ BK.save = (function () {
     if (res.acc >= 0.85 && res.wpm > p.best.wpm) { p.best.wpm = Math.round(res.wpm * 10) / 10; newBest = true; }
     if (res.acc > p.best.acc) p.best.acc = Math.round(res.acc * 1000) / 1000;
     if (res.daily) p.daily = BK.util.today();
+    res.goals = BK.goals.update(p, res);
     p.lastPlayed = BK.util.today();
     persist();
     return newBest;

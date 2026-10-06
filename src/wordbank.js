@@ -44,15 +44,18 @@ BK.wordbank = (function () {
     if (caps) {
       Object.keys(set).forEach(function (c) { var u = c.toUpperCase(); if (u !== c) set[u] = 1; });
     }
+    // a keyboard without accent keys (English QWERTY): never ask for á é í ó ö ő ú ü ű
+    if (BK.layout && !BK.layout.accents) BK.ACCENTS.split('').forEach(function (c) { delete set[c]; });
     return set;
   }
 
   // The keys a region introduces (what its letters/syllables phases drill)
   function focus(r) {
     var reg = BK.REGIONS[r - 1];
-    if (reg.capitals) return 'ASDFJKLÉGHQWERTZUIOPYXCVBNM'.split('');
+    var noAcc = function (c) { return !(BK.layout && !BK.layout.accents && BK.ACCENTS.indexOf(c) >= 0); };
+    if (reg.capitals) return 'ASDFJKLÉGHQWERTZUIOPYXCVBNM'.split('').filter(noAcc);
     if (reg.stories || !reg.keys) return [];
-    return reg.keys.replace(/[,.\-]/g, '').split('');
+    return reg.keys.replace(/[,.\-]/g, '').split('').filter(noAcc);
   }
 
   function fits(word, set) {
@@ -85,7 +88,7 @@ BK.wordbank = (function () {
     this.focus = focus(regionId);
     this.recent = [];
     // English has no accented words: Region 5 practises them with Hungarian words
-    if (lang === 'en' && BK.REGIONS[regionId - 1].keys.indexOf('á') >= 0) lang = 'hu';
+    if (lang === 'en' && BK.layout.accents && BK.REGIONS[regionId - 1].keys.indexOf('á') >= 0) lang = 'hu';
     var L = lists(lang);
     this.lang = lang;
     this.numbers = /[0-9]/.test(BK.REGIONS[regionId - 1].keys);
@@ -273,8 +276,8 @@ BK.wordbank = (function () {
         var a = allowed(r);
         if (lines.every(function (l) { return fits(l, a); })) { need = r; break; }
       }
-      return { id: st.id, title: st.title, lines: lines, region: need || BK.REGIONS.length };
-    });
+      return { id: st.id, title: st.title, lines: lines, region: need };
+    }).filter(function (st) { return st.region > 0; });   // a story this keyboard cannot type is left out
   }
 
   return {

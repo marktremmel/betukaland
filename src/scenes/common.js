@@ -9,6 +9,7 @@ BK.setProfile = function (p) {
   BK.state.profile = p;
   if (p) {
     BK.save.setLast(p.id); BK.audio.apply(p.settings);
+    BK.setLayout(BK.layoutOf(p).id);
     // each child keeps the interface language they chose
     if (p.settings.ui) BK.applyUiLang(p.settings.ui, null);
     else { p.settings.ui = BK.uiLang; BK.save.persist(); }
