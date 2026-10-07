@@ -58,7 +58,7 @@ BK.LevelScene = class extends Phaser.Scene {
 
     this.keyHandler = function (e) { s.onKey(e); };
     window.addEventListener('keydown', this.keyHandler);
-    this.events.once('shutdown', function () { window.removeEventListener('keydown', s.keyHandler); });
+    this.events.once('shutdown', function () { window.removeEventListener('keydown', s.keyHandler); s.anims.resumeAll(); });
     this.input.keyboard.on('keydown-ESC', function () { s.togglePause(); });
 
     if (this.levelIdx === 0 && BK.wordbank.focus(this.regionId).length) this.startWarmup();
@@ -504,7 +504,7 @@ BK.LevelScene = class extends Phaser.Scene {
     var panel = BK.ui.nine(this, 122, 40, 140, 112, 'ui_panel2').setDepth(901);
     var t = BK.ui.text(this, 192, 70, BK.L('Szünet', 'Paused'), { outline: false, size: 2, origin: [0.5, 0.5] }).setDepth(902);
     var b1 = BK.ui.button(this, 192, 96, BK.L('Folytatom', 'Continue'), function () { s.togglePause(); }, { w: 90 }).setDepth(902);
-    var b2 = BK.ui.button(this, 192, 120, BK.T.map, function () { s.scene.start('Map'); }, { w: 90 }).setDepth(902);
+    var b2 = BK.ui.button(this, 192, 120, BK.T.map, function () { s.anims.resumeAll(); s.scene.start('Map'); }, { w: 90 }).setDepth(902);
     this.pauseUi = [shade, panel, t, b1, b2, b1.zone, b2.zone];
   }
 

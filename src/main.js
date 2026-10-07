@@ -32,6 +32,8 @@
     var create = C.prototype.create;
     C.prototype.create = function () {
       this.cameras.main.setZoom(BK.RES).centerOn(BK.W / 2, BK.H / 2);
+      // animations are paused game-wide by the pause menu: never carry that into another screen
+      if (this.anims.paused) this.anims.resumeAll();
       return create ? create.apply(this, arguments) : undefined;
     };
   });

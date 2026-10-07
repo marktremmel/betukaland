@@ -28,6 +28,7 @@ BK.Hero = class {
     if (this.state === 'run') return;
     this.state = 'run';
     this.sprite.play(this.k.run);
+    if (this.sprite.anims.isPaused) this.sprite.anims.resume();   // idle() may have paused it
   }
   idle() {
     if (this.state === 'idle') return;

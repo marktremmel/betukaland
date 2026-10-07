@@ -109,9 +109,9 @@ BK.Walker = class extends BK.Encounter {
   hitPos() { return { x: this.spr.x, y: this.spr.y - this.spr.displayHeight / 2 }; }
   bubbleY() { return Math.max(46, BK.GROUND_Y - this.spr.displayHeight - 10); }
   activate() {
-    // stop walking, play an idle-ish animation if there is one
+    // a frog taunts; the others keep stepping on the spot, slower (a frozen mid-step frame looked stuck)
     if (this.kindKey === 'frog') this.spr.play('frog_taunt');
-    else this.spr.anims.pause();
+    else this.spr.anims.timeScale = 0.45;
     super.activate();
   }
   onWrong() {

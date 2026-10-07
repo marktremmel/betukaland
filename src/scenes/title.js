@@ -31,8 +31,10 @@ BK.TitleScene = class extends Phaser.Scene {
     BK.ui.text(this, BK.W / 2, 208, 'v' + BK.VERSION, { origin: [0.5, 0.5], color: 0xfff2dc }).setAlpha(0.6);
 
     BK.audio.music(BK.MUSIC.title);
+    // the scene object is reused, so the "already leaving" flag must start fresh every time
+    this.leaving = false;
     var go = function () { if (s.leaving) return; s.leaving = true; BK.audio.sfx('chime'); s.scene.start('Profiles'); };
-    this.input.keyboard.once('keydown', function (e) { if (e.key !== 'Tab') go(); });
+    this.input.keyboard.on('keydown', function (e) { if (e.key !== 'Tab' && e.key !== 'Escape') go(); });
     var zone = this.add.zone(BK.W / 2, 110, BK.W, 150).setInteractive();
     zone.on('pointerup', function () { if (!s.langClick) go(); });
     if (!BK.save.storageOk()) {
