@@ -70,12 +70,49 @@ BK.save = (function () {
     p.outfits = p.outfits || ['base']; p.pets = p.pets || [];
     p.best = p.best || { wpm: 0, acc: 0 }; p.bestTimes = p.bestTimes || {}; p.stories = p.stories || {};
     p.best.endless = p.best.endless || 0;
+    // story stars from before v0.6.2 were stored without the language: move English ones
+    if (p.lang === 'en' && window.BK_STORIES_EN) BK_STORIES_EN.forEach(function (st) {
+      var huToo = (window.BK_STORIES_HU || []).some(function (h) { return h.id === st.id; });
+      if (p.stories[st.id] && !huToo && !p.stories['en:' + st.id]) { p.stories['en:' + st.id] = p.stories[st.id]; delete p.stories[st.id]; }
+    });
     p.crowns = p.crowns || {};             // regionId -> [l1, l2, l3, boss] 1 = crown earned
     if (!(p.avatar >= 0 && p.avatar < BK.HEROES.length)) p.avatar = 0;   // figure list changed in v0.2
     return p;
   }
 
   // ---------------------------------------------------------------- progress
+  // Story stars are kept per word language: an English and a Hungarian story may share an id
+  function storyKey(p, id) { return (p.lang === 'en' ? 'en:' : '') + id; }
+  // Every story in a fixed order, for the save code (new stories must be added at the END of the data files)
+  function storyOrder() {
+    var hu = (window.BK_STORIES_HU || []).map(function (s) { return s.id; });
+    var en = (window.BK_STORIES_EN || []).map(function (s) { return 'en:' + s.id; });
+    return hu.concat(en);
+  }
+
+  // A code or file loaded onto a computer that already has this child: keep the best of both,
+  // never lose anything that is only stored locally (history, streak, goals, key details)
+  function merge(local, inc) {
+    for (var r = 1; r <= 7; r++) {
+      var a = local.progress[r].stars, b = (inc.progress[r] || { stars: [] }).stars;
+      for (var l = 0; l < 4; l++) a[l] = Math.max(a[l] || 0, b[l] || 0);
+      var ic = (inc.crowns || {})[r];
+      if (ic) { var lc = local.crowns[r] || (local.crowns[r] = [0, 0, 0, 0]); for (l = 0; l < 4; l++) lc[l] = lc[l] || ic[l] || 0; }
+    }
+    Object.keys(inc.stories || {}).forEach(function (k) { local.stories[k] = Math.max(local.stories[k] || 0, inc.stories[k]); });
+    (inc.outfits || []).forEach(function (o) { if (local.outfits.indexOf(o) < 0) local.outfits.push(o); });
+    (inc.pets || []).forEach(function (o) { if (local.pets.indexOf(o) < 0) local.pets.push(o); });
+    Object.keys(inc.items || {}).forEach(function (k) { local.items[k] = Math.max(local.items[k] || 0, inc.items[k]); });
+    Object.keys(inc.keys || {}).forEach(function (k) { if (!local.keys[k]) local.keys[k] = inc.keys[k]; });
+    local.coins = Math.max(local.coins, inc.coins);
+    local.best.wpm = Math.max(local.best.wpm, inc.best.wpm || 0);
+    local.best.acc = Math.max(local.best.acc, inc.best.acc || 0);
+    local.best.endless = Math.max(local.best.endless || 0, inc.best.endless || 0);
+    local.placed = Math.max(local.placed || 0, inc.placed || 0) || null;
+    ['layout', 'ui', 'font'].forEach(function (k) { if (inc.settings[k]) local.settings[k] = inc.settings[k]; });
+    return local;
+  }
+
   function regionCleared(p, r) { return (p.progress[r].stars[3] || 0) > 0; }
   function levelUnlocked(p, r, l) {
     if (!BK.REGIONS[r - 1].playable) return false;
@@ -104,7 +141,7 @@ BK.save = (function () {
     // res: { r, l, wpm, acc, stars, ms, coins, daily }
     var pr = p.progress[res.r];
     if (res.l >= 0 && res.l <= 3 && !res.daily) pr.stars[res.l] = Math.max(pr.stars[res.l] || 0, res.stars);
-    if (res.practice === 'story' && res.storyId) p.stories[res.storyId] = Math.max(p.stories[res.storyId] || 0, res.stars);
+    if (res.practice === 'story' && res.storyId) { var sk = storyKey(p, res.storyId); p.stories[sk] = Math.max(p.stories[sk] || 0, res.stars); }
     // crowns: a mastery goal on every level of a region whose boss is beaten
     res.crownNew = false;
     if (res.l >= 0 && res.l <= 3 && !res.daily && regionCleared(p, res.r) && BK.crownEarned(res)) {
@@ -144,8 +181,10 @@ BK.save = (function () {
   }
 
   function encode(p) {
+    // version 2 (v0.6.2): shorter. The per-key skill levels are left out (the game relearns
+    // them in a few rounds) and trailing zeros are dropped. Version 1 codes still load.
     var b = new Bits();
-    b.put(1, 3);
+    b.put(2, 3);
     b.put(p.avatar & 7, 3);
     b.put(p.grade === '5-6' ? 1 : 0, 1);
     b.put(p.lang === 'en' ? 1 : 0, 1);
@@ -160,9 +199,17 @@ BK.save = (function () {
     b.put(Math.max(0, BK.OUTFITS.findIndex(function (o) { return o.id === p.outfit; })), 3);
     b.put(p.pet ? BK.PETS.findIndex(function (o) { return o.id === p.pet; }) + 1 : 0, 3);
     BK.ITEMS.forEach(function (it) { b.put(Math.min(3, p.items[it.id] || 0), 2); });
-    Array.from(KEYLIST).forEach(function (k) { b.put(keyLevel(p, k), 2); });
     b.put(Math.min(127, Math.round(p.best.wpm)), 7);
     b.put(Math.min(100, Math.round(p.best.acc * 100)), 7);
+    // added in v0.6.2 (older codes simply read these as 0): crowns, keyboard, menu language,
+    // font, endless-road record, story stars
+    for (r = 1; r <= 7; r++) for (l = 0; l < 4; l++) b.put(((p.crowns || {})[r] || [])[l] ? 1 : 0, 1);
+    b.put(p.settings.layout === 'us' ? 1 : 0, 1);
+    b.put(p.settings.ui === 'en' ? 1 : 0, 1);
+    b.put(Math.max(0, BK.FONTS.findIndex(function (f) { return f.id === p.settings.font; })), 2);
+    b.put(Math.min(255, (p.best && p.best.endless) || 0), 8);
+    storyOrder().forEach(function (k) { b.put(Math.min(3, (p.stories || {})[k] || 0), 2); });
+    while (b.a.length > 5 && b.a.lastIndexOf(1) < b.a.length - 5) b.a.length -= 5;   // drop trailing zero groups
     while (b.a.length % 5) b.a.push(0);
     var sum = 0; for (var i = 0; i < b.a.length; i += 5) sum = (sum * 31 + parseInt(b.a.slice(i, i + 5).join(''), 2)) % 1024;
     b.put(sum, 10);
@@ -184,7 +231,8 @@ BK.save = (function () {
     var check = parseInt(bits.slice(bits.length - 10).join(''), 2);
     if (sum !== check) throw new Error('checksum');
     var rd = new Reader(body);
-    if (rd.get(3) !== 1) throw new Error('version');
+    var ver = rd.get(3);
+    if (ver !== 1 && ver !== 2) throw new Error('version');
     var avatar = rd.get(3), grade = rd.get(1) ? '5-6' : '3-4', lang = rd.get(1) ? 'en' : 'hu', placed = rd.get(3) || null;
     var nl = rd.get(4), nick = '';
     for (i = 0; i < nl; i++) nick += NICK[rd.get(7)] || '';
@@ -199,8 +247,20 @@ BK.save = (function () {
     var pi = rd.get(3); p.pet = pi ? BK.PETS[pi - 1].id : null;
     BK.ITEMS.forEach(function (it) { var c = rd.get(2); if (c) p.items[it.id] = c; });
     var LV = { 1: { acc: 0.97, ms: 450 }, 2: { acc: 0.9, ms: 800 }, 3: { acc: 0.8, ms: 1200 } };
-    Array.from(KEYLIST).forEach(function (k) { var v = rd.get(2); if (v) p.keys[k] = { n: 10, acc: LV[v].acc, ms: LV[v].ms }; });
+    if (ver === 1) Array.from(KEYLIST).forEach(function (k) { var v = rd.get(2); if (v) p.keys[k] = { n: 10, acc: LV[v].acc, ms: LV[v].ms }; });
     p.best.wpm = rd.get(7); p.best.acc = rd.get(7) / 100;
+    for (r = 1; r <= 7; r++) {
+      var cr = [0, 0, 0, 0], any = false;
+      for (l = 0; l < 4; l++) { cr[l] = rd.get(1); if (cr[l]) any = true; }
+      if (any) p.crowns[r] = cr;
+    }
+    if (rd.get(1)) p.settings.layout = 'us';
+    var ui = rd.get(1), fi = rd.get(2);
+    // a code from before v0.6.2 has none of this: keep the local defaults then
+    p.settings.ui = ui ? 'en' : null;
+    p.settings.font = fi ? BK.FONTS[fi].id : null;
+    p.best.endless = rd.get(8);
+    storyOrder().forEach(function (k) { var v = rd.get(2); if (v) p.stories[k] = v; });
     return p;
   }
 
@@ -231,7 +291,8 @@ BK.save = (function () {
     font: function (v) { if (v !== undefined) { load().font = v; persist(); } return load().font || 'andika'; },
     uiLang: function (v) { if (v !== undefined) { load().uiLang = v; persist(); } return load().uiLang || 'hu'; },
     regionOpen: regionOpen, regionCleared: regionCleared, levelUnlocked: levelUnlocked,
-    totalStars: totalStars, currentRegion: currentRegion, recordLevel: recordLevel,
+    merge: merge,
+    totalStars: totalStars, currentRegion: currentRegion, recordLevel: recordLevel, storyKey: storyKey,
     encode: encode, decode: decode,
     toFile: function (p) { return JSON.stringify({ app: 'betukaland', version: 1, profile: p }, null, 1); },
     fromFile: function (text) {

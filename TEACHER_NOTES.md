@@ -1,6 +1,6 @@
 # Betűkaland (Typing Adventure): teacher notes
 
-Version 0.6: all seven regions are playable, each with three levels and a boss, plus a practice corner (daily goals with a streak, sentence practice, a tricky-letter drill, the endless road, and a storybook) and crowns to win on every level of a finished region. The menus can be Hungarian or English, the text uses a font made for young readers (three to choose from), and the keyboard can be Hungarian or US English. Title screen, player profiles with a choice of six figures, placement test, world map, shop, rest spots, results with stars and a chart, saving with a code and a file, the teacher screen with CSV export, and credits.
+Version 0.6.2: all seven regions are playable, each with three levels and a boss, plus a practice corner (daily goals with a streak, sentence practice, a tricky-letter drill, the endless road, and a storybook) and crowns to win on every level of a finished region. The menus can be Hungarian or English, the text uses a font made for young readers (three to choose from), and the keyboard can be Hungarian or US English. Title screen, player profiles with a choice of six figures, placement test, world map, shop, rest spots, results with stars and a chart, saving with a code and a file, the teacher screen with CSV export, and credits.
 
 ## Running it
 
@@ -108,7 +108,7 @@ The choice is saved per child. The font files are embedded in `assets/fonts/font
 
 Everything saves automatically to the browser after every level. Profiles live in that browser on that computer only.
 
-To continue on another computer, the child opens "Mentés" on the map: a save code (about 60 characters, no letters that look alike, with a checksum) or "Mentés fájlba" for a file. On the other computer: "Mentőkód" on the player screen. The code carries progress, stars, coins, outfits, pets, treasures and a summary of the weaker keys; the file carries everything.
+To continue on another computer, the child opens "Mentés" on the map: a save code (about 30 to 60 characters, depending on progress; no letters that look alike; a checksum catches typos) or "Mentés fájlba" for a file. On the other computer: "Mentőkód" on the player screen. The code carries progress, stars, crowns, story stars, coins, outfits, pets, treasures, the endless-road record and the keyboard, language and font settings; the file carries everything (also the full history and the per-key data). Loading a child's code on a computer that already has the same child (same nickname, figure and grade) merges the two and keeps the best of both, so nothing is lost. Codes made by older versions still load.
 
 If school computers wipe browser data at logout, ask students to save a code at the end of every lesson (a line in their exercise book is enough).
 
@@ -135,6 +135,10 @@ The library has only two boss-size characters in the Sunny Land style (Berie's b
 
 If you want more, the full Sunny Land collection by Ansimuz (itch.io) has more creatures in exactly this style.
 
+## Safety of the generated drills
+
+Words, sentences and stories come from curated lists. The drills the game makes up itself (letter groups, syllables, number phrases, the tricky-letter rows) are checked against a block list of rude Hungarian and English letter combinations, as parts of words, before a child ever sees them (`BLOCK` in `src/wordbank.js`). A test generating several hundred thousand drills across every region, both word languages and both keyboards found none left. If you ever spot one, add it to that list.
+
 ## Changing things
 
 Word lists: `data/words_hu.js` and `data/words_en.js`. Add words separated by spaces; the game filters them per region automatically. `python3 tools/check_words.py` reports how many words each region gets.
@@ -153,7 +157,7 @@ Test mode: add `?debug` to the end of the address (for example `index.html?debug
 
 Ready-made test profiles: on the player screen press "Mentőkód" and paste a code.
 
-- Everything unlocked (nickname Teszt, grade 5-6, 9999 coins, every star, all outfits, pets and treasures): `4BND-G893-4KKG-ZZZZ-ZZZZ-ZZZZ-7W3G-7ZZZ-ZZZZ-ZG00-0000-0000-0000-0000-0000-N8`
-- Fresh start with all regions open but no stars (nickname Kezdo, grade 3-4, 500 coins): `43NB-88CG-CE0Z-8000-0000-0000-0400-0000-0000-0000-0000-0000-0000-0000-0000-FP`
+- Everything unlocked (nickname Teszt, grade 5-6, 9999 coins, every star and crown, all outfits, pets, treasures and story stars): `8BND-G893-4KKG-ZZZZ-ZZZZ-ZZZZ-7W3G-7ZZZ-ZZZZ-ZG00-ZZZZ-ZW33-ZZZZ-ZZZZ-ZW7Y`
+- Fresh start with all regions open but no stars (nickname Kezdo, grade 3-4, 500 coins): `83NB-88CG-CE0Z-8000-0000-0000-04ZJ`
 
 Delete test profiles afterwards on the teacher screen, so they do not show up in the class CSV.

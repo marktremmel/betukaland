@@ -13,7 +13,7 @@ BK.PracticeScene = class extends Phaser.Scene {
     this.tab = (data && data.tab) || this.tab || 'today';
     if (this.tab === 'sent' || this.tab === 'daily') this.tab = this.tab === 'daily' ? 'today' : 'practice';
     if (data && data.mode) this.mode = data.mode;
-    this.mode = this.mode || 'sent';
+    if (['sent', 'weak', 'endless'].indexOf(this.mode) < 0) this.mode = 'sent';
   }
 
   create() {
@@ -23,6 +23,10 @@ BK.PracticeScene = class extends Phaser.Scene {
     BK.ui.nine(this, 16, 4, 352, 182, 'ui_panel2');
     BK.ui.text(this, 192, 34, BK.T.practiceTitle, { outline: false, size: 2, origin: [0.5, 0.5] });
 
+    // the scene object is reused: forget the last child's choices when someone else (or another
+    // word language / keyboard) comes in
+    var who = P.id + '|' + P.lang + '|' + BK.layout.id;
+    if (this.who !== who) { this.who = who; this.storySel = undefined; this.storyTop = 0; this.sentRegion = undefined; }
     this.open = BK.REGIONS.filter(function (r) { return r.playable && BK.save.regionOpen(P, r.id); }).map(function (r) { return r.id; });
     if (this.sentRegion === undefined || this.open.indexOf(this.sentRegion) < 0) this.sentRegion = this.open[this.open.length - 1] || 1;
     this.stories = BK.wordbank.storyLibrary(P.lang || 'hu');
@@ -30,9 +34,10 @@ BK.PracticeScene = class extends Phaser.Scene {
     this.stories.sort(function (a, b) { return a.region - b.region; });
     if (this.storySel === undefined) {
       this.storySel = 0;
-      for (var i = 0; i < this.stories.length; i++) if (this.storyOpen(this.stories[i]) && !(P.stories || {})[this.stories[i].id]) { this.storySel = i; break; }
+      for (var i = 0; i < this.stories.length; i++) if (this.storyOpen(this.stories[i]) && !(P.stories || {})[BK.save.storyKey(P, this.stories[i].id)]) { this.storySel = i; break; }
     }
-    this.storyTop = this.storyTop || 0;
+    if (!(this.storySel < this.stories.length)) this.storySel = 0;
+    this.storyTop = Math.min(this.storyTop || 0, Math.max(0, this.stories.length - 1));
 
     var tabs = [['today', BK.T.pToday], ['practice', BK.T.pPractice], ['story', BK.T.pStory]];
     tabs.forEach(function (t, i) {
@@ -127,7 +132,7 @@ BK.PracticeScene = class extends Phaser.Scene {
           var story = st[i], y = y0 + (i - s.storyTop) * rh, open = s.storyOpen(story);
           if (i === s.storySel) s.keep(s.add.rectangle(192, y + 5, 318, rh, 0xf6c88a, 0.8));
           s.keep(BK.ui.text(s, x0 + 4, y, story.title, { outline: false, color: open ? 0x4a2c1c : 0x9a8a80 }));
-          if (open) s.keep(BK.ui.stars(s, 330, y + 5, (P.stories || {})[story.id] || 0, 3, 10));
+          if (open) s.keep(BK.ui.stars(s, 330, y + 5, (P.stories || {})[BK.save.storyKey(P, story.id)] || 0, 3, 10));
           else s.keep(BK.ui.text(s, 346, y, BK.T.pStoryLocked + ' ' + BK.REGIONS[story.region - 1].name, { outline: false, origin: [1, 0], color: 0x9a8a80, px: 9 }));
           var z = s.keep(s.add.zone(192, y + 5, 318, rh).setInteractive({ useHandCursor: true }));
           z.on('pointerup', function () {
@@ -169,7 +174,7 @@ BK.PracticeScene = class extends Phaser.Scene {
 
   refreshStart() {
     if (!this.startBtn) return;
-    var ok = this.tab !== 'story' || (this.stories.length && this.storyOpen(this.stories[this.storySel]));
+    var ok = this.tab !== 'story' || !!(this.stories[this.storySel] && this.storyOpen(this.stories[this.storySel]));
     this.startBtn.setDisabled(!ok);
   }
 

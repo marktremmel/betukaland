@@ -47,7 +47,7 @@ BK.levelgen = {
           texts: [w < 2 ? picker.get('words') : picker.get('pairs')],
           coins: w === 2 ? 3 : 1, item: w === 2 ? rng.pick(BK.ITEMS).id : undefined });
       }
-      out.push({ kind: 'boss', creature: reg.boss, tint: reg.bossTint, texts: texts, coins: 12 + regionId * 2,
+      out.push({ kind: 'boss', creature: reg.boss, tint: reg.bossTint, texts: texts, coins: 12 + regionId * 2, maxWidth: 170,
         name: reg.bossName, intro: reg.bossIntro, outro: reg.bossOutro });
       look.sky = sky; look.weather = 'clear';
       return { encounters: out, sky: sky, bdTint: bdTint, weather: 'clear', music: reg.bossMusic || 'm_boss', boss: true };
@@ -159,7 +159,10 @@ BK.levelgen = {
       // two warm-up drills made of the tricky keys, then real words that contain them
       for (var d = 0; d < 2; d++) {
         var toks = [];
-        for (var q = 0; q < 4; q++) { var k = weakKeys[(d * 4 + q) % weakKeys.length], v = rng.pick(V); toks.push(rng.chance(0.5) ? k + v : v + k); }
+        for (var q = 0; q < 4; q++) {
+          var k = weakKeys[(d * 4 + q) % weakKeys.length], v = rng.pick(V), tk = rng.chance(0.5) ? k + v : v + k;
+          toks.push(BK.wordbank.blocked(tk) ? k + k : tk);
+        }
         lines.push(toks.join(' '));
       }
       var nw = (band === '3-4' ? 8 : 10) - 2;
@@ -169,11 +172,12 @@ BK.levelgen = {
     } else if (mode === 'story') {
       var lib = BK.wordbank.storyLibrary(lang);
       var st = lib.find(function (x) { return x.id === opts.storyId; }) || lib[0];
-      lines = st.lines.slice(); title = st.title;
+      if (!st) { mode = 'practice'; } else { lines = st.lines.slice(); title = st.title; opts.storyId = st.id; }
     } else {
       var n = band === '3-4' ? 8 : 10;
       for (var i = 0; i < n; i++) lines.push(picker.sentence());
     }
+    if (!lines.length) for (var i2 = 0; i2 < (band === '3-4' ? 8 : 10); i2++) lines.push(picker.sentence());
     var out = lines.map(function (t, i) {
       var last = i === lines.length - 1;
       var flyer = !last && flyers.length > 0 && rng.chance(0.2);

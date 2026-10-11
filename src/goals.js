@@ -23,7 +23,7 @@ BK.goals = (function () {
     { id: 'story', n: 1, hu: 'Írj le egy egész történetet', en: 'Type a whole story', avail: function (p) { return storyOpen(p); } },
     { id: 'weak', n: 1, hu: 'Gyakorold a nehéz betűidet', en: 'Practise your tricky letters' },
     { id: 'daily', n: 1, hu: 'Játszd le a Kihívást', en: 'Play the Challenge' },
-    { id: 'endless', n: { '3-4': 15, '5-6': 25 }, hu: 'Végtelen út: jusson el {n} szóig', en: 'Endless road: reach {n} words' },
+    { id: 'endless', n: { '3-4': 15, '5-6': 25 }, hu: 'Végtelen út: juss el {n} szóig', en: 'Endless road: reach {n} words' },
   ];
 
   function storyOpen(p) {
@@ -33,7 +33,7 @@ BK.goals = (function () {
   function target(t, p) { return typeof t.n === 'object' ? (t.n[p.grade] || t.n['3-4']) : t.n; }
   function yesterday(d) {
     var x = new Date(d + 'T12:00:00'); x.setDate(x.getDate() - 1);
-    return x.toISOString().slice(0, 10);
+    return x.getFullYear() + '-' + String(x.getMonth() + 1).padStart(2, '0') + '-' + String(x.getDate()).padStart(2, '0');
   }
 
   // Today's goals (made fresh on a new day)

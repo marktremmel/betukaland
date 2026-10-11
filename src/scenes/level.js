@@ -35,6 +35,10 @@ BK.LevelScene = class extends Phaser.Scene {
     this.wordsDone = 0;
     this.layoutStrikes = 0;
     this.capsWarned = false;
+    // the scene object is reused between levels: nothing may carry over from the last one
+    this.paused = false; this.overlayOpen = false; this.pauseUi = [];
+    this.bumps = 0; this.stepT = 0; this.lastShift = null; this.layoutWarned = false;
+    this.enc = null; this.wordsDone = 0;
     this.speed = 76;          // world scroll, pixels per second
     this.startedAt = 0;
     if (this.endless) {
@@ -58,7 +62,7 @@ BK.LevelScene = class extends Phaser.Scene {
 
     this.keyHandler = function (e) { s.onKey(e); };
     window.addEventListener('keydown', this.keyHandler);
-    this.events.once('shutdown', function () { window.removeEventListener('keydown', s.keyHandler); s.anims.resumeAll(); });
+    this.events.once('shutdown', function () { window.removeEventListener('keydown', s.keyHandler); s.anims.resumeAll(); s.time.paused = false; });
     this.input.keyboard.on('keydown-ESC', function () { s.togglePause(); });
 
     if (this.levelIdx === 0 && BK.wordbank.focus(this.regionId).length) this.startWarmup();
@@ -267,6 +271,7 @@ BK.LevelScene = class extends Phaser.Scene {
   }
 
   update(time, delta) {
+    if (this.paused) return;                 // the pause menu stops the whole world
     var dt = Math.min(delta, 50), s = this;
     this.kb.update();
     this.hero.update(dt);
@@ -497,13 +502,18 @@ BK.LevelScene = class extends Phaser.Scene {
   togglePause() {
     if (this.state === 'end' || this.overlayOpen) return;
     var s = this;
-    if (this.paused) { this.pauseUi.forEach(function (o) { o.destroy(); }); this.paused = false; this.tweens.resumeAll(); this.anims.resumeAll(); return; }
+    if (this.paused) {
+      this.pauseUi.forEach(function (o) { o.destroy(); }); this.pauseUi = [];
+      this.paused = false; this.tweens.resumeAll(); this.anims.resumeAll(); this.time.paused = false;
+      if (this.lastKeyAt) this.lastKeyAt = performance.now();   // the pause does not count as typing time
+      return;
+    }
     this.paused = true;
-    this.tweens.pauseAll(); this.anims.pauseAll();
+    this.tweens.pauseAll(); this.anims.pauseAll(); this.time.paused = true;
     var shade = this.add.rectangle(0, 0, BK.W, BK.H, 0x000000, 0.45).setOrigin(0, 0).setDepth(900);
     var panel = BK.ui.nine(this, 122, 40, 140, 112, 'ui_panel2').setDepth(901);
     var t = BK.ui.text(this, 192, 70, BK.L('Szünet', 'Paused'), { outline: false, size: 2, origin: [0.5, 0.5] }).setDepth(902);
-    var b1 = BK.ui.button(this, 192, 96, BK.L('Folytatom', 'Continue'), function () { s.togglePause(); }, { w: 90 }).setDepth(902);
+    var b1 = BK.ui.button(this, 192, 96, BK.L('Folytatom', 'Continue'), function () { if (s.paused) s.togglePause(); }, { w: 90, key: 'ENTER' }).setDepth(902);
     var b2 = BK.ui.button(this, 192, 120, BK.T.map, function () { s.anims.resumeAll(); s.scene.start('Map'); }, { w: 90 }).setDepth(902);
     this.pauseUi = [shade, panel, t, b1, b2, b1.zone, b2.zone];
   }
@@ -522,6 +532,7 @@ BK.LevelScene = class extends Phaser.Scene {
 
   // ------------------------------------------------------------ end
   endLevel() {
+    if (this.state === 'end') return;
     this.state = 'end';
     this.hero.run();
     var st = this.stats, P = this.profile;

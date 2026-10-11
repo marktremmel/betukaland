@@ -12,7 +12,9 @@ BK.MapScene = class extends Phaser.Scene {
     BK.menuBackground(this, 5, { groundY: 118 });
     BK.audio.apply(P.settings);
     BK.audio.music(BK.MUSIC.map);
-    this.sel = BK.save.currentRegion(P);
+    // come back to the region the child was playing (scene objects are reused: check it is this child's)
+    var last = BK.state.mapSel;
+    this.sel = last && last.id === P.id && BK.save.regionOpen(P, last.r) ? last.r : BK.save.currentRegion(P);
     if (!BK.REGIONS[this.sel - 1].playable) this.sel = 1;
     this.levelSel = this.firstOpenLevel(this.sel);
     this.drawTop();
@@ -76,7 +78,7 @@ BK.MapScene = class extends Phaser.Scene {
       var ic = s.add.sprite(x, y + 12, icons[i], 0).setOrigin(0.5, 1);
       var maxH = 26, sc = Math.min(1, maxH / ic.height, 28 / ic.width);
       // keep whole-pixel scaling for small sprites; big ones are shrunk to fit the node
-      ic.setScale(sc >= 1 ? 1 : (sc >= 0.5 ? 0.5 : 0.25));
+      ic.setScale(sc >= 1 ? 1 : (sc >= 0.5 ? 0.5 : sc));
       if (!open) ic.setTint(0x403838);
       else if (!cleared) ic.setTint(0xd8d0c8);
       var num = BK.ui.text(s, x - 13, y - 15, String(reg.id), { color: cleared ? 0xffd23c : 0xffffff });
@@ -110,7 +112,7 @@ BK.MapScene = class extends Phaser.Scene {
     keep(BK.ui.text(this, 127, 126, this.sel + '. ' + reg.name, { origin: [0.5, 0], color: 0xfff2dc }));
     var keys = reg.capitals ? BK.L('nagybetűk (Shift)', 'capitals (Shift)') : (reg.stories ? BK.L('mondatok, történetek', 'sentences, stories') :
       (BK.wordbank.focus(this.sel).length ? reg.keys.split('').filter(function (c) { return BK.layout.accents || BK.ACCENTS.indexOf(c) < 0; }).join(' ') : BK.T.review));
-    keep(BK.ui.text(this, 127, 150, (keys === BK.T.review ? '' : BK.T.newKeys + ' ') + keys, { outline: false, origin: [0.5, 0.5], color: 0xfff2dc }));
+    keep(BK.ui.text(this, 127, 150, (keys === BK.T.review || reg.stories ? '' : BK.T.newKeys + ' ') + keys, { outline: false, origin: [0.5, 0.5], color: 0xfff2dc }));
     if (!BK.save.regionOpen(P, this.sel) || !reg.playable) {
       keep(BK.ui.text(this, 127, 180, reg.playable ? BK.L('Előbb győzd le az előző vidék főellenségét!', 'First beat the boss of the region before!') : BK.T.regionLocked,
         { outline: false, origin: [0.5, 0.5], color: 0xffe9c8, width: 220, align: 1 }));
@@ -154,6 +156,7 @@ BK.MapScene = class extends Phaser.Scene {
   }
 
   play(r, l) {
+    BK.state.mapSel = { id: this.P.id, r: r };
     var P = this.P;
     if (l === 'daily') {
       var r2 = 1;   // the daily challenge uses the highest playable open region

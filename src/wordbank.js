@@ -8,8 +8,13 @@
  */
 BK.wordbank = (function () {
   var VOWELS = 'aáeéiíoóöőuúüű';
-  var BLOCK = ['fasz', 'szar', 'kaka', 'kak', 'fos', 'segg', 'pina', 'kur', 'buzi', 'ass', 'sex', 'szex',
-    'fuck', 'shit', 'dick', 'hülye', 'pöcs', 'geci', 'cigi', 'pisa', 'kúr'];
+  // Generated drills (random letters and syllables) must never spell anything rude, in Hungarian
+  // or English. Checked as substrings, lower case, on drills only (real word lists are curated).
+  var BLOCK = ['fasz', 'szar', 'kaka', 'kak', 'fos', 'segg', 'pina', 'kur', 'kúr', 'buzi', 'buz', 'ass', 'sex', 'szex',
+    'fuck', 'fuc', 'fuk', 'shit', 'dick', 'dik', 'hülye', 'hüj', 'pöcs', 'geci', 'gec', 'cigi', 'pisa', 'pics',
+    'fag', 'nig', 'neg', 'nég', 'cum', 'tit', 'fap', 'kkk', 'sux', 'suck', 'cock', 'cok', 'kok', 'cunt', 'cun',
+    'twat', 'wank', 'porn', 'piss', 'poo', 'pee', 'boob', 'butt', 'gay', 'hoe', 'jizz', 'xxx', 'kill', 'nazi',
+    'dug', 'szop', 'csöcs', 'basz', 'bazd', 'bazm', 'kuki', 'punci', 'fing', 'anyád', 'hitl'];
   var cache = {};
 
   function splitWords(text) {
@@ -92,7 +97,14 @@ BK.wordbank = (function () {
     var L = lists(lang);
     this.lang = lang;
     this.numbers = /[0-9]/.test(BK.REGIONS[regionId - 1].keys);
-    this.stories = (L.stories || []).map(function (st) { return (st.lines || st).map(BK.util.norm); });
+    // only stories whose every line can be typed here (e.g. no accents on an English keyboard)
+    this.stories = (L.stories || []).map(function (st) { return (st.lines || st).map(BK.util.norm); })
+      .filter(function (ls) { return ls.every(function (l) { return fits(l, this.set); }, this); }, this);
+    // from Region 4 on (capitals), stories written with capitals are preferred
+    if (BK.REGIONS[regionId - 1].capitals || regionId >= 4) {
+      var capped = this.stories.filter(function (ls) { return /^[A-ZÁÉÍÓÖŐÚÜŰ"]/.test(ls[0]); });
+      if (capped.length) this.stories = capped;
+    }
     this.storyI = -1; this.lineI = 0;
     var maxLen = band === '3-4' ? 7 : 10;
     var set = this.set;
@@ -115,6 +127,12 @@ BK.wordbank = (function () {
       if (fresh.length >= 3) this.sentences = fresh;
     }
     var letters = Object.keys(set).filter(function (c) { return c !== ' '; });
+    // English words have no accents: drills for English words leave á é í ... out too
+    if (lang === 'en') {
+      var plain = function (c) { return BK.ACCENTS.indexOf(c) < 0; };
+      letters = letters.filter(plain);
+      this.focus = this.focus.filter(plain);
+    }
     this.vowels = letters.filter(function (c) { return VOWELS.indexOf(c) >= 0; });
     this.consonants = letters.filter(function (c) { return VOWELS.indexOf(c) < 0 && /\p{L}/u.test(c) && c === c.toLowerCase(); });
   }
@@ -148,7 +166,7 @@ BK.wordbank = (function () {
       for (var i = 1; i < n; i++) t += rng.chance(0.5) ? first : rng.pick(f);
       if (!blocked(t) && this._fresh(t)) return t;
     }
-    return t;
+    return blocked(t) ? f[0] : t;
   };
 
   Picker.prototype.syllables = function () {
@@ -167,7 +185,7 @@ BK.wordbank = (function () {
       if (!fits(t, this.set) || blocked(t)) continue;
       if (this._fresh(t)) return t;
     }
-    return t;
+    return (!t || blocked(t) || !fits(t, this.set)) ? this.letters() : t;
   };
 
   Picker.prototype.word = function () {
@@ -221,9 +239,10 @@ BK.wordbank = (function () {
   };
   Picker.prototype.numWord = function () {
     var rng = this.rng, w = this._noun(), n = this._num();
-    var hu = this.lang === 'hu';
-    return rng.pick([n + ' ' + w, n + ' ' + w, cap(w) + '!', cap(w) + '?', '(' + n + ')', '"' + cap(w) + '"',
-      hu ? w + ': ' + n : w + ': ' + n]);
+    // Hungarian keeps the noun singular after a number ("12 macska"); English would need a plural,
+    // so English uses the "cat: 12" form instead
+    var nw = this.lang === 'hu' ? n + ' ' + w : w + ': ' + n;
+    return rng.pick([nw, nw, cap(w) + '!', cap(w) + '?', '(' + n + ')', '"' + cap(w) + '"', w + ': ' + n]);
   };
   Picker.prototype.numPair = function () {
     var rng = this.rng, w = this._noun(), n = this._num(), m = 1 + rng.int(9);
@@ -232,7 +251,7 @@ BK.wordbank = (function () {
       ? ['Hány ' + w + '? ' + m + '!', 'Van ' + n + ' ' + w + '.', cap(w) + ': ' + n + ' darab.', 'Itt van ' + m + ' ' + w + '!',
          '"Hol ' + (/^[aáeéiíoóöőuúüű]/.test(w) ? 'az ' : 'a ') + w + '?"']
       : ['How many? ' + m + '!', 'I have ' + n + '.', cap(w) + ': ' + n + '.', '"Where is my ' + w + '?"']);
-    return fits(t, this.set) ? t : n + ' ' + w;
+    return fits(t, this.set) ? t : (hu ? n + ' ' + w : w + ': ' + n);
   };
 
   // ---- Region 7: stories, one sentence at a time -------------------------
@@ -283,6 +302,7 @@ BK.wordbank = (function () {
   return {
     Picker: Picker,
     storyLibrary: storyLibrary,
+    blocked: blocked,
     allowed: allowed,
     focus: focus,
     fits: fits,
@@ -296,7 +316,7 @@ BK.wordbank = (function () {
       if (BK.REGIONS[r - 1].keys.match(/[0-9]/)) {
         // numbers stage: mix digits into short phrases
         need = [];
-        for (var i = 0; i < 20; i++) need.push((rng.int(90) + 1) + ' ' + rng.pick(p.words));
+        for (var i = 0; i < 20; i++) { var nn = p._noun(); need.push(lang === 'hu' ? (rng.int(90) + 1) + ' ' + nn : nn + ': ' + (rng.int(90) + 1)); }
       }
       rng.shuffle(need);
       return need.slice(0, n);

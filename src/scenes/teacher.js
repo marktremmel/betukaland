@@ -39,10 +39,13 @@ BK.SaveCodeUI = {
     }
     var importProfile = function (p) {
       var names = BK.save.profiles().map(function (q) { return q.nick; });
-      if (profile && p.nick === profile.nick) {
-        // loading your own code on this computer replaces this profile
-        p.id = profile.id;
-        BK.save.replace(p);
+      // the same child already on this computer (own code from the map, or same nickname, figure and grade)
+      var same = profile && p.nick === profile.nick ? profile : BK.save.profiles().filter(function (q) {
+        return q.nick === p.nick && q.avatar === p.avatar && q.grade === p.grade;
+      })[0];
+      if (same) {
+        p = BK.save.merge(same, p);
+        BK.save.persist();
       } else {
         var base = p.nick, n = 2;
         while (names.indexOf(p.nick) >= 0) p.nick = base + ' ' + (n++);
@@ -78,9 +81,10 @@ BK.TeacherScene = class extends Phaser.Scene {
   }
   back() { BK.html.hide(); this.scene.start('Title'); }
 
-  gate() {
+  // changing: the old PIN stays valid until a new one is saved (Back keeps it)
+  gate(changing) {
     var s = this, t = BK.save.teacher();
-    if (!t.pinHash) {
+    if (!t.pinHash || changing) {
       var el = BK.html.show('<h2>Teacher screen</h2><p>Choose a PIN (4 to 8 digits). It keeps students out of this screen; it is not real security.</p>' +
         '<input id="p1" type="password" inputmode="numeric" placeholder="PIN"><input id="p2" type="password" inputmode="numeric" placeholder="PIN again">' +
         '<p id="msg" class="msg"></p><div class="row"><button id="ok">Save PIN</button><button id="cancel" class="secondary">Back</button></div>');
@@ -90,7 +94,7 @@ BK.TeacherScene = class extends Phaser.Scene {
         if (a !== b) { el.querySelector('#msg').textContent = 'The two PINs differ.'; return; }
         t.pinHash = BK.save.pinHash(a); BK.save.persist(); s.dashboard();
       };
-      el.querySelector('#cancel').onclick = function () { s.back(); };
+      el.querySelector('#cancel').onclick = function () { if (changing) s.dashboard(); else s.back(); };
       el.querySelector('#p1').focus();
       return;
     }
@@ -144,7 +148,7 @@ BK.TeacherScene = class extends Phaser.Scene {
       '<div class="row"><button id="csv">Export CSV</button><button id="imp">Import save files</button><input type="file" id="fi" multiple accept=".json" style="display:none">' +
       '<button id="pin" class="secondary">Change PIN</button><button id="close" class="secondary">Close</button></div>');
     el.querySelector('#close').onclick = function () { s.back(); };
-    el.querySelector('#pin').onclick = function () { BK.save.teacher().pinHash = null; BK.save.persist(); s.gate(); };
+    el.querySelector('#pin').onclick = function () { s.gate(true); };
     el.querySelector('#csv').onclick = function () { s.exportCsv(); };
     var fi = el.querySelector('#fi');
     el.querySelector('#imp').onclick = function () { fi.click(); };
@@ -175,10 +179,11 @@ BK.TeacherScene = class extends Phaser.Scene {
     var lines = [head.join(';')];
     BK.save.profiles().forEach(function (p) {
       var m = s.summary(p);
-      var cells = [m.nick, m.grade, m.lang, m.region, m.placed, m.stars, m.crowns, m.streak, m.endless, m.levels, m.levels ? m.acc : '', m.levels ? m.wpm : '', m.best, m.weak, m.coins, m.last];
+      var cells = [m.nick, 'grade ' + m.grade, m.lang, m.region, m.placed, m.stars, m.crowns, m.streak, m.endless, m.levels, m.levels ? m.acc : '', m.levels ? m.wpm : '', m.best, m.weak, m.coins, m.last];
       lines.push(cells.map(function (c) {
         c = String(c);
         if (/^\d+\.\d+$/.test(c)) c = c.replace('.', ',');  // Hungarian Excel expects a decimal comma
+        else if (/^[=+\-@]/.test(c)) c = "'" + c;          // would be read as a formula
         return /[;"\n]/.test(c) ? '"' + c.replace(/"/g, '""') + '"' : c;
       }).join(';'));
     });

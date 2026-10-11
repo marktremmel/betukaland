@@ -49,10 +49,13 @@ BK.menuBackground = function (scene, sky, opts) {
   scene.add.image(330, gy + 1, 'tree').setOrigin(0.5, 1);
   scene.add.image(250, gy + 1, 'bush').setOrigin(0.5, 1);
   out.ground = scene.add.tileSprite(0, gy, BK.W, BK.H - gy, 'ground').setOrigin(0, 0);
-  scene.events.on('update', function (t, d) {
+  var tick = function (t, d) {
     out.layers.forEach(function (l) { l.tilePositionX += l.speed * d / 16; });
     if (opts.scroll) out.ground.tilePositionX += d / 16;
-  });
+  };
+  scene.events.on('update', tick);
+  // scenes are reused: remove the listener when the screen closes, or they pile up
+  scene.events.once('shutdown', function () { scene.events.off('update', tick); });
   return out;
 };
 
@@ -74,14 +77,30 @@ BK.html = {
     var el = this.el();
     el.innerHTML = '<div class="ov-card">' + html + '</div>';
     el.style.display = 'flex';
-    if (window.BK_GAME) BK_GAME.input.keyboard.enabled = false;
+    // the game underneath must not react to clicks on the dialog (Phaser listens on the whole window)
+    if (window.BK_GAME) { BK_GAME.input.keyboard.enabled = false; BK_GAME.input.enabled = false; }
+    if (!el.bkStop) {
+      el.bkStop = true;
+      ['mousedown', 'mouseup', 'pointerdown', 'pointerup', 'touchstart', 'touchend', 'click'].forEach(function (t) {
+        el.addEventListener(t, function (e) { e.stopPropagation(); });
+      });
+      // Esc closes the dialog like its Close / Back button
+      window.addEventListener('keydown', function (e) {
+        if (e.key !== 'Escape' || el.style.display !== 'flex') return;
+        var c = el.querySelector('#bk-close, #close, #cancel'); if (c) c.click();
+      });
+    }
     return el;
   },
   hide: function () {
     var el = this.el();
     el.style.display = 'none';
     el.innerHTML = '';
-    if (window.BK_GAME) BK_GAME.input.keyboard.enabled = true;
+    if (window.BK_GAME) {
+      BK_GAME.input.keyboard.enabled = true;
+      // switch the mouse back on only after this click has finished travelling
+      setTimeout(function () { BK_GAME.input.enabled = true; }, 120);
+    }
   },
   esc: function (s) {
     return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; });

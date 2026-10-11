@@ -2,7 +2,7 @@
 // Same rules as words_hu.js: filtered by unlocked keys at runtime.
 window.BK_WORDS_EN = `
 a as ask asks add adds all fall falls lad lads dad dads sad salad salads flask flasks alas lass glass
-jak kale lake leaf deal seal sale safe self desk
+kale lake leaf deal seal sale safe self desk
 egg eggs frog frogs dog dogs toy toys tree trees fish wish water tiger tigers apple apples pear pears
 quiet quick queen quilt tower power tea tree street sweet sweater pie pies pig pigs rope ride ridge
 hat hats hit sit fit kit kite kites ship shop shops top tops pot pots hop hope rose roses red green
@@ -41,7 +41,7 @@ window.BK_STORIES_EN = [
   { id: 'birthday', title: 'Birthday', lines: ["Today Dan is 10 years old!", "There are 10 candles on the cake.",
     "Everyone sings: \"Happy birthday!\"", "Dan blows out the candles.", "\"What did you wish for?\" asks Mia.", "\"It is a secret!\" laughs Dan."] },
   { id: 'rabbit', title: 'Rabbit and fox', lines: ["The little rabbit went into the forest.", "On the path it met a fox.", "\"Hi! Where are you going?\" asked the fox.",
-   "\"To the river, to drink.\" said the rabbit.", "They walked on together and laughed a lot."] },
+   "\"To the river, to drink,\" said the rabbit.", "They walked on together and laughed a lot."] },
   { id: 'rain', title: 'A rainy day', lines: ["It was raining in the morning.", "Peter put on his yellow raincoat.", "He jumped in all the puddles.",
    "At noon the sun came out.", "A rainbow appeared in the sky!"] },
   { id: 'drawing', title: 'Anna draws', lines: ["Anna is 9 and she loves to draw.", "Today she drew a dragon in her book.", "The dragon was green and it smiled.",

@@ -26,15 +26,19 @@ BK.TitleScene = class extends Phaser.Scene {
       BK.applyUiLang(BK.uiLang === 'en' ? 'hu' : 'en', null);
       s.scene.restart();
     }, { w: 60, h: 18 });
-    lb.zone.on('pointerdown', function () { s.langClick = true; });
+    lb.zone.on('pointerdown', function () { s.langClick = true; setTimeout(function () { s.langClick = false; }, 400); });
     if (BK.DEBUG) BK.ui.text(this, BK.W / 2, 140, BK.L('TESZT MÓD: minden pálya nyitva', 'TEST MODE: every level open'), { origin: [0.5, 0.5], color: 0xff9a7a });
     BK.ui.text(this, BK.W / 2, 208, 'v' + BK.VERSION, { origin: [0.5, 0.5], color: 0xfff2dc }).setAlpha(0.6);
 
     BK.audio.music(BK.MUSIC.title);
     // the scene object is reused, so the "already leaving" flag must start fresh every time
     this.leaving = false;
+    this.langClick = false;
     var go = function () { if (s.leaving) return; s.leaving = true; BK.audio.sfx('chime'); s.scene.start('Profiles'); };
-    this.input.keyboard.on('keydown', function (e) { if (e.key !== 'Tab' && e.key !== 'Escape') go(); });
+    // a plain window listener: Phaser skips keys the page already handled (Space, Backspace)
+    var onKey = function (e) { if (e.key !== 'Tab' && e.key !== 'Escape' && !e.repeat && !s.langClick) go(); };
+    window.addEventListener('keydown', onKey);
+    this.events.once('shutdown', function () { window.removeEventListener('keydown', onKey); });
     var zone = this.add.zone(BK.W / 2, 110, BK.W, 150).setInteractive();
     zone.on('pointerup', function () { if (!s.langClick) go(); });
     if (!BK.save.storageOk()) {

@@ -49,7 +49,7 @@ BK.ResultsScene = class extends Phaser.Scene {
     if (r.acc < 0.85) tip = BK.T.slowDown;
     else if (r.stars < 2) tip = BK.L('2 csillag: ', '2 stars: ') + Math.round(BK.STARS.two * 100) + BK.L('% pontosság', '% accuracy');
     else if (r.stars < 3) tip = BK.L('3 csillag: ', '3 stars: ') + Math.round(BK.STARS.three * 100) + BK.L('% és ', '% and ') + r.target + ' ' + BK.T.wpm;
-    else tip = BK.pick(BK.L(['Tökéletes!', 'Hibátlan munka!', 'Csillagos ötös!'], ['Perfect!', 'Flawless work!', 'Top marks!']));
+    else tip = r.acc >= 0.999 ? BK.pick(BK.L(['Hibátlan!', 'Tökéletes!'], ['Flawless!', 'Perfect!'])) : BK.pick(BK.L(['Szuper munka!', 'Csillagos ötös!'], ['Great work!', 'Top marks!']));
     if (r.practice === 'endless') tip = '';
     // crowns: mastery on levels of a region whose boss is beaten
     var crownable = r.l >= 0 && r.l <= 3 && !r.daily && BK.save.regionCleared(P, r.r);
@@ -69,13 +69,13 @@ BK.ResultsScene = class extends Phaser.Scene {
       if (G.bonus) msgs.push(BK.T.goalsAll.replace('{n}', BK.goals.BONUS));
       msgs.forEach(function (m, i) {
         s.time.delayedCall(1600 + i * 2600, function () {
-          BK.ui.toast(s, 192, 162, m, 0xffd23c, 1, 1400);
+          BK.ui.toast(s, 192, 176, m, 0xffd23c, 1, 1400);
           BK.audio.sfx('coin', { volume: 0.5 });
         });
       });
     }
     if (r.newBest) {
-      var nb = BK.ui.text(this, 72, 50, BK.T.newBest, { origin: [0.5, 0.5], color: 0xffd23c });
+      var nb = BK.ui.text(this, 72, 48, BK.T.newBest, { origin: [0.5, 0.5], color: 0xffd23c, px: 10 });
       this.tweens.add({ targets: nb, scale: 1.2, duration: 400, yoyo: true, repeat: -1 });
       this.time.delayedCall(1300, function () { BK.audio.sfx('v_highscore', { volume: 0.7 }); });
     } else if (r.stars === 3) {
@@ -89,10 +89,10 @@ BK.ResultsScene = class extends Phaser.Scene {
       // boss beaten: the next region opens
       nextRegion = r.r + 1; nextLevel = 0;
       var nr = BK.REGIONS[r.r];
-      var msg = BK.ui.text(this, 192, 172, BK.L('Új vidék: ', 'New region: ') + nr.name + '!', { origin: [0.5, 0.5], color: 0xffd23c });
+      var msg = BK.ui.text(this, 192, 156, BK.L('Új vidék: ', 'New region: ') + nr.name + '!', { origin: [0.5, 0.5], color: 0xffd23c });
       this.tweens.add({ targets: msg, scale: 1.15, duration: 500, yoyo: true, repeat: -1 });
     } else if (!r.daily && r.l === 3 && r.r === BK.REGIONS.length) {
-      BK.ui.text(this, 192, 172, BK.L('Végigértél a Betűkalandon! Gratulálunk!', 'You finished the Typing Adventure! Well done!'), { origin: [0.5, 0.5], color: 0xffd23c });
+      BK.ui.text(this, 192, 156, BK.L('Végigértél a Betűkalandon! Gratulálunk!', 'You finished the Typing Adventure! Well done!'), { origin: [0.5, 0.5], color: 0xffd23c });
       BK.fx.confetti(this, 192, 60);
     }
     var canNext = nextLevel !== null && BK.save.levelUnlocked(P, nextRegion, nextLevel);
@@ -124,7 +124,8 @@ BK.ResultsScene = class extends Phaser.Scene {
     for (var gy = 0; gy <= 4; gy++) g.lineBetween(x, y + 4 + gy * (h - 20) / 4, x + w, y + 4 + gy * (h - 20) / 4);
     if (!hist.length) return;
     var maxW = Math.max(10, Math.max.apply(null, hist.map(function (h) { return h.wpm; })) * 1.15);
-    var n = hist.length, step = w / Math.max(n, 1), base = y + h - 16, top = y + 4;
+    var n = hist.length, step = w / 12, base = y + h - 16, top = y + 4;
+    x += (12 - n) * step;   // newest level always on the right
     // accuracy bars (light), WPM line (dark)
     hist.forEach(function (hh, i) {
       var bh = (base - top) * BK.util.clamp((hh.acc - 0.5) / 0.5, 0, 1);

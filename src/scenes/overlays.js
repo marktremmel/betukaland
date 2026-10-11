@@ -44,6 +44,8 @@ BK.ShopScene = class extends BK.OverlayBase {
     var s = this, P = this.P, b = this.box;
     this.clearD();
     this.coinText.setText(String(P.coins));
+    // which tab is open
+    this.keepD(this.add.rectangle(b.x + (this.tab === 0 ? 76 : 146), b.y + 46, 68, 20).setStrokeStyle(1, 0x9a3d1a));
     var list = this.tab === 0 ? BK.OUTFITS : BK.PETS;
     list.forEach(function (it, i) {
       var col = i % 3, row = Math.floor(i / 3);
@@ -69,7 +71,7 @@ BK.ShopScene = class extends BK.OverlayBase {
       return;
     }
     if (!owned) {
-      if (P.coins < it.price) { BK.ui.toast(this, BK.W / 2, 150, BK.T.notEnough, 0xff9a7a); BK.audio.sfx('key_bad', { volume: 0.3 }); return; }
+      if (P.coins < it.price) { BK.ui.toast(this, BK.W / 2, this.box.y + this.box.h - 34, BK.T.notEnough, 0xff9a7a); BK.audio.sfx('key_bad', { volume: 0.3 }); return; }
       P.coins -= it.price;
       if (this.tab === 0) P.outfits.push(it.id); else P.pets.push(it.id);
       BK.audio.sfx('buy');
@@ -120,7 +122,7 @@ BK.SettingsScene = class extends BK.OverlayBase {
     ];
     toggles.forEach(function (r, i) {
       var y = b.y + 56 + i * 22;
-      s.keepD(BK.ui.text(s, b.x + 20, y, r[1], { outline: false, origin: [0, 0.5] }));
+      s.keepD(BK.ui.text(s, b.x + 20, y, r[1], { outline: false, origin: [0, 0.5], fit: 118 }));
       var on = !!P.settings[r[0]];
       s.keepD(BK.ui.button(s, b.x + 158, y, on ? BK.T.on : BK.T.off, function () {
         P.settings[r[0]] = !P.settings[r[0]];
@@ -147,7 +149,7 @@ BK.SettingsScene = class extends BK.OverlayBase {
     ];
     choices.forEach(function (c, i) {
       var y = b.y + 56 + i * 22;
-      s.keepD(BK.ui.text(s, b.x + 186, y, c[0], { outline: false, origin: [0, 0.5] }));
+      s.keepD(BK.ui.text(s, b.x + 186, y, c[0], { outline: false, origin: [0, 0.5], fit: 82 }));
       s.keepD(BK.ui.button(s, b.x + b.w - 50, y, c[1], c[2], { w: 70, h: 18 }));
     });
     if (lay.id !== 'hu') {

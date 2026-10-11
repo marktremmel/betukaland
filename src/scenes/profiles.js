@@ -93,15 +93,17 @@ BK.NewProfileScene = class extends Phaser.Scene {
       this.keep(BK.ui.text(this, 192, 118, BK.T.nickHint, { outline: false, origin: [0.5, 0.5], color: 0x6b3a20 }));
       this.keep(BK.ui.button(this, 192, 150, BK.T.next, function () { s.nextStep(); }, { w: 80 }));
     } else if (this.step === 1) {
-      this.keep(BK.ui.text(this, 192, 50, BK.T.chooseAvatar, { outline: false, size: 2, origin: [0.5, 0.5] }));
+      this.keep(BK.ui.text(this, 192, 44, BK.T.chooseAvatar, { outline: false, size: 2, origin: [0.5, 0.5] }));
       BK.HEROES.forEach(function (h, i) {
-        var x = 102 + (i % 3) * 90, y = 86 + Math.floor(i / 3) * 46;
+        // figure above, name below, the chosen one framed in white
+        var x = 102 + (i % 3) * 90, y = 79 + Math.floor(i / 3) * 52;
         var sel = i === s.avatar;
-        s.keep(BK.ui.nine(s, x - 30, y - 22, 60, 44, sel ? 'ui_slot_sel' : 'ui_slot'));
-        var spr = s.keep(BK.avatarSprite(s, x - 10, y + 16, i));
-        s.keep(BK.ui.text(s, x + 26, y + 10, h.name, { outline: false, origin: [1, 0], color: sel ? 0x9a3d1a : 0x4a2c1c }));
-        if (sel) s.keep(s.add.rectangle(x, y, 64, 48).setStrokeStyle(2, 0xffffff));
-        var z = s.keep(s.add.zone(x, y, 60, 44).setInteractive({ useHandCursor: true }));
+        s.keep(BK.ui.nine(s, x - 32, y - 25, 64, 50, sel ? 'ui_slot_sel' : 'ui_slot'));
+        var spr = s.keep(BK.avatarSprite(s, x, y + 6, i));
+        if (h.id === 'crab') spr.setScale(2);           // the crab is tiny
+        s.keep(BK.ui.text(s, x, y + 7, h.name, { outline: false, origin: [0.5, 0], color: 0x4a2c1c, bold: sel, fit: 58 }));
+        if (sel) s.keep(s.add.rectangle(x, y, 68, 54).setStrokeStyle(2, 0xffffff));
+        var z = s.keep(s.add.zone(x, y, 64, 50).setInteractive({ useHandCursor: true }));
         // first click selects, a second click on the same figure confirms
         z.on('pointerup', function () {
           BK.audio.sfx('ui');
@@ -121,12 +123,13 @@ BK.NewProfileScene = class extends Phaser.Scene {
     }
     this.keep(BK.ui.button(this, 52, 204, BK.T.back, function () {
       if (s.step === 0) s.scene.start('Profiles'); else { s.step--; s.draw(); }
-    }, { w: 70, h: 18 }));
+    }, { w: 70, h: 18, key: 'ESC' }));
   }
 
   onKey(e) {
     if (e.metaKey || (e.ctrlKey && !e.altKey)) return;
     var k = e.key;
+    if (k === 'Enter' && e.repeat) return;     // a held Enter must not skip the next steps
     if (this.step === 0) {
       if (k === 'Enter') { this.nextStep(); return; }
       if (k === 'Backspace') { this.nick = Array.from(this.nick).slice(0, -1).join(''); }

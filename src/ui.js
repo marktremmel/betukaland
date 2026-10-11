@@ -66,6 +66,11 @@ BK.ui.text = function (scene, x, y, str, opts) {
   var px = opts.px || (size === 1 ? BK.ui.PX : 8 * size);
   var outline = opts.outline !== false;
   var bold = opts.bold !== undefined ? opts.bold : (size >= 2 || outline);
+  // fit: never wider than this (long words, wide fonts like Lexend): shrink the letters a little
+  if (opts.fit && str.indexOf('\n') < 0) {
+    var w0 = BK.ui.measure(str, px, bold);
+    if (w0 > opts.fit) px = Math.max(7, Math.floor(px * opts.fit / w0));
+  }
   var style = {
     fontFamily: BK.FONT, fontSize: px + 'px', fontStyle: bold ? 'bold' : 'normal', color: '#ffffff',
     align: ['left', 'center', 'right'][opts.align || 0],
@@ -103,20 +108,25 @@ BK.ui.button = function (scene, x, y, label, onClick, opts) {
   var up = BK.ui.nine(scene, 0, 0, w, h, 'ui_btn');
   var down = BK.ui.nine(scene, 0, 1, w, h - 1, 'ui_btn_down').setVisible(false);
   var lift = h >= 18 ? 3 : (h >= 16 ? 1 : 0);      // the font's accent room sits above the letters
-  var txt = BK.ui.text(scene, w / 2, h / 2 - lift, label, { outline: false, origin: [0.5, 0.5], color: opts.color || 0x4a2c1c });
+  var txt = BK.ui.text(scene, w / 2, h / 2 - lift, label, { outline: false, origin: [0.5, 0.5], color: opts.color || 0x4a2c1c, fit: w - 8 });
   c.add([up, down, txt]);
   c.setSize(w, h);
   var zone = scene.add.zone(x, y, w, h).setInteractive({ useHandCursor: true });
   c.zone = zone;
   c.label = txt;
+  // One press at a time (a double click must not buy twice), and nothing happens if the
+  // button was removed in the meantime. A real timer, so it also works under the pause menu.
   var press = function () {
-    if (c.disabled) return;
+    if (c.disabled || c.busy) return;
+    c.busy = true;
     BK.audio.sfx('ui');
     up.setVisible(false); down.setVisible(true); txt.y = h / 2 - lift + 1;
-    scene.time.delayedCall(90, function () {
+    setTimeout(function () {
+      c.busy = false;
+      if (!c.scene || !zone.input) return;            // destroyed meanwhile
       up.setVisible(true); down.setVisible(false); txt.y = h / 2 - lift;
       onClick();
-    });
+    }, 90);
   };
   zone.on('pointerover', function () { if (!c.disabled) txt.setTint(0x9a3d1a); });
   zone.on('pointerout', function () { txt.setTint(c.disabled ? 0x9a8a80 : (opts.color || 0x4a2c1c)); });
@@ -125,7 +135,8 @@ BK.ui.button = function (scene, x, y, label, onClick, opts) {
   c.setDisabled = function (d) { c.disabled = d; c.setAlpha(d ? 0.55 : 1); txt.setTint(d ? 0x9a8a80 : (opts.color || 0x4a2c1c)); };
   c.destroyAll = function () { zone.destroy(); c.destroy(); };
   if (opts.key) {
-    scene.input.keyboard.on('keydown-' + opts.key, function () { if (c.visible && !c.disabled && zone.input && zone.input.enabled) press(); });
+    // a held key repeats: only a fresh press counts, so holding Enter cannot skip screens
+    scene.input.keyboard.on('keydown-' + opts.key, function (e) { if (e && e.repeat) return; if (c.visible && !c.disabled && zone.input && zone.input.enabled) press(); });
   }
   if (opts.disabled) c.setDisabled(true);
   return c;

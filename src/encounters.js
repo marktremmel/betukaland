@@ -330,11 +330,12 @@ BK.Boss = class extends BK.Mini {
     var hy = this.tall ? 30 : BK.GROUND_Y - 84;
     this.hearts.forEach(function (h, i) { h.setPosition(x + (i - (n - 1) / 2) * gap, hy); h.setVisible(true); });
     this.nameTag = BK.ui.text(this.scene, x, this.tall ? hy + 10 : hy - 22, this.def.name || '', { origin: [0.5, 0], color: 0xffe9c8 }).setDepth(260);
-    BK.ui.toast(this.scene, 160, 108, this.def.intro || '', 0xffe9c8);
+    BK.ui.toast(this.scene, 150, BK.GROUND_Y - 6, this.def.intro || '', 0xffe9c8, 1, 1500);
     BK.Encounter.prototype.activate.call(this);
   }
   bubbleX() { return 150; }
-  bubbleY() { return BK.GROUND_Y - 48; }
+  // below the hearts and the name (the big dragon flies high), and a little narrower
+  bubbleY() { return this.tall ? BK.GROUND_Y - 30 : BK.GROUND_Y - 44; }
   update(dt) {
     this.tt = (this.tt || 0) + dt;
     if (this.spr && this.active !== false) this.spr.y = this.baseY + Math.round(Math.sin(this.tt / 300) * (this.tall ? 3 : 1));

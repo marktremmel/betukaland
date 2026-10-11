@@ -24,7 +24,7 @@ krokodil panda koala kenguru rakéta napfény csipog brummog zizeg alszik eszik 
 siet keres hall kap vesz visz hoz fog tud kér mesél énekel fekete fehér nagy kicsi puha kemény édes finom
 tiszta boldog kedves vicces szuper csinos ablak alma almafa citromfa nyuszifül meleg hideg
 ágy állat áfonya ásít éjjel éjszaka ének épít érett érme íj ír író ízes óra óriás óvoda ősz őz őzike öt öröm
-öltözik öböl ölel úszik út újság ügyes üveg ül üres ünnep űr űrhajó fű tű tűz dió dínó fenyő fészek fiók folyó
+öltözik öböl ölel úszik út újság ügyes üveg ül üres ünnep űr űrhajó fű tű tűz dió dinó fenyő fészek fiók folyó
 forró fúj füzet fül gólya gyöngy gyümölcs hattyú hajó hód holló hópehely hóember hűtő jég játék játszik kakaó
 kalács kanál karácsony kastély kéz kígyó kosár kő könyv kör körte láb láda lámpa lány lapát levél ló málna mackó
 méh méz mókus nyár olló ország oroszlán pálma pék pillangó pók póni répa rét rigó róka rózsa sál sárga sátor séta
@@ -113,7 +113,7 @@ window.BK_STORIES_HU = [
   { id: 'horcsog', title: 'Pötty, a hörcsög', lines: ["Van egy hörcsögöm, Pötty a neve.", "Pötty 2 éves, és nagyon kíváncsi.",
     "Reggel friss vizet és magot kap.", "Délután kiveszem a ketrecből.", "Megkérdezem: \"Éhes vagy?\"", "Pötty szimatol, aztán eszik egy darab répát."] },
   { id: 'nyuszi', title: 'Nyuszi és róka', lines: ["A kis nyuszi elindult az erdőbe.", "Az ösvényen egy rókával találkozott.", "\"Szia! Hová mész?\" - kérdezte a róka.",
-   "\"A patakhoz, vizet inni.\" - felelte a nyuszi.", "Együtt mentek tovább, és sokat nevettek."] },
+   "\"A patakhoz, vizet inni\" - felelte a nyuszi.", "Együtt mentek tovább, és sokat nevettek."] },
   { id: 'eso', title: 'Esős nap', lines: ["Reggel esett az eső.", "Peti felvette a sárga esőkabátját.", "A pocsolyákban vidáman ugrált.",
    "Délre kisütött a nap.", "Az égen szivárvány jelent meg!"] },
   { id: 'rajz', title: 'Anna rajza', lines: ["Anna 9 éves, és nagyon szeret rajzolni.", "Ma egy sárkányt rajzolt a füzetébe.", "A sárkány zöld volt, és mosolygott.",
