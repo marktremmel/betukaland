@@ -78,6 +78,17 @@
   Promise.all(faces).then(go);
   setTimeout(go, 3000);     // never wait forever for a font
 
+  // Inside a frame (itch.io page) the keyboard only reaches the game after a click on it.
+  // When the frame loses focus, say so, so a child does not think the game is stuck.
+  if (window.self !== window.top) {
+    var hint = document.getElementById('focushint');
+    var show = function (v) { if (hint) hint.style.display = v ? 'block' : 'none'; };
+    window.addEventListener('blur', function () { show(true); });
+    window.addEventListener('focus', function () { show(false); });
+    window.addEventListener('pointerdown', function () { window.focus(); show(false); });
+    if (!document.hasFocus()) show(true);
+  }
+
   // Space, quote and slash would scroll or open quick-find in some browsers
   window.addEventListener('keydown', function (e) {
     if (BK.DEBUG && e.key === 'Tab') e.preventDefault();

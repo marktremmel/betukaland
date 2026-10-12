@@ -2,3 +2,4 @@
 __pycache__/
 * 2.*
 push_to_github.command
+itch/*.zip
