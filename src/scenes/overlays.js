@@ -1,6 +1,6 @@
 /*
  * Overlay scenes opened on top of the map or a level:
- * Shop (outfits and pets), Bag (collected treasures), Settings.
+ * Shop (outfits, pets and switching figures, which is free), Bag (collected treasures), Settings.
  * Each is started with { from, onClose } and calls onClose when it closes.
  */
 BK.OverlayBase = class extends Phaser.Scene {
@@ -35,8 +35,10 @@ BK.ShopScene = class extends BK.OverlayBase {
     this.karou = this.add.sprite(b.x + 34, b.y + b.h - 6, 'karou_sit').setOrigin(0.5, 1).play('karou_sit');
     BK.ui.button(this, b.x + 76, b.y + 46, BK.T.outfits, function () { s.tab = 0; s.draw(); }, { w: 64, h: 16 });
     BK.ui.button(this, b.x + 146, b.y + 46, BK.T.pets, function () { s.tab = 1; s.draw(); }, { w: 64, h: 16 });
-    this.coinIcon = this.add.sprite(b.x + b.w - 52, b.y + 46, 'coin').play('coin');
-    this.coinText = BK.ui.text(this, b.x + b.w - 42, b.y + 40, '', { outline: false, color: 0x9a3d1a });
+    // switching figures only from the map: in a level the hero is already on the road
+    if (this.data0.from !== 'Level') BK.ui.button(this, b.x + 216, b.y + 46, BK.T.figures, function () { s.tab = 2; s.draw(); }, { w: 64, h: 16 });
+    this.coinIcon = this.add.sprite(b.x + b.w - 44, b.y + 30, 'coin').play('coin');
+    this.coinText = BK.ui.text(this, b.x + b.w - 34, b.y + 24, '', { outline: false, color: 0x9a3d1a });
     BK.audio.sfx('v_hiya', { volume: 0.5 });
     this.draw();
   }
@@ -45,7 +47,9 @@ BK.ShopScene = class extends BK.OverlayBase {
     this.clearD();
     this.coinText.setText(String(P.coins));
     // which tab is open
-    this.keepD(this.add.rectangle(b.x + (this.tab === 0 ? 76 : 146), b.y + 46, 68, 20).setStrokeStyle(1, 0x9a3d1a));
+    this.keepD(this.add.rectangle(b.x + 76 + this.tab * 70, b.y + 46, 68, 20).setStrokeStyle(1, 0x9a3d1a));
+    this.karou.setVisible(this.tab !== 2);
+    if (this.tab === 2) { this.drawFigures(); return; }
     var list = this.tab === 0 ? BK.OUTFITS : BK.PETS;
     list.forEach(function (it, i) {
       var col = i % 3, row = Math.floor(i / 3);
@@ -63,6 +67,28 @@ BK.ShopScene = class extends BK.OverlayBase {
       var label = wearing ? (s.tab === 1 ? BK.L('Hazaküld', 'Send home') : BK.T.wearing) : (owned ? BK.T.wear : BK.T.buy);
       var btn = s.keepD(BK.ui.button(s, x + 58, y + 42, label, function () { s.act(it, owned, wearing); }, { w: 56, h: 16, disabled: wearing && s.tab === 0 }));
     });
+  }
+  // Figures: free to switch, 5 x 3 small slots, the current one framed in white
+  drawFigures() {
+    var s = this, P = this.P, b = this.box;
+    BK.HEROES.forEach(function (h, i) {
+      var x = b.x + 38 + (i % 5) * 56, y = b.y + 76 + Math.floor(i / 5) * 38;
+      var sel = i === (P.avatar || 0);
+      s.keepD(BK.ui.nine(s, x - 26, y - 18, 52, 36, sel ? 'ui_slot_sel' : 'ui_slot'));
+      var spr = s.keepD(BK.avatarSprite(s, x, y + 16, i, P));
+      spr.setScale(h.id === 'crab' ? 1.4 : Math.min(1, 30 / spr.height));
+      if (sel) s.keepD(s.add.rectangle(x, y, 56, 40).setStrokeStyle(2, 0xffffff));
+      var z = s.keepD(s.add.zone(x, y, 52, 36).setInteractive({ useHandCursor: true }));
+      z.on('pointerup', function () {
+        if (P.avatar === i) return;
+        P.avatar = i;
+        BK.audio.sfx('ui');
+        BK.save.persist();
+        s.draw();
+      });
+    });
+    this.keepD(BK.ui.text(this, b.x + 14, b.y + b.h - 16, BK.T.figureNow + ' ' + BK.heroOf(P).name,
+      { outline: false, origin: [0, 0.5], color: 0x9a3d1a, fit: 96 }));
   }
   act(it, owned, wearing) {
     var P = this.P;

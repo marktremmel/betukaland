@@ -39,9 +39,10 @@ BK.SaveCodeUI = {
     }
     var importProfile = function (p) {
       var names = BK.save.profiles().map(function (q) { return q.nick; });
-      // the same child already on this computer (own code from the map, or same nickname, figure and grade)
+      // the same child already on this computer (own code from the map, or same nickname and grade;
+      // not the figure, since children can switch figures in the shop)
       var same = profile && p.nick === profile.nick ? profile : BK.save.profiles().filter(function (q) {
-        return q.nick === p.nick && q.avatar === p.avatar && q.grade === p.grade;
+        return q.nick === p.nick && q.grade === p.grade;
       })[0];
       if (same) {
         p = BK.save.merge(same, p);

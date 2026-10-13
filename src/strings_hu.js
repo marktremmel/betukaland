@@ -123,6 +123,8 @@ BK.STR.hu = {
   wear: 'Felveszem',
   wearing: 'Rajtad',
   notEnough: 'Még nincs elég érméd.',
+  figures: 'Figurák',
+  figureNow: 'Most:',
   outfits: 'Ruhák',
   pets: 'Kedvencek',
   items: 'Kincsek',

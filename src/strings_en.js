@@ -123,6 +123,8 @@ BK.STR.en = {
   wear: 'Wear',
   wearing: 'Wearing',
   notEnough: 'Not enough coins yet.',
+  figures: 'Figures',
+  figureNow: 'Now:',
   outfits: 'Outfits',
   pets: 'Pets',
   items: 'Treasures',

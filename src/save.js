@@ -109,6 +109,7 @@ BK.save = (function () {
     local.best.acc = Math.max(local.best.acc, inc.best.acc || 0);
     local.best.endless = Math.max(local.best.endless || 0, inc.best.endless || 0);
     local.placed = Math.max(local.placed || 0, inc.placed || 0) || null;
+    local.avatar = inc.avatar;              // the figure can change, the code carries the latest choice
     ['layout', 'ui', 'font'].forEach(function (k) { if (inc.settings[k]) local.settings[k] = inc.settings[k]; });
     return local;
   }
