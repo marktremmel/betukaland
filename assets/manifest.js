@@ -595,6 +595,594 @@ window.BK_MANIFEST = {
    "fh": 32,
    "frames": 4,
    "fps": 8
+  },
+  "cheetah_idle": {
+   "url": "assets/sprites/cheetah_idle.png",
+   "fw": 44,
+   "fh": 43,
+   "frames": 4,
+   "fps": 6
+  },
+  "cheetah_idle_blue": {
+   "url": "assets/sprites/cheetah_idle_blue.png",
+   "fw": 44,
+   "fh": 43,
+   "frames": 4,
+   "fps": 6
+  },
+  "cheetah_idle_mint": {
+   "url": "assets/sprites/cheetah_idle_mint.png",
+   "fw": 44,
+   "fh": 43,
+   "frames": 4,
+   "fps": 6
+  },
+  "cheetah_idle_pink": {
+   "url": "assets/sprites/cheetah_idle_pink.png",
+   "fw": 44,
+   "fh": 43,
+   "frames": 4,
+   "fps": 6
+  },
+  "cheetah_idle_gold": {
+   "url": "assets/sprites/cheetah_idle_gold.png",
+   "fw": 44,
+   "fh": 43,
+   "frames": 4,
+   "fps": 6
+  },
+  "cheetah_idle_night": {
+   "url": "assets/sprites/cheetah_idle_night.png",
+   "fw": 44,
+   "fh": 43,
+   "frames": 4,
+   "fps": 6
+  },
+  "cheetah_run": {
+   "url": "assets/sprites/cheetah_run.png",
+   "fw": 64,
+   "fh": 42,
+   "frames": 6,
+   "fps": 12
+  },
+  "cheetah_run_blue": {
+   "url": "assets/sprites/cheetah_run_blue.png",
+   "fw": 64,
+   "fh": 42,
+   "frames": 6,
+   "fps": 12
+  },
+  "cheetah_run_mint": {
+   "url": "assets/sprites/cheetah_run_mint.png",
+   "fw": 64,
+   "fh": 42,
+   "frames": 6,
+   "fps": 12
+  },
+  "cheetah_run_pink": {
+   "url": "assets/sprites/cheetah_run_pink.png",
+   "fw": 64,
+   "fh": 42,
+   "frames": 6,
+   "fps": 12
+  },
+  "cheetah_run_gold": {
+   "url": "assets/sprites/cheetah_run_gold.png",
+   "fw": 64,
+   "fh": 42,
+   "frames": 6,
+   "fps": 12
+  },
+  "cheetah_run_night": {
+   "url": "assets/sprites/cheetah_run_night.png",
+   "fw": 64,
+   "fh": 42,
+   "frames": 6,
+   "fps": 12
+  },
+  "panda_idle": {
+   "url": "assets/sprites/panda_idle.png",
+   "fw": 30,
+   "fh": 40,
+   "frames": 4,
+   "fps": 6
+  },
+  "panda_idle_blue": {
+   "url": "assets/sprites/panda_idle_blue.png",
+   "fw": 30,
+   "fh": 40,
+   "frames": 4,
+   "fps": 6
+  },
+  "panda_idle_mint": {
+   "url": "assets/sprites/panda_idle_mint.png",
+   "fw": 30,
+   "fh": 40,
+   "frames": 4,
+   "fps": 6
+  },
+  "panda_idle_pink": {
+   "url": "assets/sprites/panda_idle_pink.png",
+   "fw": 30,
+   "fh": 40,
+   "frames": 4,
+   "fps": 6
+  },
+  "panda_idle_gold": {
+   "url": "assets/sprites/panda_idle_gold.png",
+   "fw": 30,
+   "fh": 40,
+   "frames": 4,
+   "fps": 6
+  },
+  "panda_idle_night": {
+   "url": "assets/sprites/panda_idle_night.png",
+   "fw": 30,
+   "fh": 40,
+   "frames": 4,
+   "fps": 6
+  },
+  "panda_run": {
+   "url": "assets/sprites/panda_run.png",
+   "fw": 32,
+   "fh": 39,
+   "frames": 6,
+   "fps": 12
+  },
+  "panda_run_blue": {
+   "url": "assets/sprites/panda_run_blue.png",
+   "fw": 32,
+   "fh": 39,
+   "frames": 6,
+   "fps": 12
+  },
+  "panda_run_mint": {
+   "url": "assets/sprites/panda_run_mint.png",
+   "fw": 32,
+   "fh": 39,
+   "frames": 6,
+   "fps": 12
+  },
+  "panda_run_pink": {
+   "url": "assets/sprites/panda_run_pink.png",
+   "fw": 32,
+   "fh": 39,
+   "frames": 6,
+   "fps": 12
+  },
+  "panda_run_gold": {
+   "url": "assets/sprites/panda_run_gold.png",
+   "fw": 32,
+   "fh": 39,
+   "frames": 6,
+   "fps": 12
+  },
+  "panda_run_night": {
+   "url": "assets/sprites/panda_run_night.png",
+   "fw": 32,
+   "fh": 39,
+   "frames": 6,
+   "fps": 12
+  },
+  "firefox_idle": {
+   "url": "assets/sprites/firefox_idle.png",
+   "fw": 48,
+   "fh": 43,
+   "frames": 4,
+   "fps": 6
+  },
+  "firefox_idle_blue": {
+   "url": "assets/sprites/firefox_idle_blue.png",
+   "fw": 48,
+   "fh": 43,
+   "frames": 4,
+   "fps": 6
+  },
+  "firefox_idle_mint": {
+   "url": "assets/sprites/firefox_idle_mint.png",
+   "fw": 48,
+   "fh": 43,
+   "frames": 4,
+   "fps": 6
+  },
+  "firefox_idle_pink": {
+   "url": "assets/sprites/firefox_idle_pink.png",
+   "fw": 48,
+   "fh": 43,
+   "frames": 4,
+   "fps": 6
+  },
+  "firefox_idle_gold": {
+   "url": "assets/sprites/firefox_idle_gold.png",
+   "fw": 48,
+   "fh": 43,
+   "frames": 4,
+   "fps": 6
+  },
+  "firefox_idle_night": {
+   "url": "assets/sprites/firefox_idle_night.png",
+   "fw": 48,
+   "fh": 43,
+   "frames": 4,
+   "fps": 6
+  },
+  "firefox_run": {
+   "url": "assets/sprites/firefox_run.png",
+   "fw": 56,
+   "fh": 42,
+   "frames": 6,
+   "fps": 12
+  },
+  "firefox_run_blue": {
+   "url": "assets/sprites/firefox_run_blue.png",
+   "fw": 56,
+   "fh": 42,
+   "frames": 6,
+   "fps": 12
+  },
+  "firefox_run_mint": {
+   "url": "assets/sprites/firefox_run_mint.png",
+   "fw": 56,
+   "fh": 42,
+   "frames": 6,
+   "fps": 12
+  },
+  "firefox_run_pink": {
+   "url": "assets/sprites/firefox_run_pink.png",
+   "fw": 56,
+   "fh": 42,
+   "frames": 6,
+   "fps": 12
+  },
+  "firefox_run_gold": {
+   "url": "assets/sprites/firefox_run_gold.png",
+   "fw": 56,
+   "fh": 42,
+   "frames": 6,
+   "fps": 12
+  },
+  "firefox_run_night": {
+   "url": "assets/sprites/firefox_run_night.png",
+   "fw": 56,
+   "fh": 42,
+   "frames": 6,
+   "fps": 12
+  },
+  "roach_idle": {
+   "url": "assets/sprites/roach_idle.png",
+   "fw": 42,
+   "fh": 48,
+   "frames": 4,
+   "fps": 6
+  },
+  "roach_idle_blue": {
+   "url": "assets/sprites/roach_idle_blue.png",
+   "fw": 42,
+   "fh": 48,
+   "frames": 4,
+   "fps": 6
+  },
+  "roach_idle_mint": {
+   "url": "assets/sprites/roach_idle_mint.png",
+   "fw": 42,
+   "fh": 48,
+   "frames": 4,
+   "fps": 6
+  },
+  "roach_idle_pink": {
+   "url": "assets/sprites/roach_idle_pink.png",
+   "fw": 42,
+   "fh": 48,
+   "frames": 4,
+   "fps": 6
+  },
+  "roach_idle_gold": {
+   "url": "assets/sprites/roach_idle_gold.png",
+   "fw": 42,
+   "fh": 48,
+   "frames": 4,
+   "fps": 6
+  },
+  "roach_idle_night": {
+   "url": "assets/sprites/roach_idle_night.png",
+   "fw": 42,
+   "fh": 48,
+   "frames": 4,
+   "fps": 6
+  },
+  "roach_run": {
+   "url": "assets/sprites/roach_run.png",
+   "fw": 40,
+   "fh": 47,
+   "frames": 6,
+   "fps": 12
+  },
+  "roach_run_blue": {
+   "url": "assets/sprites/roach_run_blue.png",
+   "fw": 40,
+   "fh": 47,
+   "frames": 6,
+   "fps": 12
+  },
+  "roach_run_mint": {
+   "url": "assets/sprites/roach_run_mint.png",
+   "fw": 40,
+   "fh": 47,
+   "frames": 6,
+   "fps": 12
+  },
+  "roach_run_pink": {
+   "url": "assets/sprites/roach_run_pink.png",
+   "fw": 40,
+   "fh": 47,
+   "frames": 6,
+   "fps": 12
+  },
+  "roach_run_gold": {
+   "url": "assets/sprites/roach_run_gold.png",
+   "fw": 40,
+   "fh": 47,
+   "frames": 6,
+   "fps": 12
+  },
+  "roach_run_night": {
+   "url": "assets/sprites/roach_run_night.png",
+   "fw": 40,
+   "fh": 47,
+   "frames": 6,
+   "fps": 12
+  },
+  "tiger_idle": {
+   "url": "assets/sprites/tiger_idle.png",
+   "fw": 40,
+   "fh": 42,
+   "frames": 4,
+   "fps": 6
+  },
+  "tiger_idle_blue": {
+   "url": "assets/sprites/tiger_idle_blue.png",
+   "fw": 40,
+   "fh": 42,
+   "frames": 4,
+   "fps": 6
+  },
+  "tiger_idle_mint": {
+   "url": "assets/sprites/tiger_idle_mint.png",
+   "fw": 40,
+   "fh": 42,
+   "frames": 4,
+   "fps": 6
+  },
+  "tiger_idle_pink": {
+   "url": "assets/sprites/tiger_idle_pink.png",
+   "fw": 40,
+   "fh": 42,
+   "frames": 4,
+   "fps": 6
+  },
+  "tiger_idle_gold": {
+   "url": "assets/sprites/tiger_idle_gold.png",
+   "fw": 40,
+   "fh": 42,
+   "frames": 4,
+   "fps": 6
+  },
+  "tiger_idle_night": {
+   "url": "assets/sprites/tiger_idle_night.png",
+   "fw": 40,
+   "fh": 42,
+   "frames": 4,
+   "fps": 6
+  },
+  "tiger_run": {
+   "url": "assets/sprites/tiger_run.png",
+   "fw": 50,
+   "fh": 41,
+   "frames": 6,
+   "fps": 12
+  },
+  "tiger_run_blue": {
+   "url": "assets/sprites/tiger_run_blue.png",
+   "fw": 50,
+   "fh": 41,
+   "frames": 6,
+   "fps": 12
+  },
+  "tiger_run_mint": {
+   "url": "assets/sprites/tiger_run_mint.png",
+   "fw": 50,
+   "fh": 41,
+   "frames": 6,
+   "fps": 12
+  },
+  "tiger_run_pink": {
+   "url": "assets/sprites/tiger_run_pink.png",
+   "fw": 50,
+   "fh": 41,
+   "frames": 6,
+   "fps": 12
+  },
+  "tiger_run_gold": {
+   "url": "assets/sprites/tiger_run_gold.png",
+   "fw": 50,
+   "fh": 41,
+   "frames": 6,
+   "fps": 12
+  },
+  "tiger_run_night": {
+   "url": "assets/sprites/tiger_run_night.png",
+   "fw": 50,
+   "fh": 41,
+   "frames": 6,
+   "fps": 12
+  },
+  "seahorse_idle": {
+   "url": "assets/sprites/seahorse_idle.png",
+   "fw": 34,
+   "fh": 42,
+   "frames": 4,
+   "fps": 6
+  },
+  "seahorse_idle_blue": {
+   "url": "assets/sprites/seahorse_idle_blue.png",
+   "fw": 34,
+   "fh": 42,
+   "frames": 4,
+   "fps": 6
+  },
+  "seahorse_idle_mint": {
+   "url": "assets/sprites/seahorse_idle_mint.png",
+   "fw": 34,
+   "fh": 42,
+   "frames": 4,
+   "fps": 6
+  },
+  "seahorse_idle_pink": {
+   "url": "assets/sprites/seahorse_idle_pink.png",
+   "fw": 34,
+   "fh": 42,
+   "frames": 4,
+   "fps": 6
+  },
+  "seahorse_idle_gold": {
+   "url": "assets/sprites/seahorse_idle_gold.png",
+   "fw": 34,
+   "fh": 42,
+   "frames": 4,
+   "fps": 6
+  },
+  "seahorse_idle_night": {
+   "url": "assets/sprites/seahorse_idle_night.png",
+   "fw": 34,
+   "fh": 42,
+   "frames": 4,
+   "fps": 6
+  },
+  "seahorse_run": {
+   "url": "assets/sprites/seahorse_run.png",
+   "fw": 34,
+   "fh": 42,
+   "frames": 6,
+   "fps": 12
+  },
+  "seahorse_run_blue": {
+   "url": "assets/sprites/seahorse_run_blue.png",
+   "fw": 34,
+   "fh": 42,
+   "frames": 6,
+   "fps": 12
+  },
+  "seahorse_run_mint": {
+   "url": "assets/sprites/seahorse_run_mint.png",
+   "fw": 34,
+   "fh": 42,
+   "frames": 6,
+   "fps": 12
+  },
+  "seahorse_run_pink": {
+   "url": "assets/sprites/seahorse_run_pink.png",
+   "fw": 34,
+   "fh": 42,
+   "frames": 6,
+   "fps": 12
+  },
+  "seahorse_run_gold": {
+   "url": "assets/sprites/seahorse_run_gold.png",
+   "fw": 34,
+   "fh": 42,
+   "frames": 6,
+   "fps": 12
+  },
+  "seahorse_run_night": {
+   "url": "assets/sprites/seahorse_run_night.png",
+   "fw": 34,
+   "fh": 42,
+   "frames": 6,
+   "fps": 12
+  },
+  "polar_idle": {
+   "url": "assets/sprites/polar_idle.png",
+   "fw": 36,
+   "fh": 43,
+   "frames": 4,
+   "fps": 6
+  },
+  "polar_idle_blue": {
+   "url": "assets/sprites/polar_idle_blue.png",
+   "fw": 36,
+   "fh": 43,
+   "frames": 4,
+   "fps": 6
+  },
+  "polar_idle_mint": {
+   "url": "assets/sprites/polar_idle_mint.png",
+   "fw": 36,
+   "fh": 43,
+   "frames": 4,
+   "fps": 6
+  },
+  "polar_idle_pink": {
+   "url": "assets/sprites/polar_idle_pink.png",
+   "fw": 36,
+   "fh": 43,
+   "frames": 4,
+   "fps": 6
+  },
+  "polar_idle_gold": {
+   "url": "assets/sprites/polar_idle_gold.png",
+   "fw": 36,
+   "fh": 43,
+   "frames": 4,
+   "fps": 6
+  },
+  "polar_idle_night": {
+   "url": "assets/sprites/polar_idle_night.png",
+   "fw": 36,
+   "fh": 43,
+   "frames": 4,
+   "fps": 6
+  },
+  "polar_run": {
+   "url": "assets/sprites/polar_run.png",
+   "fw": 38,
+   "fh": 42,
+   "frames": 6,
+   "fps": 12
+  },
+  "polar_run_blue": {
+   "url": "assets/sprites/polar_run_blue.png",
+   "fw": 38,
+   "fh": 42,
+   "frames": 6,
+   "fps": 12
+  },
+  "polar_run_mint": {
+   "url": "assets/sprites/polar_run_mint.png",
+   "fw": 38,
+   "fh": 42,
+   "frames": 6,
+   "fps": 12
+  },
+  "polar_run_pink": {
+   "url": "assets/sprites/polar_run_pink.png",
+   "fw": 38,
+   "fh": 42,
+   "frames": 6,
+   "fps": 12
+  },
+  "polar_run_gold": {
+   "url": "assets/sprites/polar_run_gold.png",
+   "fw": 38,
+   "fh": 42,
+   "frames": 6,
+   "fps": 12
+  },
+  "polar_run_night": {
+   "url": "assets/sprites/polar_run_night.png",
+   "fw": 38,
+   "fh": 42,
+   "frames": 6,
+   "fps": 12
   }
  },
  "images": {
@@ -1039,4 +1627,4 @@ window.BK_MANIFEST = {
   ]
  }
 };
-window.BK_CREDITS = [["Grafika", "Ansimuz: Sunny Land, Tiny RPG, Gothicvania"], ["Grafika", "Crabby Beach, Berie's Adventure: Seaside"], ["Felület", "Complete UI Essential: Crusenho, CC BY 4.0"], ["Ikonok", "Addin's RPG Icon Packs: Addin"], ["Effektek", "Effect and FX Pixel"], ["Égbolt", "Free Sky with Clouds: CraftPix.net"], ["Betűtípus", "Andika (SIL), Atkinson Hyperlegible, Lexend: OFL 1.1"], ["Zene", "Music by Clement Panchout"], ["Hangok", "Pixel Combat SFX: Helton Yan"], ["Hangok", "Super Dialogue: Dillon Becker, CC BY 4.0"], ["Motor", "Phaser 3 (phaser.io), MIT licence"]];
+window.BK_CREDITS = [["Grafika", "Ansimuz: Sunny Land, Tiny RPG, Gothicvania"], ["Grafika", "Crabby Beach, Berie's Adventure: Seaside"], ["Felület", "Complete UI Essential: Crusenho, CC BY 4.0"], ["Ikonok", "Addin's RPG Icon Packs: Addin"], ["Effektek", "Effect and FX Pixel"], ["Égbolt", "Free Sky with Clouds: CraftPix.net"], ["Betűtípus", "Andika, Atkinson Hyperlegible, Lexend (OFL)"], ["Zene", "Music by Clement Panchout"], ["Hangok", "Pixel Combat SFX: Helton Yan"], ["Hangok", "Super Dialogue: Dillon Becker, CC BY 4.0"], ["Motor", "Phaser 3 (phaser.io), MIT licence"], ["Figurák", "Új állatok: a 4.B osztály ötletei. Köszönjük!", "New animals: ideas from class 4.B. Thank you!"]];

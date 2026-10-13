@@ -8,6 +8,7 @@ Art
 - Addin's RPG Icon Packs (food and drinks) by Addin.
 - Effect and FX Pixel (free edition).
 - Free Sky with Clouds Background Pixel Art Set, CraftPix.net (https://craftpix.net/file-licenses/).
+- New figures (cheetah, panda, fire fox, cockroach, tiger, seahorse, polar bear): ideas from class 4.B, drawn with ChatGPT image generation and cleaned up for the game. Thank you, 4.B!
 
 Font
 - Andika by SIL International (https://software.sil.org/andika/), SIL Open Font License 1.1.

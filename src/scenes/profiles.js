@@ -35,6 +35,7 @@ BK.ProfilesScene = class extends Phaser.Scene {
         s.cards.push(BK.ui.text(s, x + 39, y + 36, BK.T.newPlayer, { outline: false, origin: [0.5, 0.5] }));
       } else {
         var av = BK.avatarSprite(s, x + 39, y + 44, it.p.avatar, it.p);
+        if (av.height > 42) av.setScale(42 / av.height);    // tall figures stay inside the card
         s.cards.push(av);
         s.cards.push(BK.ui.text(s, x + 39, y + 45, it.p.nick, { outline: false, origin: [0.5, 0] }));
         s.cards.push(s.add.image(x + 30, y + 63, 'star_on'));
@@ -93,23 +94,36 @@ BK.NewProfileScene = class extends Phaser.Scene {
       this.keep(BK.ui.text(this, 192, 118, BK.T.nickHint, { outline: false, origin: [0.5, 0.5], color: 0x6b3a20 }));
       this.keep(BK.ui.button(this, 192, 150, BK.T.next, function () { s.nextStep(); }, { w: 80 }));
     } else if (this.step === 1) {
-      this.keep(BK.ui.text(this, 192, 44, BK.T.chooseAvatar, { outline: false, size: 2, origin: [0.5, 0.5] }));
+      this.keep(BK.ui.text(this, 192, 41, BK.T.chooseAvatar, { outline: false, size: 2, origin: [0.5, 0.5] }));
+      // 8 figures a page (4 x 2); the page follows the chosen figure
+      var PER = 8, page = Math.floor(this.avatar / PER), pages = Math.ceil(BK.HEROES.length / PER);
       BK.HEROES.forEach(function (h, i) {
+        if (Math.floor(i / PER) !== page) return;
         // figure above, name below, the chosen one framed in white
-        var x = 102 + (i % 3) * 90, y = 79 + Math.floor(i / 3) * 52;
+        var j = i % PER, x = 93 + (j % 4) * 66, y = 83 + Math.floor(j / 4) * 50;
         var sel = i === s.avatar;
-        s.keep(BK.ui.nine(s, x - 32, y - 25, 64, 50, sel ? 'ui_slot_sel' : 'ui_slot'));
+        s.keep(BK.ui.nine(s, x - 31, y - 25, 62, 50, sel ? 'ui_slot_sel' : 'ui_slot'));
         var spr = s.keep(BK.avatarSprite(s, x, y + 6, i));
         if (h.id === 'crab') spr.setScale(2);           // the crab is tiny
-        s.keep(BK.ui.text(s, x, y + 7, h.name, { outline: false, origin: [0.5, 0], color: 0x4a2c1c, bold: sel, fit: 58 }));
-        if (sel) s.keep(s.add.rectangle(x, y, 68, 54).setStrokeStyle(2, 0xffffff));
-        var z = s.keep(s.add.zone(x, y, 64, 50).setInteractive({ useHandCursor: true }));
+        else if (spr.height > 40) spr.setScale(40 / spr.height);   // tall ones fit the slot
+        s.keep(BK.ui.text(s, x, y + 7, h.name, { outline: false, origin: [0.5, 0], color: 0x4a2c1c, bold: sel, fit: 56 }));
+        if (sel) s.keep(s.add.rectangle(x, y, 66, 54).setStrokeStyle(2, 0xffffff));
+        var z = s.keep(s.add.zone(x, y, 62, 50).setInteractive({ useHandCursor: true }));
         // first click selects, a second click on the same figure confirms
         z.on('pointerup', function () {
           BK.audio.sfx('ui');
           if (s.avatar === i) s.nextStep(); else { s.avatar = i; s.draw(); }
         });
       });
+      if (pages > 1) {
+        var turn = function (d) {
+          var np = (page + d + pages) % pages;
+          s.avatar = Math.min(BK.HEROES.length - 1, np * PER + (s.avatar % PER)); s.draw();
+        };
+        this.keep(BK.ui.button(this, 50, 108, '<', function () { turn(-1); }, { w: 14, h: 22 }));
+        this.keep(BK.ui.button(this, 334, 108, '>', function () { turn(1); }, { w: 14, h: 22 }));
+        this.keep(BK.ui.text(this, 192, 165, (page + 1) + ' / ' + pages, { outline: false, origin: [0.5, 0.5], color: 0x6b3a20 }));
+      }
       this.keep(BK.ui.text(this, 172, 186, BK.L('<- -> és Enter', '<- -> and Enter'), { origin: [0.5, 0.5], color: 0xfff2dc }));
       this.keep(BK.ui.button(this, 300, 186, BK.T.next, function () { s.nextStep(); }, { w: 64, h: 16 }));
     } else if (this.step === 2) {
@@ -142,7 +156,8 @@ BK.NewProfileScene = class extends Phaser.Scene {
     } else if (this.step === 1) {
       if (k === 'ArrowRight') { this.avatar = (this.avatar + 1) % BK.HEROES.length; this.draw(); }
       if (k === 'ArrowLeft') { this.avatar = (this.avatar + BK.HEROES.length - 1) % BK.HEROES.length; this.draw(); }
-      if (k === 'ArrowDown' || k === 'ArrowUp') { this.avatar = (this.avatar + 3) % BK.HEROES.length; this.draw(); }
+      if (k === 'ArrowDown') { this.avatar = (this.avatar + 4) % BK.HEROES.length; this.draw(); }
+      if (k === 'ArrowUp') { this.avatar = (this.avatar + BK.HEROES.length - 4) % BK.HEROES.length; this.draw(); }
       if (k === 'Enter') this.nextStep();
     } else if (this.step === 2) {
       if (k === '1') { this.grade = '3-4'; this.nextStep(); }

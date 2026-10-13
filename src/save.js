@@ -181,10 +181,10 @@ BK.save = (function () {
   }
 
   function encode(p) {
-    // version 2 (v0.6.2): shorter. The per-key skill levels are left out (the game relearns
+    // version 3 (v0.7): as version 2 plus two more figure bits. Version 2 (v0.6.2) made codes shorter: the per-key skill levels are left out (the game relearns
     // them in a few rounds) and trailing zeros are dropped. Version 1 codes still load.
     var b = new Bits();
-    b.put(2, 3);
+    b.put(3, 3);
     b.put(p.avatar & 7, 3);
     b.put(p.grade === '5-6' ? 1 : 0, 1);
     b.put(p.lang === 'en' ? 1 : 0, 1);
@@ -208,6 +208,7 @@ BK.save = (function () {
     b.put(p.settings.ui === 'en' ? 1 : 0, 1);
     b.put(Math.max(0, BK.FONTS.findIndex(function (f) { return f.id === p.settings.font; })), 2);
     b.put(Math.min(255, (p.best && p.best.endless) || 0), 8);
+    b.put((p.avatar >> 3) & 3, 2);          // v3 (v0.7): more than 8 figures
     storyOrder().forEach(function (k) { b.put(Math.min(3, (p.stories || {})[k] || 0), 2); });
     while (b.a.length > 5 && b.a.lastIndexOf(1) < b.a.length - 5) b.a.length -= 5;   // drop trailing zero groups
     while (b.a.length % 5) b.a.push(0);
@@ -232,7 +233,7 @@ BK.save = (function () {
     if (sum !== check) throw new Error('checksum');
     var rd = new Reader(body);
     var ver = rd.get(3);
-    if (ver !== 1 && ver !== 2) throw new Error('version');
+    if (ver < 1 || ver > 3) throw new Error('version');
     var avatar = rd.get(3), grade = rd.get(1) ? '5-6' : '3-4', lang = rd.get(1) ? 'en' : 'hu', placed = rd.get(3) || null;
     var nl = rd.get(4), nick = '';
     for (i = 0; i < nl; i++) nick += NICK[rd.get(7)] || '';
@@ -260,6 +261,7 @@ BK.save = (function () {
     p.settings.ui = ui ? 'en' : null;
     p.settings.font = fi ? BK.FONTS[fi].id : null;
     p.best.endless = rd.get(8);
+    if (ver >= 3) { p.avatar |= rd.get(2) << 3; if (p.avatar >= BK.HEROES.length) p.avatar = 0; }
     storyOrder().forEach(function (k) { var v = rd.get(2); if (v) p.stories[k] = v; });
     return p;
   }

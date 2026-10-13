@@ -46,6 +46,7 @@ CP = "09_Audio_Music/Clement_Panchout/"
 #   grid:  (path, cols, rows, n)       source is a grid, repacked to a strip
 #   files: [paths]                     single frames packed to a strip (bottom-centred)
 #   fxrow: (path, cell, row, first, n, step) one colour row of an FX sheet
+#   local: (path, frames)              a strip inside this project (art/), not the library
 # "fps" is a default animation speed used by the game.
 # ---------------------------------------------------------------------------
 SPRITES = {
@@ -104,7 +105,12 @@ OUTFIT_COLOURS = {
     "gold":  (25, 1.35, 1.15),
     "night": (230, 0.45, 0.8),
 }
-HERO_BASES = ["bunny", "berie", "frog", "mush", "crab", "gull"]
+HERO_BASES = ["bunny", "berie", "frog", "mush", "crab", "gull",
+              "cheetah", "panda", "firefox", "roach", "tiger", "seahorse", "polar"]
+
+# Figures suggested by class 4.B, drawn with ChatGPT and cleaned up by
+# tools/clean_ai_sprites.py into art/animals/ (idle 4 frames, run 6 frames).
+NEW_FIGURES = ["cheetah", "panda", "firefox", "roach", "tiger", "seahorse", "polar"]
 
 # Plain images (optionally cropped): key -> (path, crop box or None)
 SUNTILES = SUN + "colorful-tileset/PNG/layers/tile-set.png"
@@ -225,12 +231,17 @@ CREDITS = [
     ["Ikonok", "Addin's RPG Icon Packs: Addin"],
     ["Effektek", "Effect and FX Pixel"],
     ["Égbolt", "Free Sky with Clouds: CraftPix.net"],
-    ["Betűtípus", "Andika (SIL), Atkinson Hyperlegible, Lexend: OFL 1.1"],
+    ["Betűtípus", "Andika, Atkinson Hyperlegible, Lexend (OFL)"],
     ["Zene", "Music by Clement Panchout"],
     ["Hangok", "Pixel Combat SFX: Helton Yan"],
     ["Hangok", "Super Dialogue: Dillon Becker, CC BY 4.0"],
     ["Motor", "Phaser 3 (phaser.io), MIT licence"],
+    ["Figurák", "Új állatok: a 4.B osztály ötletei. Köszönjük!", "New animals: ideas from class 4.B. Thank you!"],
 ]
+
+for _n in NEW_FIGURES:
+    SPRITES[_n + "_idle"] = dict(local=("art/animals/%s_idle.png" % _n, 4), fps=6)
+    SPRITES[_n + "_run"] = dict(local=("art/animals/%s_run.png" % _n, 6), fps=12)
 
 # ---------------------------------------------------------------------------
 
@@ -275,6 +286,10 @@ def build_sprite(lib, key, spec):
     elif "files" in spec:
         frames = [load(lib, p) for p in spec["files"]]
         img, fw, fh = pack_frames(frames)
+    elif "local" in spec:
+        path, n = spec["local"]
+        img = Image.open(os.path.join(ROOT, path)).convert("RGBA")
+        fw, fh = img.width // n, img.height
     elif "fxrow" in spec:
         path, cell, row, first, n, step = spec["fxrow"]
         src = load(lib, path)

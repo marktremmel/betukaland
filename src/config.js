@@ -6,7 +6,7 @@
  */
 window.BK = window.BK || {};
 
-BK.VERSION = '0.6.3';
+BK.VERSION = '0.7.0';
 
 // Test mode for the teacher: open the game with ?debug at the end of the address.
 // Every region and level is open; in a level Tab finishes the current word and
@@ -218,6 +218,14 @@ BK.HEROES = [
   { id: 'mush', name: 'Gomba', idle: 'mush_walk', run: 'mush_walk', creature: 'mush' },
   { id: 'crab', name: 'Rák', idle: 'crab_walk', run: 'crab_walk', creature: 'crab' },
   { id: 'gull', name: 'Sirály', idle: 'gull_fly', run: 'gull_fly', creature: 'gull', flies: true },
+  // the 4.B animals (art/animals, see tools/clean_ai_sprites.py)
+  { id: 'cheetah', name: 'Gepárd', idle: 'cheetah_idle', run: 'cheetah_run' },
+  { id: 'panda', name: 'Panda', idle: 'panda_idle', run: 'panda_run' },
+  { id: 'firefox', name: 'Tűzróka', idle: 'firefox_idle', run: 'firefox_run' },
+  { id: 'roach', name: 'Csótány', idle: 'roach_idle', run: 'roach_run' },
+  { id: 'tiger', name: 'Tigris', idle: 'tiger_idle', run: 'tiger_run' },
+  { id: 'seahorse', name: 'Csikóhal', idle: 'seahorse_idle', run: 'seahorse_run', flies: true },
+  { id: 'polar', name: 'Jegesmedve', idle: 'polar_idle', run: 'polar_run' },
 ];
 BK.heroOf = function (p) { return BK.HEROES[(p && p.avatar) || 0] || BK.HEROES[0]; };
 // key of an animation in the profile's outfit colour

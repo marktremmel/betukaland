@@ -1,6 +1,6 @@
 # Betűkaland (Typing Adventure): teacher notes
 
-Version 0.6.2: all seven regions are playable, each with three levels and a boss, plus a practice corner (daily goals with a streak, sentence practice, a tricky-letter drill, the endless road, and a storybook) and crowns to win on every level of a finished region. The menus can be Hungarian or English, the text uses a font made for young readers (three to choose from), and the keyboard can be Hungarian or US English. Title screen, player profiles with a choice of six figures, placement test, world map, shop, rest spots, results with stars and a chart, saving with a code and a file, the teacher screen with CSV export, and credits.
+Version 0.7.0: all seven regions are playable, each with three levels and a boss, plus a practice corner (daily goals with a streak, sentence practice, a tricky-letter drill, the endless road, and a storybook) and crowns to win on every level of a finished region. The menus can be Hungarian or English, the text uses a font made for young readers (three to choose from), and the keyboard can be Hungarian or US English. Title screen, player profiles with a choice of thirteen figures, placement test, world map, shop, rest spots, results with stars and a chart, saving with a code and a file, the teacher screen with CSV export, and credits.
 
 ## Running it
 
@@ -12,7 +12,7 @@ The canvas is 384×216 pixels, scaled by a whole number to stay sharp: 3× on a 
 
 ## What a child does
 
-1. "Ki játszik?": picks their profile or makes a new one: a nickname (not their real name), a figure to play as (Nyuszi, Berie, Béka, Gomba, Rák or Sirály), their grade band (3-4 or 5-6) and the word language (Hungarian or English). The figure is the hero that walks through the levels; creatures of the same kind are left out of that child's levels, so a frog never meets a frog. Shop outfits recolour whichever figure was chosen.
+1. "Ki játszik?": picks their profile or makes a new one: a nickname (not their real name), a figure to play as (Nyuszi, Berie, Béka, Gomba, Rák, Sirály, and the seven animals suggested by class 4.B: Gepárd, Panda, Tűzróka, Csótány, Tigris, Csikóhal, Jegesmedve; two pages, < > or the arrow keys turn the page), their grade band (3-4 or 5-6) and the word language (Hungarian or English). The figure is the hero that walks through the levels; creatures of the same kind are left out of that child's levels, so a frog never meets a frog. Shop outfits recolour whichever figure was chosen.
 2. Placement test, first time only, about two minutes. Five words for each of: home row, top row, bottom row, capitals, accents, numbers. It stops at the first stage they cannot pass at 90% accuracy (and a gentle minimum speed), and opens the map up to that region. "Kihagyom" skips it.
 3. World map: arrow keys choose a region, 1 to 4 choose a level, Enter plays. Mouse works everywhere too.
 4. A level: the bunny walks; creatures, gates, wobbly bridges and chests arrive carrying a word. Typing it clears the way. A correct letter turns green with a spark and a click; a wrong letter only shakes the bubble a little with a soft sound. Creatures that arrive simply wait. Nothing can be lost.
@@ -111,6 +111,10 @@ Everything saves automatically to the browser after every level. Profiles live i
 To continue on another computer, the child opens "Mentés" on the map: a save code (about 30 to 60 characters, depending on progress; no letters that look alike; a checksum catches typos) or "Mentés fájlba" for a file. On the other computer: "Mentőkód" on the player screen. The code carries progress, stars, crowns, story stars, coins, outfits, pets, treasures, the endless-road record and the keyboard, language and font settings; the file carries everything (also the full history and the per-key data). Loading a child's code on a computer that already has the same child (same nickname, figure and grade) merges the two and keeps the best of both, so nothing is lost. Codes made by older versions still load.
 
 If school computers wipe browser data at logout, ask students to save a code at the end of every lesson (a line in their exercise book is enough).
+
+## The 4.B figures
+
+Class 4.B suggested seven new animals. They were drawn with ChatGPT image generation (the prompts are in `new_animals/CHATGPT_PROMPTS.md`) and turned into game sprites by `tools/clean_ai_sprites.py`: it removes the magenta background, cuts the frames, shrinks them to the game's pixel size with one shared palette, adds an outline and lines the frames up. The cleaned strips live in `art/animals/`; `tools/build_assets.py` packs them like the library sprites, outfit colours included. The raw ChatGPT pictures stay in `new_animals/` and are not part of the game or git. To redo one animal from new pictures: save them in `new_animals/`, fix the file names at the top of the tool, run `python3 tools/clean_ai_sprites.py tiger`, then `python3 tools/build_assets.py --no-audio` and `python3 tools/build_pack.py`. The Credits screen thanks 4.B.
 
 ## Teacher screen
 

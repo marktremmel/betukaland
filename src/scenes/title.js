@@ -57,13 +57,13 @@ BK.CreditsScene = class extends Phaser.Scene {
     BK.menuBackground(this, 2, { groundY: 196 });
     BK.ui.nine(this, 14, 4, BK.W - 28, 190, 'ui_panel2');
     BK.ui.text(this, BK.W / 2, 36, BK.T.creditsTitle, { outline: false, size: 2, origin: [0.5, 0.5] });
-    var y = 48;
+    var y = 46;
     var EN = { 'Grafika': 'Graphics', 'Felület': 'Interface', 'Ikonok': 'Icons', 'Effektek': 'Effects', 'Égbolt': 'Skies',
-      'Betűtípus': 'Font', 'Zene': 'Music', 'Hangok': 'Sounds', 'Motor': 'Engine' };
+      'Betűtípus': 'Font', 'Zene': 'Music', 'Hangok': 'Sounds', 'Motor': 'Engine', 'Figurák': 'Figures' };
     (window.BK_CREDITS || []).forEach(function (c) {
       BK.ui.text(s, 34, y, BK.uiLang === 'en' ? (EN[c[0]] || c[0]) : c[0], { outline: false, color: 0x9a3d1a });
-      var t = BK.ui.text(s, 100, y, c[1], { outline: false, width: 250 });
-      y += 11;
+      var t = BK.ui.text(s, 96, y, (BK.uiLang === 'en' && c[2]) || c[1], { outline: false, width: 262 });
+      y += Math.max(10, Math.round(t.displayHeight / 11) * 10);   // a wrapped line takes two rows
     });
     
     BK.ui.button(this, BK.W / 2, 204, BK.T.back, function () { s.scene.start('Title'); }, { w: 70, h: 18, key: 'ESC' });
