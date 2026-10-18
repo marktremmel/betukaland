@@ -128,12 +128,12 @@ BK.NewProfileScene = class extends Phaser.Scene {
       this.keep(BK.ui.button(this, 300, 186, BK.T.next, function () { s.nextStep(); }, { w: 64, h: 16 }));
     } else if (this.step === 2) {
       this.keep(BK.ui.text(this, 192, 54, BK.T.chooseGrade, { outline: false, size: 2, origin: [0.5, 0.5] }));
-      this.keep(BK.ui.button(this, 192, 88, '1: ' + BK.T.grade34, function () { s.grade = '3-4'; s.nextStep(); }, { w: 140 }));
-      this.keep(BK.ui.button(this, 192, 116, '2: ' + BK.T.grade56, function () { s.grade = '5-6'; s.nextStep(); }, { w: 140 }));
+      this.keep(BK.ui.button(this, 192, 88, BK.T.grade34, function () { s.grade = '3-4'; s.nextStep(); }, { w: 140 }));
+      this.keep(BK.ui.button(this, 192, 116, BK.T.grade56, function () { s.grade = '5-6'; s.nextStep(); }, { w: 140 }));
     } else if (this.step === 3) {
       this.keep(BK.ui.text(this, 192, 54, BK.T.chooseLang, { outline: false, size: 2, origin: [0.5, 0.5] }));
-      this.keep(BK.ui.button(this, 192, 88, '1: ' + BK.T.langHu, function () { s.lang = 'hu'; s.nextStep(); }, { w: 140 }));
-      this.keep(BK.ui.button(this, 192, 116, '2: ' + BK.T.langEn, function () { s.lang = 'en'; s.nextStep(); }, { w: 140 }));
+      this.keep(BK.ui.button(this, 192, 88, BK.T.langHu, function () { s.lang = 'hu'; s.nextStep(); }, { w: 140 }));
+      this.keep(BK.ui.button(this, 192, 116, BK.T.langEn, function () { s.lang = 'en'; s.nextStep(); }, { w: 140 }));
     }
     this.keep(BK.ui.button(this, 52, 204, BK.T.back, function () {
       if (s.step === 0) s.scene.start('Profiles'); else { s.step--; s.draw(); }
