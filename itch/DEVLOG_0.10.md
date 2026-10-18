@@ -4,7 +4,7 @@ On the game's itch page: Edit game → Devlog → Create a new post.
 
 - Title: Halloween éjszaka, bossaréna és varázslövések · Halloween Night, a boss arena and magic shots
 - Type: Update
-- Attach the release: tick betukaland-itch-0.10.0.zip, so the post links to the new version
+- Attach the release: tick betukaland-itch-0.10.1.zip, so the post links to the new version
 - Images: upload 15_pumpkin_king_marks.png as the cover, then 13_halloween_night.png, 14_bat_narrator.png, 17_magic_impacts.png and 18_boss_arena.png inside the post
 - Tags: update, halloween, new features
 
@@ -18,7 +18,7 @@ Halloween éjszaka. A címképernyő bal felső sarkában be lehet kapcsolni. N�
 
 Bossaréna. A Gyakorlósarok új, 4. fülén minden legyőzött boss újra kihívható, egyedül, Normál vagy Nehéz fokozaton. Nehézen két mondattal hosszabb a harc, és a boss jeleket is dob.
 
-Varázslövések. Minden jó leütésnél egy kis varázslat repül a lény felé. A boltban ki lehet választani a formáját (hullám, csillag, kód, szikra, üstökös, villám, gravihullám), a színét (egy szín, pasztell, szivárvány, RTX, króm, neon) és azt, mi történik, ahol becsapódik (pukk, paca, pixel, csillagszóró, Bumm!). Az RTX és a neon a szövegbuborékot is megvilágítja.
+Varázslövések. Minden jó leütésnél egy kis varázslat repül a lény felé. A boltban ki lehet választani a formáját (hullám, csillag, kód, szikra, üstökös, villám, gravihullám), a színét (egy szín, pasztell, szivárvány, RTX, króm, neon) és azt, mi történik, ahol becsapódik (pukk, paca, pixel, csillagszóró, Bumm!). Külön választható fény is, ami a szövegbuborékot világítja meg (keret, csillanás, lüktetés, szivárvány, neontábla); alapból ki van kapcsolva.
 
 Ami még új:
 
@@ -28,7 +28,10 @@ Ami még új:
 - A bemelegítő teszt újra kitölthető (Beállítások → Bemelegítés: Újra).
 - Minden vidéken mást fúj a szél: pitypangot, homokot, havat, ördögszekeret, szentjánosbogarakat. Néha egy kalap vagy egy papírrepülő is elszáll.
 - Sokkal több szó minden vidéken, kevesebb ismétlés.
-- Tisztább körvonalak a 4.B állatain.
+- A 4.B állatai és a Halloween-figurák sokkal részletesebbek lettek: a rajzokat most nagy felbontásban tartja meg a játék.
+- A Halloween-figurák is felvehetik a ruhaszíneket.
+- A boltban egy új figura már nem vásárlódik meg egy kattintásra: előbb kiválasztod, aztán a Vásárlás gombbal veszed meg.
+- Kezdő és Haladó szint a 3–4. és 5–6. osztály helyett, és a kezdők kevesebb, könnyebb jelet kapnak a bossoktól.
 - A régi mentőkódok továbbra is működnek.
 
 ## Halloween Night, a boss arena and magic shots
@@ -39,7 +42,7 @@ Halloween Night. Switch it on in the top left of the title screen. A friendly sp
 
 Boss arena. A new 4th tab in the practice corner lets you fight every boss you have beaten again, alone, on Normal or Hard. Hard adds two sentences, and the boss throws marks too.
 
-Magic shots. At every correct key a little magic flies at the creature. In the shop you choose its shape (wave, star, code, sparkle, comet, lightning, grav wave), its colour (one colour, pastel, rainbow, RTX, chrome, neon) and what happens where it lands (pop, splat, pixel, starburst, Pow!). RTX and neon also light up the word bubble.
+Magic shots. At every correct key a little magic flies at the creature. In the shop you choose its shape (wave, star, code, sparkle, comet, lightning, grav wave), its colour (one colour, pastel, rainbow, RTX, chrome, neon) and what happens where it lands (pop, splat, pixel, starburst, Pow!). There is also a separate light for the word bubble (rim, shine, pulse, rainbow, neon sign), off by default.
 
 Also new:
 
@@ -49,5 +52,8 @@ Also new:
 - The warm-up test can be taken again (Settings → Warm-up: Again).
 - The wind carries something different in each region: dandelion seeds, sand, snow, a tumbleweed, fireflies. Now and then a hat or a paper plane blows past.
 - Many more words in every region, fewer repeats.
-- Cleaner outlines on the 4.B animals.
+- The 4.B animals and the Halloween figures are much more detailed: the game now keeps the drawings in high resolution.
+- The Halloween figures can wear the outfit colours too.
+- In the shop a new figure is no longer bought with one click: you select it first, then buy it with the Buy button.
+- Beginner and Intermediate instead of grades 3–4 and 5–6, and beginners get fewer, easier marks from the bosses.
 - Old save codes still work.

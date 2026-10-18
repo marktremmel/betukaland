@@ -6,7 +6,7 @@
  */
 window.BK = window.BK || {};
 
-BK.VERSION = '0.10.0';
+BK.VERSION = '0.10.1';
 
 // Test mode for the teacher: open the game with ?debug at the end of the address.
 // Every region and level is open; in a level Tab finishes the current word and
@@ -118,7 +118,8 @@ BK.hintKey = function (ch) {
   return k;
 };
 // The marks the Pumpkin King sends, by grade band (the US keyboard has no €)
-BK.HW_SPECIALS = { '3-4': ['!', '?', ':', '-', '(', ')', ',', '@'], '5-6': ['#', '$', '€', '&', ';', '/', '<', '>', '=', '%'] };
+// beginners get a few easy ones (Shift + one key, or a key of its own)
+BK.HW_SPECIALS = { '3-4': ['!', '?', ':', '-', ','], '5-6': ['#', '$', '€', '&', ';', '/', '<', '>', '=', '%'] };
 
 // Fingers: 0..3 left pinky..index, 4..7 right index..pinky, 8 thumbs
 BK.FINGER_NAMES = ['bal kisujj', 'bal gyűrűsujj', 'bal középső ujj', 'bal mutatóujj',
@@ -300,7 +301,16 @@ BK.SHOT_IMPACTS = [
   { id: 'stars', name: 'Csillagszóró', en: 'Starburst', price: 50 },
   { id: 'comic', name: 'Bumm!', en: 'Pow!', price: 60 },
 ];
-BK.FX_DEFAULT = function () { return { v: 2, shape: 'wave', colour: 'classic', tone: 0, impact: 'spark', owned: ['wave', 'classic', 'spark'] }; };
+// Light on the word bubble when a shot lands (off by default: "Nincs" turns it off again)
+BK.SHOT_GLOWS = [
+  { id: 'g_none', name: 'Nincs', en: 'None', price: 0 },
+  { id: 'g_rim', name: 'Fénykeret', en: 'Light rim', price: 40 },
+  { id: 'g_shine', name: 'Csillanás', en: 'Shine', price: 40 },
+  { id: 'g_pulse', name: 'Lüktetés', en: 'Pulse', price: 30 },
+  { id: 'g_rainbow', name: 'Szivárvány', en: 'Rainbow', price: 55 },
+  { id: 'g_neon', name: 'Neontábla', en: 'Neon sign', price: 65 },
+];
+BK.FX_DEFAULT = function () { return { v: 2, shape: 'wave', colour: 'classic', tone: 0, impact: 'spark', glow: 'g_none', owned: ['wave', 'classic', 'spark', 'g_none'] }; };
 
 // Boss arena (practice corner): every boss the child has beaten, again, alone, in two
 // difficulties. Hard: two more sentences, and the boss sends marks to catch like the Pumpkin King.

@@ -7,6 +7,35 @@
  * holds every file as a data URI in window.BK_PACK; resolve() then hands out
  * those instead of URLs. Online (GitHub Pages) the normal URLs are used.
  */
+/*
+ * HD sprites (the figures drawn with ChatGPT): the sheet is drawn at hd times the game size.
+ * Every frame keeps sampling the whole drawing but reports, and is drawn at, the game size,
+ * so the rest of the game sees a normal sprite while the high-resolution canvas shows the
+ * detail. Frame UVs are computed before the sizes are divided, and nothing re-computes them
+ * (the game never crops these sprites).
+ */
+BK.hdTexture = function (tex, k) {
+  tex.getFrameNames(true).forEach(function (name) {
+    var f = tex.get(name);
+    ['cutWidth', 'cutHeight', 'width', 'height', 'realWidth', 'realHeight', 'halfWidth', 'halfHeight',
+      'centerX', 'centerY', 'x', 'y'].forEach(function (p) {
+      var d = Object.getOwnPropertyDescriptor(f, p);
+      if (d && d.writable && typeof f[p] === 'number') f[p] /= k;
+    });
+    // realWidth and realHeight are read from here
+    var D = f.data;
+    [[D.sourceSize, 1], [D.spriteSourceSize, 1], [D.cut, 0]].forEach(function (a) {
+      var o = a[0]; if (!o) return;
+      (a[1] ? ['w', 'h', 'x', 'y'] : ['w', 'h']).forEach(function (p) { if (typeof o[p] === 'number') o[p] /= k; });
+    });
+    if (typeof D.radius === 'number') D.radius /= k;
+  });
+  // a whole number of screen pixels per drawn pixel looks sharpest; otherwise smooth it
+  var px = (BK.RES || 1) / k;
+  if (Math.abs(px - Math.round(px)) > 0.01 || px < 1) tex.setFilter(Phaser.Textures.FilterMode.LINEAR);
+  tex.hd = k;
+};
+
 BK.BootScene = class extends Phaser.Scene {
   constructor() { super('Boot'); }
 
@@ -25,6 +54,7 @@ BK.BootScene = class extends Phaser.Scene {
         img.onload = function () {
           if (frame) self.textures.addSpriteSheet(key, img, { frameWidth: frame.fw, frameHeight: frame.fh });
           else self.textures.addImage(key, img);
+          if (frame && frame.hd) BK.hdTexture(self.textures.get(key), frame.hd);
           ok();
         };
         img.onerror = function () { console.warn('image failed', url); ok(); };

@@ -598,591 +598,675 @@ window.BK_MANIFEST = {
   },
   "cheetah_idle": {
    "url": "assets/sprites/cheetah_idle.png",
-   "fw": 44,
-   "fh": 43,
+   "fw": 132,
+   "fh": 129,
    "frames": 4,
-   "fps": 6
+   "fps": 6,
+   "hd": 3
   },
   "cheetah_idle_blue": {
    "url": "assets/sprites/cheetah_idle_blue.png",
-   "fw": 44,
-   "fh": 43,
+   "fw": 132,
+   "fh": 129,
    "frames": 4,
-   "fps": 6
+   "fps": 6,
+   "hd": 3
   },
   "cheetah_idle_mint": {
    "url": "assets/sprites/cheetah_idle_mint.png",
-   "fw": 44,
-   "fh": 43,
+   "fw": 132,
+   "fh": 129,
    "frames": 4,
-   "fps": 6
+   "fps": 6,
+   "hd": 3
   },
   "cheetah_idle_pink": {
    "url": "assets/sprites/cheetah_idle_pink.png",
-   "fw": 44,
-   "fh": 43,
+   "fw": 132,
+   "fh": 129,
    "frames": 4,
-   "fps": 6
+   "fps": 6,
+   "hd": 3
   },
   "cheetah_idle_gold": {
    "url": "assets/sprites/cheetah_idle_gold.png",
-   "fw": 44,
-   "fh": 43,
+   "fw": 132,
+   "fh": 129,
    "frames": 4,
-   "fps": 6
+   "fps": 6,
+   "hd": 3
   },
   "cheetah_idle_night": {
    "url": "assets/sprites/cheetah_idle_night.png",
-   "fw": 44,
-   "fh": 43,
+   "fw": 132,
+   "fh": 129,
    "frames": 4,
-   "fps": 6
+   "fps": 6,
+   "hd": 3
   },
   "cheetah_run": {
    "url": "assets/sprites/cheetah_run.png",
-   "fw": 64,
-   "fh": 42,
+   "fw": 192,
+   "fh": 126,
    "frames": 6,
-   "fps": 12
+   "fps": 12,
+   "hd": 3
   },
   "cheetah_run_blue": {
    "url": "assets/sprites/cheetah_run_blue.png",
-   "fw": 64,
-   "fh": 42,
+   "fw": 192,
+   "fh": 126,
    "frames": 6,
-   "fps": 12
+   "fps": 12,
+   "hd": 3
   },
   "cheetah_run_mint": {
    "url": "assets/sprites/cheetah_run_mint.png",
-   "fw": 64,
-   "fh": 42,
+   "fw": 192,
+   "fh": 126,
    "frames": 6,
-   "fps": 12
+   "fps": 12,
+   "hd": 3
   },
   "cheetah_run_pink": {
    "url": "assets/sprites/cheetah_run_pink.png",
-   "fw": 64,
-   "fh": 42,
+   "fw": 192,
+   "fh": 126,
    "frames": 6,
-   "fps": 12
+   "fps": 12,
+   "hd": 3
   },
   "cheetah_run_gold": {
    "url": "assets/sprites/cheetah_run_gold.png",
-   "fw": 64,
-   "fh": 42,
+   "fw": 192,
+   "fh": 126,
    "frames": 6,
-   "fps": 12
+   "fps": 12,
+   "hd": 3
   },
   "cheetah_run_night": {
    "url": "assets/sprites/cheetah_run_night.png",
-   "fw": 64,
-   "fh": 42,
+   "fw": 192,
+   "fh": 126,
    "frames": 6,
-   "fps": 12
+   "fps": 12,
+   "hd": 3
   },
   "panda_idle": {
    "url": "assets/sprites/panda_idle.png",
-   "fw": 30,
-   "fh": 40,
+   "fw": 84,
+   "fh": 120,
    "frames": 4,
-   "fps": 6
+   "fps": 6,
+   "hd": 3
   },
   "panda_idle_blue": {
    "url": "assets/sprites/panda_idle_blue.png",
-   "fw": 30,
-   "fh": 40,
+   "fw": 84,
+   "fh": 120,
    "frames": 4,
-   "fps": 6
+   "fps": 6,
+   "hd": 3
   },
   "panda_idle_mint": {
    "url": "assets/sprites/panda_idle_mint.png",
-   "fw": 30,
-   "fh": 40,
+   "fw": 84,
+   "fh": 120,
    "frames": 4,
-   "fps": 6
+   "fps": 6,
+   "hd": 3
   },
   "panda_idle_pink": {
    "url": "assets/sprites/panda_idle_pink.png",
-   "fw": 30,
-   "fh": 40,
+   "fw": 84,
+   "fh": 120,
    "frames": 4,
-   "fps": 6
+   "fps": 6,
+   "hd": 3
   },
   "panda_idle_gold": {
    "url": "assets/sprites/panda_idle_gold.png",
-   "fw": 30,
-   "fh": 40,
+   "fw": 84,
+   "fh": 120,
    "frames": 4,
-   "fps": 6
+   "fps": 6,
+   "hd": 3
   },
   "panda_idle_night": {
    "url": "assets/sprites/panda_idle_night.png",
-   "fw": 30,
-   "fh": 40,
+   "fw": 84,
+   "fh": 120,
    "frames": 4,
-   "fps": 6
+   "fps": 6,
+   "hd": 3
   },
   "panda_run": {
    "url": "assets/sprites/panda_run.png",
-   "fw": 30,
-   "fh": 39,
+   "fw": 90,
+   "fh": 117,
    "frames": 6,
-   "fps": 12
+   "fps": 12,
+   "hd": 3
   },
   "panda_run_blue": {
    "url": "assets/sprites/panda_run_blue.png",
-   "fw": 30,
-   "fh": 39,
+   "fw": 90,
+   "fh": 117,
    "frames": 6,
-   "fps": 12
+   "fps": 12,
+   "hd": 3
   },
   "panda_run_mint": {
    "url": "assets/sprites/panda_run_mint.png",
-   "fw": 30,
-   "fh": 39,
+   "fw": 90,
+   "fh": 117,
    "frames": 6,
-   "fps": 12
+   "fps": 12,
+   "hd": 3
   },
   "panda_run_pink": {
    "url": "assets/sprites/panda_run_pink.png",
-   "fw": 30,
-   "fh": 39,
+   "fw": 90,
+   "fh": 117,
    "frames": 6,
-   "fps": 12
+   "fps": 12,
+   "hd": 3
   },
   "panda_run_gold": {
    "url": "assets/sprites/panda_run_gold.png",
-   "fw": 30,
-   "fh": 39,
+   "fw": 90,
+   "fh": 117,
    "frames": 6,
-   "fps": 12
+   "fps": 12,
+   "hd": 3
   },
   "panda_run_night": {
    "url": "assets/sprites/panda_run_night.png",
-   "fw": 30,
-   "fh": 39,
+   "fw": 90,
+   "fh": 117,
    "frames": 6,
-   "fps": 12
+   "fps": 12,
+   "hd": 3
   },
   "firefox_idle": {
    "url": "assets/sprites/firefox_idle.png",
-   "fw": 48,
-   "fh": 43,
+   "fw": 138,
+   "fh": 129,
    "frames": 4,
-   "fps": 6
+   "fps": 6,
+   "hd": 3
   },
   "firefox_idle_blue": {
    "url": "assets/sprites/firefox_idle_blue.png",
-   "fw": 48,
-   "fh": 43,
+   "fw": 138,
+   "fh": 129,
    "frames": 4,
-   "fps": 6
+   "fps": 6,
+   "hd": 3
   },
   "firefox_idle_mint": {
    "url": "assets/sprites/firefox_idle_mint.png",
-   "fw": 48,
-   "fh": 43,
+   "fw": 138,
+   "fh": 129,
    "frames": 4,
-   "fps": 6
+   "fps": 6,
+   "hd": 3
   },
   "firefox_idle_pink": {
    "url": "assets/sprites/firefox_idle_pink.png",
-   "fw": 48,
-   "fh": 43,
+   "fw": 138,
+   "fh": 129,
    "frames": 4,
-   "fps": 6
+   "fps": 6,
+   "hd": 3
   },
   "firefox_idle_gold": {
    "url": "assets/sprites/firefox_idle_gold.png",
-   "fw": 48,
-   "fh": 43,
+   "fw": 138,
+   "fh": 129,
    "frames": 4,
-   "fps": 6
+   "fps": 6,
+   "hd": 3
   },
   "firefox_idle_night": {
    "url": "assets/sprites/firefox_idle_night.png",
-   "fw": 48,
-   "fh": 43,
+   "fw": 138,
+   "fh": 129,
    "frames": 4,
-   "fps": 6
+   "fps": 6,
+   "hd": 3
   },
   "firefox_run": {
    "url": "assets/sprites/firefox_run.png",
-   "fw": 56,
-   "fh": 42,
+   "fw": 162,
+   "fh": 126,
    "frames": 6,
-   "fps": 12
+   "fps": 12,
+   "hd": 3
   },
   "firefox_run_blue": {
    "url": "assets/sprites/firefox_run_blue.png",
-   "fw": 56,
-   "fh": 42,
+   "fw": 162,
+   "fh": 126,
    "frames": 6,
-   "fps": 12
+   "fps": 12,
+   "hd": 3
   },
   "firefox_run_mint": {
    "url": "assets/sprites/firefox_run_mint.png",
-   "fw": 56,
-   "fh": 42,
+   "fw": 162,
+   "fh": 126,
    "frames": 6,
-   "fps": 12
+   "fps": 12,
+   "hd": 3
   },
   "firefox_run_pink": {
    "url": "assets/sprites/firefox_run_pink.png",
-   "fw": 56,
-   "fh": 42,
+   "fw": 162,
+   "fh": 126,
    "frames": 6,
-   "fps": 12
+   "fps": 12,
+   "hd": 3
   },
   "firefox_run_gold": {
    "url": "assets/sprites/firefox_run_gold.png",
-   "fw": 56,
-   "fh": 42,
+   "fw": 162,
+   "fh": 126,
    "frames": 6,
-   "fps": 12
+   "fps": 12,
+   "hd": 3
   },
   "firefox_run_night": {
    "url": "assets/sprites/firefox_run_night.png",
-   "fw": 56,
-   "fh": 42,
+   "fw": 162,
+   "fh": 126,
    "frames": 6,
-   "fps": 12
+   "fps": 12,
+   "hd": 3
   },
   "roach_idle": {
    "url": "assets/sprites/roach_idle.png",
-   "fw": 40,
-   "fh": 48,
+   "fw": 114,
+   "fh": 144,
    "frames": 4,
-   "fps": 6
+   "fps": 6,
+   "hd": 3
   },
   "roach_idle_blue": {
    "url": "assets/sprites/roach_idle_blue.png",
-   "fw": 40,
-   "fh": 48,
+   "fw": 114,
+   "fh": 144,
    "frames": 4,
-   "fps": 6
+   "fps": 6,
+   "hd": 3
   },
   "roach_idle_mint": {
    "url": "assets/sprites/roach_idle_mint.png",
-   "fw": 40,
-   "fh": 48,
+   "fw": 114,
+   "fh": 144,
    "frames": 4,
-   "fps": 6
+   "fps": 6,
+   "hd": 3
   },
   "roach_idle_pink": {
    "url": "assets/sprites/roach_idle_pink.png",
-   "fw": 40,
-   "fh": 48,
+   "fw": 114,
+   "fh": 144,
    "frames": 4,
-   "fps": 6
+   "fps": 6,
+   "hd": 3
   },
   "roach_idle_gold": {
    "url": "assets/sprites/roach_idle_gold.png",
-   "fw": 40,
-   "fh": 48,
+   "fw": 114,
+   "fh": 144,
    "frames": 4,
-   "fps": 6
+   "fps": 6,
+   "hd": 3
   },
   "roach_idle_night": {
    "url": "assets/sprites/roach_idle_night.png",
-   "fw": 40,
-   "fh": 48,
+   "fw": 114,
+   "fh": 144,
    "frames": 4,
-   "fps": 6
+   "fps": 6,
+   "hd": 3
   },
   "roach_run": {
    "url": "assets/sprites/roach_run.png",
-   "fw": 38,
-   "fh": 47,
+   "fw": 114,
+   "fh": 141,
    "frames": 6,
-   "fps": 12
+   "fps": 12,
+   "hd": 3
   },
   "roach_run_blue": {
    "url": "assets/sprites/roach_run_blue.png",
-   "fw": 38,
-   "fh": 47,
+   "fw": 114,
+   "fh": 141,
    "frames": 6,
-   "fps": 12
+   "fps": 12,
+   "hd": 3
   },
   "roach_run_mint": {
    "url": "assets/sprites/roach_run_mint.png",
-   "fw": 38,
-   "fh": 47,
+   "fw": 114,
+   "fh": 141,
    "frames": 6,
-   "fps": 12
+   "fps": 12,
+   "hd": 3
   },
   "roach_run_pink": {
    "url": "assets/sprites/roach_run_pink.png",
-   "fw": 38,
-   "fh": 47,
+   "fw": 114,
+   "fh": 141,
    "frames": 6,
-   "fps": 12
+   "fps": 12,
+   "hd": 3
   },
   "roach_run_gold": {
    "url": "assets/sprites/roach_run_gold.png",
-   "fw": 38,
-   "fh": 47,
+   "fw": 114,
+   "fh": 141,
    "frames": 6,
-   "fps": 12
+   "fps": 12,
+   "hd": 3
   },
   "roach_run_night": {
    "url": "assets/sprites/roach_run_night.png",
-   "fw": 38,
-   "fh": 47,
+   "fw": 114,
+   "fh": 141,
    "frames": 6,
-   "fps": 12
+   "fps": 12,
+   "hd": 3
   },
   "tiger_idle": {
    "url": "assets/sprites/tiger_idle.png",
-   "fw": 40,
-   "fh": 42,
+   "fw": 114,
+   "fh": 126,
    "frames": 4,
-   "fps": 6
+   "fps": 6,
+   "hd": 3
   },
   "tiger_idle_blue": {
    "url": "assets/sprites/tiger_idle_blue.png",
-   "fw": 40,
-   "fh": 42,
+   "fw": 114,
+   "fh": 126,
    "frames": 4,
-   "fps": 6
+   "fps": 6,
+   "hd": 3
   },
   "tiger_idle_mint": {
    "url": "assets/sprites/tiger_idle_mint.png",
-   "fw": 40,
-   "fh": 42,
+   "fw": 114,
+   "fh": 126,
    "frames": 4,
-   "fps": 6
+   "fps": 6,
+   "hd": 3
   },
   "tiger_idle_pink": {
    "url": "assets/sprites/tiger_idle_pink.png",
-   "fw": 40,
-   "fh": 42,
+   "fw": 114,
+   "fh": 126,
    "frames": 4,
-   "fps": 6
+   "fps": 6,
+   "hd": 3
   },
   "tiger_idle_gold": {
    "url": "assets/sprites/tiger_idle_gold.png",
-   "fw": 40,
-   "fh": 42,
+   "fw": 114,
+   "fh": 126,
    "frames": 4,
-   "fps": 6
+   "fps": 6,
+   "hd": 3
   },
   "tiger_idle_night": {
    "url": "assets/sprites/tiger_idle_night.png",
-   "fw": 40,
-   "fh": 42,
+   "fw": 114,
+   "fh": 126,
    "frames": 4,
-   "fps": 6
+   "fps": 6,
+   "hd": 3
   },
   "tiger_run": {
    "url": "assets/sprites/tiger_run.png",
-   "fw": 50,
-   "fh": 41,
+   "fw": 144,
+   "fh": 123,
    "frames": 6,
-   "fps": 12
+   "fps": 12,
+   "hd": 3
   },
   "tiger_run_blue": {
    "url": "assets/sprites/tiger_run_blue.png",
-   "fw": 50,
-   "fh": 41,
+   "fw": 144,
+   "fh": 123,
    "frames": 6,
-   "fps": 12
+   "fps": 12,
+   "hd": 3
   },
   "tiger_run_mint": {
    "url": "assets/sprites/tiger_run_mint.png",
-   "fw": 50,
-   "fh": 41,
+   "fw": 144,
+   "fh": 123,
    "frames": 6,
-   "fps": 12
+   "fps": 12,
+   "hd": 3
   },
   "tiger_run_pink": {
    "url": "assets/sprites/tiger_run_pink.png",
-   "fw": 50,
-   "fh": 41,
+   "fw": 144,
+   "fh": 123,
    "frames": 6,
-   "fps": 12
+   "fps": 12,
+   "hd": 3
   },
   "tiger_run_gold": {
    "url": "assets/sprites/tiger_run_gold.png",
-   "fw": 50,
-   "fh": 41,
+   "fw": 144,
+   "fh": 123,
    "frames": 6,
-   "fps": 12
+   "fps": 12,
+   "hd": 3
   },
   "tiger_run_night": {
    "url": "assets/sprites/tiger_run_night.png",
-   "fw": 50,
-   "fh": 41,
+   "fw": 144,
+   "fh": 123,
    "frames": 6,
-   "fps": 12
+   "fps": 12,
+   "hd": 3
   },
   "seahorse_idle": {
    "url": "assets/sprites/seahorse_idle.png",
-   "fw": 32,
-   "fh": 42,
+   "fw": 90,
+   "fh": 126,
    "frames": 4,
-   "fps": 6
+   "fps": 6,
+   "hd": 3
   },
   "seahorse_idle_blue": {
    "url": "assets/sprites/seahorse_idle_blue.png",
-   "fw": 32,
-   "fh": 42,
+   "fw": 90,
+   "fh": 126,
    "frames": 4,
-   "fps": 6
+   "fps": 6,
+   "hd": 3
   },
   "seahorse_idle_mint": {
    "url": "assets/sprites/seahorse_idle_mint.png",
-   "fw": 32,
-   "fh": 42,
+   "fw": 90,
+   "fh": 126,
    "frames": 4,
-   "fps": 6
+   "fps": 6,
+   "hd": 3
   },
   "seahorse_idle_pink": {
    "url": "assets/sprites/seahorse_idle_pink.png",
-   "fw": 32,
-   "fh": 42,
+   "fw": 90,
+   "fh": 126,
    "frames": 4,
-   "fps": 6
+   "fps": 6,
+   "hd": 3
   },
   "seahorse_idle_gold": {
    "url": "assets/sprites/seahorse_idle_gold.png",
-   "fw": 32,
-   "fh": 42,
+   "fw": 90,
+   "fh": 126,
    "frames": 4,
-   "fps": 6
+   "fps": 6,
+   "hd": 3
   },
   "seahorse_idle_night": {
    "url": "assets/sprites/seahorse_idle_night.png",
-   "fw": 32,
-   "fh": 42,
+   "fw": 90,
+   "fh": 126,
    "frames": 4,
-   "fps": 6
+   "fps": 6,
+   "hd": 3
   },
   "seahorse_run": {
    "url": "assets/sprites/seahorse_run.png",
-   "fw": 32,
-   "fh": 42,
+   "fw": 90,
+   "fh": 126,
    "frames": 6,
-   "fps": 12
+   "fps": 12,
+   "hd": 3
   },
   "seahorse_run_blue": {
    "url": "assets/sprites/seahorse_run_blue.png",
-   "fw": 32,
-   "fh": 42,
+   "fw": 90,
+   "fh": 126,
    "frames": 6,
-   "fps": 12
+   "fps": 12,
+   "hd": 3
   },
   "seahorse_run_mint": {
    "url": "assets/sprites/seahorse_run_mint.png",
-   "fw": 32,
-   "fh": 42,
+   "fw": 90,
+   "fh": 126,
    "frames": 6,
-   "fps": 12
+   "fps": 12,
+   "hd": 3
   },
   "seahorse_run_pink": {
    "url": "assets/sprites/seahorse_run_pink.png",
-   "fw": 32,
-   "fh": 42,
+   "fw": 90,
+   "fh": 126,
    "frames": 6,
-   "fps": 12
+   "fps": 12,
+   "hd": 3
   },
   "seahorse_run_gold": {
    "url": "assets/sprites/seahorse_run_gold.png",
-   "fw": 32,
-   "fh": 42,
+   "fw": 90,
+   "fh": 126,
    "frames": 6,
-   "fps": 12
+   "fps": 12,
+   "hd": 3
   },
   "seahorse_run_night": {
    "url": "assets/sprites/seahorse_run_night.png",
-   "fw": 32,
-   "fh": 42,
+   "fw": 90,
+   "fh": 126,
    "frames": 6,
-   "fps": 12
+   "fps": 12,
+   "hd": 3
   },
   "polar_idle": {
    "url": "assets/sprites/polar_idle.png",
-   "fw": 34,
-   "fh": 43,
+   "fw": 102,
+   "fh": 129,
    "frames": 4,
-   "fps": 6
+   "fps": 6,
+   "hd": 3
   },
   "polar_idle_blue": {
    "url": "assets/sprites/polar_idle_blue.png",
-   "fw": 34,
-   "fh": 43,
+   "fw": 102,
+   "fh": 129,
    "frames": 4,
-   "fps": 6
+   "fps": 6,
+   "hd": 3
   },
   "polar_idle_mint": {
    "url": "assets/sprites/polar_idle_mint.png",
-   "fw": 34,
-   "fh": 43,
+   "fw": 102,
+   "fh": 129,
    "frames": 4,
-   "fps": 6
+   "fps": 6,
+   "hd": 3
   },
   "polar_idle_pink": {
    "url": "assets/sprites/polar_idle_pink.png",
-   "fw": 34,
-   "fh": 43,
+   "fw": 102,
+   "fh": 129,
    "frames": 4,
-   "fps": 6
+   "fps": 6,
+   "hd": 3
   },
   "polar_idle_gold": {
    "url": "assets/sprites/polar_idle_gold.png",
-   "fw": 34,
-   "fh": 43,
+   "fw": 102,
+   "fh": 129,
    "frames": 4,
-   "fps": 6
+   "fps": 6,
+   "hd": 3
   },
   "polar_idle_night": {
    "url": "assets/sprites/polar_idle_night.png",
-   "fw": 34,
-   "fh": 43,
+   "fw": 102,
+   "fh": 129,
    "frames": 4,
-   "fps": 6
+   "fps": 6,
+   "hd": 3
   },
   "polar_run": {
    "url": "assets/sprites/polar_run.png",
-   "fw": 36,
-   "fh": 42,
+   "fw": 108,
+   "fh": 126,
    "frames": 6,
-   "fps": 12
+   "fps": 12,
+   "hd": 3
   },
   "polar_run_blue": {
    "url": "assets/sprites/polar_run_blue.png",
-   "fw": 36,
-   "fh": 42,
+   "fw": 108,
+   "fh": 126,
    "frames": 6,
-   "fps": 12
+   "fps": 12,
+   "hd": 3
   },
   "polar_run_mint": {
    "url": "assets/sprites/polar_run_mint.png",
-   "fw": 36,
-   "fh": 42,
+   "fw": 108,
+   "fh": 126,
    "frames": 6,
-   "fps": 12
+   "fps": 12,
+   "hd": 3
   },
   "polar_run_pink": {
    "url": "assets/sprites/polar_run_pink.png",
-   "fw": 36,
-   "fh": 42,
+   "fw": 108,
+   "fh": 126,
    "frames": 6,
-   "fps": 12
+   "fps": 12,
+   "hd": 3
   },
   "polar_run_gold": {
    "url": "assets/sprites/polar_run_gold.png",
-   "fw": 36,
-   "fh": 42,
+   "fw": 108,
+   "fh": 126,
    "frames": 6,
-   "fps": 12
+   "fps": 12,
+   "hd": 3
   },
   "polar_run_night": {
    "url": "assets/sprites/polar_run_night.png",
-   "fw": 36,
-   "fh": 42,
+   "fw": 108,
+   "fh": 126,
    "frames": 6,
-   "fps": 12
+   "fps": 12,
+   "hd": 3
   },
   "crow_fly": {
    "url": "assets/sprites/crow_fly.png",
@@ -1193,45 +1277,51 @@ window.BK_MANIFEST = {
   },
   "hw_ghost_float": {
    "url": "assets/sprites/hw_ghost_float.png",
-   "fw": 40,
-   "fh": 36,
+   "fw": 120,
+   "fh": 108,
    "frames": 6,
-   "fps": 8
+   "fps": 8,
+   "hd": 3
   },
   "hw_bat_fly": {
    "url": "assets/sprites/hw_bat_fly.png",
-   "fw": 36,
-   "fh": 32,
+   "fw": 108,
+   "fh": 96,
    "frames": 4,
-   "fps": 10
+   "fps": 10,
+   "hd": 3
   },
   "hw_cat_walk": {
    "url": "assets/sprites/hw_cat_walk.png",
-   "fw": 36,
-   "fh": 40,
+   "fw": 102,
+   "fh": 120,
    "frames": 6,
-   "fps": 10
+   "fps": 10,
+   "hd": 3
   },
   "hw_pumpkin_walk": {
    "url": "assets/sprites/hw_pumpkin_walk.png",
-   "fw": 28,
-   "fh": 36,
+   "fw": 72,
+   "fh": 108,
    "frames": 6,
-   "fps": 10
+   "fps": 10,
+   "hd": 3
   },
   "hw_mummy_walk": {
    "url": "assets/sprites/hw_mummy_walk.png",
-   "fw": 62,
-   "fh": 48,
+   "fw": 186,
+   "fh": 144,
    "frames": 6,
-   "fps": 8
+   "fps": 8,
+   "hd": 3
   },
   "hw_king_idle": {
    "url": "assets/sprites/hw_king_idle.png",
-   "fw": 84,
-   "fh": 80,
+   "fw": 252,
+   "fh": 240,
    "frames": 6,
-   "fps": 6
+   "fps": 6,
+   "hd": 3
   },
   "hw_decor": {
    "url": "assets/sprites/hw_decor.png",
@@ -1239,6 +1329,206 @@ window.BK_MANIFEST = {
    "fh": 56,
    "frames": 25,
    "fps": 1
+  },
+  "hw_ghost_float_blue": {
+   "url": "assets/sprites/hw_ghost_float_blue.png",
+   "fw": 120,
+   "fh": 108,
+   "frames": 6,
+   "fps": 8,
+   "hd": 3
+  },
+  "hw_ghost_float_mint": {
+   "url": "assets/sprites/hw_ghost_float_mint.png",
+   "fw": 120,
+   "fh": 108,
+   "frames": 6,
+   "fps": 8,
+   "hd": 3
+  },
+  "hw_ghost_float_pink": {
+   "url": "assets/sprites/hw_ghost_float_pink.png",
+   "fw": 120,
+   "fh": 108,
+   "frames": 6,
+   "fps": 8,
+   "hd": 3
+  },
+  "hw_ghost_float_gold": {
+   "url": "assets/sprites/hw_ghost_float_gold.png",
+   "fw": 120,
+   "fh": 108,
+   "frames": 6,
+   "fps": 8,
+   "hd": 3
+  },
+  "hw_ghost_float_night": {
+   "url": "assets/sprites/hw_ghost_float_night.png",
+   "fw": 120,
+   "fh": 108,
+   "frames": 6,
+   "fps": 8,
+   "hd": 3
+  },
+  "hw_bat_fly_blue": {
+   "url": "assets/sprites/hw_bat_fly_blue.png",
+   "fw": 108,
+   "fh": 96,
+   "frames": 4,
+   "fps": 10,
+   "hd": 3
+  },
+  "hw_bat_fly_mint": {
+   "url": "assets/sprites/hw_bat_fly_mint.png",
+   "fw": 108,
+   "fh": 96,
+   "frames": 4,
+   "fps": 10,
+   "hd": 3
+  },
+  "hw_bat_fly_pink": {
+   "url": "assets/sprites/hw_bat_fly_pink.png",
+   "fw": 108,
+   "fh": 96,
+   "frames": 4,
+   "fps": 10,
+   "hd": 3
+  },
+  "hw_bat_fly_gold": {
+   "url": "assets/sprites/hw_bat_fly_gold.png",
+   "fw": 108,
+   "fh": 96,
+   "frames": 4,
+   "fps": 10,
+   "hd": 3
+  },
+  "hw_bat_fly_night": {
+   "url": "assets/sprites/hw_bat_fly_night.png",
+   "fw": 108,
+   "fh": 96,
+   "frames": 4,
+   "fps": 10,
+   "hd": 3
+  },
+  "hw_cat_walk_blue": {
+   "url": "assets/sprites/hw_cat_walk_blue.png",
+   "fw": 102,
+   "fh": 120,
+   "frames": 6,
+   "fps": 10,
+   "hd": 3
+  },
+  "hw_cat_walk_mint": {
+   "url": "assets/sprites/hw_cat_walk_mint.png",
+   "fw": 102,
+   "fh": 120,
+   "frames": 6,
+   "fps": 10,
+   "hd": 3
+  },
+  "hw_cat_walk_pink": {
+   "url": "assets/sprites/hw_cat_walk_pink.png",
+   "fw": 102,
+   "fh": 120,
+   "frames": 6,
+   "fps": 10,
+   "hd": 3
+  },
+  "hw_cat_walk_gold": {
+   "url": "assets/sprites/hw_cat_walk_gold.png",
+   "fw": 102,
+   "fh": 120,
+   "frames": 6,
+   "fps": 10,
+   "hd": 3
+  },
+  "hw_cat_walk_night": {
+   "url": "assets/sprites/hw_cat_walk_night.png",
+   "fw": 102,
+   "fh": 120,
+   "frames": 6,
+   "fps": 10,
+   "hd": 3
+  },
+  "hw_pumpkin_walk_blue": {
+   "url": "assets/sprites/hw_pumpkin_walk_blue.png",
+   "fw": 72,
+   "fh": 108,
+   "frames": 6,
+   "fps": 10,
+   "hd": 3
+  },
+  "hw_pumpkin_walk_mint": {
+   "url": "assets/sprites/hw_pumpkin_walk_mint.png",
+   "fw": 72,
+   "fh": 108,
+   "frames": 6,
+   "fps": 10,
+   "hd": 3
+  },
+  "hw_pumpkin_walk_pink": {
+   "url": "assets/sprites/hw_pumpkin_walk_pink.png",
+   "fw": 72,
+   "fh": 108,
+   "frames": 6,
+   "fps": 10,
+   "hd": 3
+  },
+  "hw_pumpkin_walk_gold": {
+   "url": "assets/sprites/hw_pumpkin_walk_gold.png",
+   "fw": 72,
+   "fh": 108,
+   "frames": 6,
+   "fps": 10,
+   "hd": 3
+  },
+  "hw_pumpkin_walk_night": {
+   "url": "assets/sprites/hw_pumpkin_walk_night.png",
+   "fw": 72,
+   "fh": 108,
+   "frames": 6,
+   "fps": 10,
+   "hd": 3
+  },
+  "hw_mummy_walk_blue": {
+   "url": "assets/sprites/hw_mummy_walk_blue.png",
+   "fw": 186,
+   "fh": 144,
+   "frames": 6,
+   "fps": 8,
+   "hd": 3
+  },
+  "hw_mummy_walk_mint": {
+   "url": "assets/sprites/hw_mummy_walk_mint.png",
+   "fw": 186,
+   "fh": 144,
+   "frames": 6,
+   "fps": 8,
+   "hd": 3
+  },
+  "hw_mummy_walk_pink": {
+   "url": "assets/sprites/hw_mummy_walk_pink.png",
+   "fw": 186,
+   "fh": 144,
+   "frames": 6,
+   "fps": 8,
+   "hd": 3
+  },
+  "hw_mummy_walk_gold": {
+   "url": "assets/sprites/hw_mummy_walk_gold.png",
+   "fw": 186,
+   "fh": 144,
+   "frames": 6,
+   "fps": 8,
+   "hd": 3
+  },
+  "hw_mummy_walk_night": {
+   "url": "assets/sprites/hw_mummy_walk_night.png",
+   "fw": 186,
+   "fh": 144,
+   "frames": 6,
+   "fps": 8,
+   "hd": 3
   }
  },
  "images": {

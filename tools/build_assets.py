@@ -240,8 +240,8 @@ CREDITS = [
 ]
 
 for _n in NEW_FIGURES:
-    SPRITES[_n + "_idle"] = dict(local=("art/animals/%s_idle.png" % _n, 4), fps=6)
-    SPRITES[_n + "_run"] = dict(local=("art/animals/%s_run.png" % _n, 6), fps=12)
+    SPRITES[_n + "_idle"] = dict(local=("art/animals/%s_idle.png" % _n, 4), fps=6, hd=3)
+    SPRITES[_n + "_run"] = dict(local=("art/animals/%s_run.png" % _n, 6), fps=12, hd=3)
 
 # Halloween Night (stand-in from the library until the drawn bat exists)
 SPRITES["crow_fly"] = dict(strip=(GOTH + "crow/Spritesheets/crow-fly.png", 2), fps=6)
@@ -252,6 +252,9 @@ HALLOWEEN_SPRITES = {"hw_ghost_float": (6, 8), "hw_bat_fly": (4, 10), "hw_cat_wa
 for _k, (_n, _fps) in HALLOWEEN_SPRITES.items():
     if os.path.exists(os.path.join(ROOT, "art", "halloween", _k + ".png")):
         SPRITES[_k] = dict(local=("art/halloween/%s.png" % _k, _n), fps=_fps)
+        if _k != "hw_decor": SPRITES[_k]["hd"] = 3          # drawn at three times the game size
+# the Halloween figures can wear the outfit colours too (not the King, not the props)
+HW_OUTFITS = ["hw_ghost_float", "hw_bat_fly", "hw_cat_walk", "hw_pumpkin_walk", "hw_mummy_walk"]
 
 # ---------------------------------------------------------------------------
 
@@ -365,11 +368,12 @@ def local_only():
         img, fw, fh, n = build_sprite(None, key, spec)
         img.save(os.path.join(OUT, "sprites", key + ".png"))
         manifest["sprites"][key] = dict(url="assets/sprites/%s.png" % key, fw=fw, fh=fh, frames=n, fps=spec.get("fps", 10))
-        if key.split("_")[0] in HERO_BASES:
+        if spec.get("hd"): manifest["sprites"][key]["hd"] = spec["hd"]
+        if key.split("_")[0] in HERO_BASES or key in HW_OUTFITS:
             for suffix, (hue, sat, val) in OUTFIT_COLOURS.items():
                 nk = "%s_%s" % (key, suffix)
                 recolour(img, hue, sat, val).save(os.path.join(OUT, "sprites", nk + ".png"))
-                manifest["sprites"][nk] = dict(url="assets/sprites/%s.png" % nk, fw=fw, fh=fh, frames=n, fps=spec.get("fps", 10))
+                manifest["sprites"][nk] = dict(manifest["sprites"][key], url="assets/sprites/%s.png" % nk)
         log("local sprite %-16s %2d x %dx%d" % (key, n, fw, fh))
     write_manifest(manifest)
     log("manifest written")
@@ -397,14 +401,15 @@ def main():
         built[key] = (img, fw, fh, n, spec.get("fps", 10))
         img.save(os.path.join(OUT, "sprites", key + ".png"))
         manifest["sprites"][key] = dict(url="assets/sprites/%s.png" % key, fw=fw, fh=fh, frames=n, fps=spec.get("fps", 10))
+        if spec.get("hd"): manifest["sprites"][key]["hd"] = spec["hd"]
         log("sprite %-16s %2d x %dx%d" % (key, n, fw, fh))
 
     for suffix, (hue, sat, val) in OUTFIT_COLOURS.items():
-        for k in [k for k in built if k.split("_")[0] in HERO_BASES]:
+        for k in [k for k in built if k.split("_")[0] in HERO_BASES or k in HW_OUTFITS]:
             img, fw, fh, n, fps = built[k]
             nk = "%s_%s" % (k, suffix)          # e.g. bunny_run_blue
             recolour(img, hue, sat, val).save(os.path.join(OUT, "sprites", nk + ".png"))
-            manifest["sprites"][nk] = dict(url="assets/sprites/%s.png" % nk, fw=fw, fh=fh, frames=n, fps=fps)
+            manifest["sprites"][nk] = dict(manifest["sprites"][k], url="assets/sprites/%s.png" % nk)
         log("recolour", suffix)
 
     for key, (path, crop) in IMAGES.items():

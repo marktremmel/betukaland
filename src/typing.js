@@ -98,7 +98,7 @@ BK.WordBubble = class {
   light(c, kind) {
     var sc = this.scene, W = this.w, H = this.h, self = this;
     if (!this.c || !this.c.active) return;
-    if (kind === 'rtx') {
+    if (kind === 'g_rim' || kind === 'rtx') {
       var g = sc.add.graphics();
       g.fillStyle(c, 0.16).fillRoundedRect(-W / 2, -H, W, H, 3);
       g.lineStyle(2, c, 1).strokeRoundedRect(-W / 2 - 1.5, -H - 1.5, W + 3, H + 3, 4);
@@ -115,7 +115,29 @@ BK.WordBubble = class {
           if (o.t.active) o.t.setTint(Phaser.Display.Color.GetColor(m.r, m.g, m.b));
         });
       }, onComplete: function () { lit.forEach(function (o) { if (o.t.active) o.t.setTint(0x2e9e52); }); } });
-    } else if (kind === 'neon') {
+    } else if (kind === 'g_pulse') {
+      // the bubble breathes once, with a soft wash of the colour
+      var pw = sc.add.graphics();
+      pw.fillStyle(c, 0.2).fillRoundedRect(-W / 2, -H, W, H, 3);
+      this.c.addAt(pw, 2);
+      sc.tweens.add({ targets: pw, alpha: 0, duration: 260, onComplete: function () { pw.destroy(); } });
+      if (!sc.tweens.isTweening(this.c)) sc.tweens.add({ targets: this.c, scale: 1.05, duration: 70, yoyo: true, ease: 'Sine.easeOut' });
+    } else if (kind === 'g_rainbow') {
+      // a rim in all colours, and the letters just typed in a rainbow for a moment
+      var rg = sc.add.graphics(), n = 12;
+      for (var q = 0; q < n; q++) {
+        rg.lineStyle(2, Phaser.Display.Color.HSVToRGB(q / n, 0.75, 1).color, 1);
+        var t0 = q / n, t1 = (q + 1) / n, P0 = this.rimPoint(t0), P1 = this.rimPoint(t1);
+        rg.lineBetween(P0.x, P0.y, P1.x, P1.y);
+      }
+      this.c.addAt(rg, 2);
+      sc.tweens.add({ targets: rg, alpha: 0, duration: 380, onComplete: function () { rg.destroy(); } });
+      for (var k2 = Math.max(0, this.i - 3); k2 < this.i; k2++) (function (ch, hue) {
+        if (!ch || !ch.t) return;
+        ch.t.setTint(Phaser.Display.Color.HSVToRGB(hue, 0.8, 0.9).color);
+        sc.time.delayedCall(260, function () { if (ch.t.active) ch.t.setTint(0x2e9e52); });
+      })(this.chars[k2], (k2 * 0.13) % 1);
+    } else if (kind === 'g_neon' || kind === 'neon') {
       // a neon sign: a bright tube around the bubble that buzzes on and slowly goes out
       if (this.neon) this.neon.destroy();
       var nb = this.neon = sc.add.graphics();
@@ -143,6 +165,15 @@ BK.WordBubble = class {
         sc.time.delayedCall(140, function () { if (last.t.active) last.t.setTint(0x2e9e52); });
       }
     }
+  }
+
+  // a point on the bubble's edge, t from 0 to 1 going round
+  rimPoint(t) {
+    var W = this.w + 3, H = this.h + 3, L = 2 * (W + H), d = t * L, x0 = -W / 2, y0 = -this.h - 1.5;
+    if (d < W) return { x: x0 + d, y: y0 };
+    d -= W; if (d < H) return { x: x0 + W, y: y0 + d };
+    d -= H; if (d < W) return { x: x0 + W - d, y: y0 + H };
+    d -= W; return { x: x0, y: y0 + H - d };
   }
 
   // world position of the next letter (for sparks)

@@ -533,9 +533,10 @@ BK.fx = {
     var dx = x1 - x0, dy = y1 - y0, len = Math.max(1, Math.sqrt(dx * dx + dy * dy)), nx = -dy / len, ny = dx / len;
     var hit = function () {
       BK.fx.impact(scene, x1, y1, fx.impact || 'spark', col, n);
-      if (set.rtx) { BK.fx.flare(scene, x1, y1, col(0)); BK.fx.light(scene, col(0), 'rtx'); }
-      if (set.chrome) { BK.fx.glint(scene, x1, y1); BK.fx.light(scene, 0xffffff, 'chrome'); }
-      if (set.neon) BK.fx.light(scene, col(0), 'neon');
+      if (set.rtx) BK.fx.flare(scene, x1, y1, col(0));
+      if (set.chrome) BK.fx.glint(scene, x1, y1);
+      // light on the word bubble: a separate choice in the shop, off by default
+      if (fx.glow && fx.glow !== 'g_none') BK.fx.light(scene, set.chrome ? 0xe8eef6 : col(0), fx.glow);
     };
     // a moving thing: the shape, with a coloured glow around it for RTX and a shine for chrome.
     // RTX: the shape itself stays in its neon colour (normal blend, so it shows on a bright sky),
@@ -678,7 +679,7 @@ BK.fx = {
     if (!enc) return;
     if (enc.bubble && enc.bubble.light) enc.bubble.light(c, kind);
     var p = enc.proj;
-    if (p && p.c && kind === 'rtx') {
+    if (p && p.c && kind !== 'g_shine') {
       var g = scene.add.image(p.x, p.y, 'shot_glow').setTint(c).setBlendMode(Phaser.BlendModes.ADD).setDepth(224).setScale(2.4).setAlpha(0.8);
       scene.tweens.add({ targets: g, alpha: 0, duration: 300, onComplete: function () { g.destroy(); } });
     }
@@ -696,10 +697,12 @@ BK.fx = {
     } else if (id === 'splat') {
       // a blob of paint with a few drops around it, that slides down a little and fades
       var bl = [];
-      for (var j = 0; j < 6; j++) {
-        var ang = Math.random() * Math.PI * 2, dist = j ? 3 + Math.random() * 7 : 0;
-        bl.push(scene.add.image(x + Math.cos(ang) * dist, y + Math.sin(ang) * dist, 'shot_ball').setTint(col(0))
-          .setDepth(221).setScale(j ? 0.3 + Math.random() * 0.4 : 0.9 + Math.random() * 0.3));
+      // a big blob of the shot's colour and drops in a few colours around it
+      for (var j = 0; j < 9; j++) {
+        var ang = Math.random() * Math.PI * 2, dist = j ? 5 + Math.random() * 9 : 0;
+        bl.push(scene.add.image(x + Math.cos(ang) * dist, y + Math.sin(ang) * dist, 'shot_ball')
+          .setTint(j ? Phaser.Display.Color.HSVToRGB(Math.random(), 0.7, 1).color : col(0))
+          .setDepth(221).setScale(j ? 0.45 + Math.random() * 0.5 : 1.5 + Math.random() * 0.4));
       }
       bl.forEach(function (o, k) { o.setScale(o.scale * 0.4); scene.tweens.add({ targets: o, scale: o.scale * 2.5, duration: 70, ease: 'Back.easeOut' });
         tw(o, { y: o.y + 2 + (k % 3), alpha: 0, delay: 260 }, 420); });
@@ -708,14 +711,14 @@ BK.fx = {
       for (var q = 0; q < 7; q++) (function (q) {
         var sz = 1 + (q % 2), px = scene.add.rectangle(x, y, sz * 2, sz * 2, col(q)).setDepth(222);
         var vx = (Math.random() - 0.5) * 34, vy = -14 - Math.random() * 14, t0 = 0;
-        scene.tweens.add({ targets: { t: 0 }, t: 1, duration: 420, onUpdate: function (twn) {
-          t0 = twn.progress * 0.42; px.x = x + vx * t0 * 2; px.y = y + vy * t0 * 2 + 90 * t0 * t0 * 2; px.alpha = 1 - twn.progress * 0.8;
+        scene.tweens.add({ targets: { t: 0 }, t: 1, duration: 700, onUpdate: function (twn) {
+          t0 = twn.progress * 0.55; px.x = x + vx * t0 * 2; px.y = y + vy * t0 * 2 + 90 * t0 * t0 * 2; px.alpha = 1 - twn.progress * 0.8;
         }, onComplete: function () { px.destroy(); } });
       })(q);
     } else if (id === 'stars') {
       for (var m = 0; m < 5; m++) {
-        var a2 = -Math.PI / 2 + (m - 2) * 0.55, st = scene.add.image(x, y, 'shot_star').setTint(col(m)).setDepth(222).setScale(0.4);
-        tw(st, { x: x + Math.cos(a2) * 14, y: y + Math.sin(a2) * 14, angle: 180, scale: 0.8, alpha: { from: 1, to: 0 }, ease: 'Cubic.easeOut' }, 380);
+        var a2 = -Math.PI / 2 + (m - 2) * 0.55, st = scene.add.image(x, y, 'shot_star').setTint(col(m)).setDepth(222).setScale(0.6);
+        tw(st, { x: x + Math.cos(a2) * 18, y: y + Math.sin(a2) * 18, angle: 180, scale: 1.25, alpha: { from: 1, to: 0 }, ease: 'Cubic.easeOut' }, 460);
       }
     } else if (id === 'comic') {
       // a comic-book word now and then (not on every key, it would be too much), small sparks otherwise

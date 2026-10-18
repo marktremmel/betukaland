@@ -39,7 +39,7 @@ BK.ShopScene = class extends BK.OverlayBase {
     tabs.forEach(function (t, i) {
       var x = b.x + b.w / 2 + (i - (tabs.length - 1) / 2) * 76;
       s.tabX[t[0]] = x;
-      BK.ui.button(s, x, b.y + 46, t[1], function () { s.tab = t[0]; s.fxSel = null; s.draw(); }, { w: 70, h: 16 });
+      BK.ui.button(s, x, b.y + 46, t[1], function () { s.tab = t[0]; s.fxSel = null; s.figSel = undefined; s.draw(); }, { w: 70, h: 16 });
     });
     this.coinIcon = this.add.sprite(b.x + b.w - 44, b.y + 30, 'coin').play('coin');
     this.coinText = BK.ui.text(this, b.x + b.w - 34, b.y + 24, '', { outline: false, color: 0x9a3d1a });
@@ -63,8 +63,9 @@ BK.ShopScene = class extends BK.OverlayBase {
       s.keepD(BK.ui.nine(s, x, y, 86, 54, 'ui_slot'));
       var hero = BK.heroOf(P);
       var key = s.tab === 0 ? (it.id === 'base' ? hero.idle : hero.idle + '_' + it.id) : it.sprite;
-      var spr = s.keepD(s.add.sprite(x + 20, y + 50, key).setOrigin(0.5, 1).play(key));
-      if (spr.height > 36) spr.setScale(0.5);
+      if (!s.textures.exists(key)) key = s.tab === 0 ? hero.idle : key;      // a figure without outfit colours
+      var spr = s.keepD(s.add.sprite(x + 20, y + 51, key).setOrigin(0.5, 1).play(key));
+      if (spr.height > 36) spr.setScale(spr.height > 60 ? 0.5 : 36 / spr.height);
       if (s.tab === 1) spr.setFlipX(BK.FACES_LEFT[key.split('_')[0]] === true);
       s.keepD(BK.ui.text(s, x + 43, y + 4, it.name, { outline: false, origin: [0.5, 0] }));
       var owned = s.tab === 0 ? P.outfits.indexOf(it.id) >= 0 : P.pets.indexOf(it.id) >= 0;
@@ -79,16 +80,16 @@ BK.ShopScene = class extends BK.OverlayBase {
   // basic and pastel sets the child then picks one colour from the row of swatches.
   drawMagic() {
     var s = this, P = this.P, b = this.box, fx = P.fx;
-    var LISTS = { shape: BK.SHOT_SHAPES, colour: BK.SHOT_COLOURS, impact: BK.SHOT_IMPACTS };
-    var KEY = { shape: 'shape', colour: 'colour', impact: 'impact' };
+    var LISTS = { shape: BK.SHOT_SHAPES, colour: BK.SHOT_COLOURS, impact: BK.SHOT_IMPACTS, glow: BK.SHOT_GLOWS };
+    var KEY = { shape: 'shape', colour: 'colour', impact: 'impact', glow: 'glow' };
     var page = this.magicPage || 'shape';
     var sel = this.fxSel && this.fxSel.kind === page ? this.fxSel : { kind: page, id: fx[KEY[page]] || LISTS[page][0].id, tone: fx.tone };
     var item = LISTS[page].find(function (o) { return o.id === sel.id; }) || LISTS[page][0];
     // the three pages
-    [['shape', BK.T.shape], ['colour', BK.T.colours], ['impact', BK.L('Becsapódás', 'Impact')]].forEach(function (pg, i) {
-      var x = b.x + b.w / 2 + (i - 1) * 84;
-      s.keepD(BK.ui.button(s, x, b.y + 64, pg[1], function () { s.magicPage = pg[0]; s.fxSel = null; BK.audio.sfx('ui'); s.draw(); }, { w: 78, h: 14 }));
-      if (pg[0] === page) s.keepD(s.add.rectangle(x, b.y + 64, 82, 18).setStrokeStyle(1, 0x9a3d1a));
+    [['shape', BK.T.shape], ['colour', BK.T.colours], ['impact', BK.L('Becsapódás', 'Impact')], ['glow', BK.L('Fény', 'Light')]].forEach(function (pg, i) {
+      var x = b.x + b.w / 2 + (i - 1.5) * 76;
+      s.keepD(BK.ui.button(s, x, b.y + 64, pg[1], function () { s.magicPage = pg[0]; s.fxSel = null; BK.audio.sfx('ui'); s.draw(); }, { w: 70, h: 14 }));
+      if (pg[0] === page) s.keepD(s.add.rectangle(x, b.y + 64, 74, 18).setStrokeStyle(1, 0x9a3d1a));
     });
     var list = LISTS[page], w = page === 'colour' ? 42 : 40, step = page === 'colour' ? 45 : (page === 'shape' ? 44 : 50), h = 40, y = b.y + 98;
     var x0 = b.x + b.w / 2 - (list.length - 1) * step / 2;
@@ -97,7 +98,8 @@ BK.ShopScene = class extends BK.OverlayBase {
       s.keepD(BK.ui.nine(s, x - w / 2, y - h / 2, w, h, inUse ? 'ui_slot_sel' : 'ui_slot'));
       if (page === 'shape') s.shotIcon(x, y - 8, o.id, fx.colour, fx.tone);
       else if (page === 'colour') s.colourIcon(x, y - 9, o);
-      else s.impactIcon(x, y - 8, o.id);
+      else if (page === 'impact') s.impactIcon(x, y - 8, o.id);
+      else s.glowIcon(x, y - 8, o.id);
       s.keepD(BK.ui.text(s, x, y + 3, o.name, { outline: false, origin: [0.5, 0.5], px: 8, color: 0x4a2c1c, fit: w - 4 }));
       if (!owned) s.keepD(BK.ui.text(s, x, y + 11, o.price + '', { outline: false, origin: [0.5, 0.5], px: 8, bold: true, color: 0x9a3d1a }));
       if (sel.id === o.id) s.keepD(s.add.rectangle(x, y, w + 4, h + 4).setStrokeStyle(2, 0xffffff));
@@ -118,9 +120,17 @@ BK.ShopScene = class extends BK.OverlayBase {
         z.on('pointerup', function () { s.fxSel = { kind: 'colour', id: item.id, tone: i }; BK.audio.sfx('ui'); s.draw(); s.demo(); });
       });
     }
-    // what the child uses now, all three
+    // the light needs something to shine on: a little word bubble, half typed
+    this.enc = null;
+    if (page === 'glow') {
+      var wb = new BK.WordBubble(this, BK.L('varázslat', 'magic'), b.x + b.w / 2, b.y + 147, { px: 11 });
+      for (var q = 0; q < 4; q++) wb.type(wb.next);
+      this.keepD(wb);
+      this.enc = { bubble: wb };
+    }
+    // what the child uses now, all of it
     var nm = function (l, id) { var o = l.find(function (q) { return q.id === id; }); return o ? o.name : ''; };
-    this.keepD(BK.ui.text(this, b.x + b.w / 2, b.y + 143, BK.T.figureNow + ' ' + nm(BK.SHOT_SHAPES, fx.shape) + ' · ' + nm(BK.SHOT_COLOURS, fx.colour) + ' · ' + nm(BK.SHOT_IMPACTS, fx.impact || 'spark'),
+    if (page !== 'glow') this.keepD(BK.ui.text(this, b.x + b.w / 2, b.y + 143, BK.T.figureNow + ' ' + nm(BK.SHOT_SHAPES, fx.shape) + ' · ' + nm(BK.SHOT_COLOURS, fx.colour) + ' · ' + nm(BK.SHOT_IMPACTS, fx.impact || 'spark') + ' · ' + BK.L('fény: ', 'light: ') + nm(BK.SHOT_GLOWS, fx.glow || 'g_none'),
       { outline: false, origin: [0.5, 0.5], px: 9, color: 0x6b3a20, fit: 300 }));
     // what is selected, and the button for it
     var owned = fx.owned.indexOf(item.id) >= 0;
@@ -128,6 +138,18 @@ BK.ShopScene = class extends BK.OverlayBase {
     this.keepD(BK.ui.text(this, b.x + 20, b.y + 160, item.name + (owned ? '' : '  ·  ' + item.price + ' ' + BK.L('érme', 'coins')), { outline: false, origin: [0, 0.5], color: 0x4a2c1c, bold: true, fit: 150 }));
     var label = inUse ? BK.T.using : owned ? BK.T.use : BK.T.buy;
     this.keepD(BK.ui.button(this, b.x + b.w - 62, b.y + 160, label, function () { s.buyMagic(sel, item); }, { w: 84, h: 16, disabled: inUse }));
+  }
+  // a tiny word bubble showing the light
+  glowIcon(x, y, id) {
+    var fx = this.P.fx, set = BK.fx.colourSet(fx.colour), c = BK.fx.shotColour(set, fx.tone, 2), g = this.keepD(this.add.graphics());
+    g.fillStyle(0x5a3426, 1).fillRoundedRect(x - 12, y - 6, 24, 12, 3);
+    g.fillStyle(0xfffaeb, 1).fillRoundedRect(x - 11, y - 5, 22, 10, 2);
+    if (id === 'g_rim') g.lineStyle(1.5, c, 1).strokeRoundedRect(x - 13, y - 7, 26, 14, 3);
+    else if (id === 'g_neon') { g.lineStyle(3, c, 0.35).strokeRoundedRect(x - 14, y - 8, 28, 16, 4); g.lineStyle(1, c, 1).strokeRoundedRect(x - 13, y - 7, 26, 14, 3); }
+    else if (id === 'g_shine') { g.fillStyle(0xffffff, 0.9).fillRect(x - 1, y - 5, 3, 10); }
+    else if (id === 'g_pulse') { g.fillStyle(c, 0.3).fillRoundedRect(x - 11, y - 5, 22, 10, 2); }
+    else if (id === 'g_rainbow') { for (var i = 0; i < 6; i++) { g.lineStyle(1.5, Phaser.Display.Color.HSVToRGB(i / 6, 0.75, 1).color, 1); g.lineBetween(x - 13 + i * 4.4, y - 7, x - 13 + (i + 1) * 4.4, y - 7); g.lineBetween(x - 13 + i * 4.4, y + 7, x - 13 + (i + 1) * 4.4, y + 7); } }
+    this.keepD(BK.ui.text(this, x, y, 'abc', { outline: false, origin: [0.5, 0.5], px: 7, color: id === 'g_none' ? 0x4a2c1c : 0x2e9e52 }));
   }
   // a tiny picture of an impact, in the colour the child uses now
   impactIcon(x, y, id) {
@@ -178,9 +200,13 @@ BK.ShopScene = class extends BK.OverlayBase {
     var sel = this.fxSel, fx = this.P.fx, b = this.box, s = this;
     if (!sel) return;
     var test = { shape: sel.kind === 'shape' ? sel.id : fx.shape, colour: sel.kind === 'colour' ? sel.id : fx.colour,
-      tone: sel.kind === 'colour' ? sel.tone || 0 : fx.tone, impact: sel.kind === 'impact' ? sel.id : fx.impact };
+      tone: sel.kind === 'colour' ? sel.tone || 0 : fx.tone, impact: sel.kind === 'impact' ? sel.id : fx.impact,
+      glow: sel.kind === 'glow' ? sel.id : fx.glow };
     for (var i = 0; i < 3; i++) (function (i) {
-      s.time.delayedCall(i * 170, function () { BK.fx.bolt(s, b.x + 40, b.y + 123, b.x + b.w - 40, b.y + 121 + (i - 1) * 3, test); });
+      s.time.delayedCall(i * 170, function () {
+        if (s.magicPage === 'glow') BK.fx.bolt(s, b.x + 40, b.y + 136, b.x + b.w / 2 - 20, b.y + 136 + (i - 1) * 2, test);
+        else BK.fx.bolt(s, b.x + 40, b.y + 123, b.x + b.w - 40, b.y + 121 + (i - 1) * 3, test);
+      });
     })(i);
   }
   buyMagic(sel, item) {
@@ -194,6 +220,7 @@ BK.ShopScene = class extends BK.OverlayBase {
     }
     if (sel.kind === 'shape') fx.shape = item.id;
     else if (sel.kind === 'impact') fx.impact = item.id;
+    else if (sel.kind === 'glow') fx.glow = item.id;
     else { fx.colour = item.id; fx.tone = item.pick ? sel.tone || 0 : 0; }
     this.fxSel = sel;
     BK.save.persist();
@@ -201,45 +228,62 @@ BK.ShopScene = class extends BK.OverlayBase {
     this.demo();
   }
 
-  // Figures: switching is free. 6 x 3 small slots, the current one framed in white.
+  // Figures: switching to one you have is free (one click). One you don't have yet is only
+  // selected by a click; it is bought with the button below, so nothing is bought by accident.
   // The Halloween figures open after Halloween Night: one is a gift, the others cost coins.
   drawFigures() {
     var s = this, P = this.P, b = this.box;
+    var sel = this.figSel !== undefined ? this.figSel : (P.avatar || 0);
     BK.HEROES.forEach(function (h, i) {
-      var x = b.x + (b.w - 324) / 2 + 27 + (i % 6) * 54, y = b.y + 74 + Math.floor(i / 6) * 36;
-      var sel = i === (P.avatar || 0), owned = BK.heroOwned(P, h), open = BK.heroUnlocked(P, h);
-      s.keepD(BK.ui.nine(s, x - 25, y - 17, 50, 34, sel ? 'ui_slot_sel' : open ? 'ui_slot' : 'ui_slot_off'));
-      var spr = s.keepD(BK.avatarSprite(s, x, y + (owned ? 15 : 6), i, P));
-      spr.setScale(h.id === 'crab' ? 1.4 : Math.min(1, (owned ? 28 : 21) / spr.height));
+      var x = b.x + (b.w - 324) / 2 + 27 + (i % 6) * 54, y = b.y + 72 + Math.floor(i / 6) * 31;
+      var cur = i === (P.avatar || 0), owned = BK.heroOwned(P, h), open = BK.heroUnlocked(P, h);
+      s.keepD(BK.ui.nine(s, x - 25, y - 15, 50, 30, cur ? 'ui_slot_sel' : open ? 'ui_slot' : 'ui_slot_off'));
+      var spr = s.keepD(BK.avatarSprite(s, x, y + 14, i, P));
+      spr.setScale(h.id === 'crab' ? 1.4 : Math.min(1, 26 / spr.height));
       if (!open) spr.setTint(0x302838).setAlpha(0.7);
       if (!owned) {
-        s.keepD(BK.ui.text(s, x, y + 5, open ? h.price + ' ' + BK.L('érme', 'coins') : 'Halloween',
-          { outline: false, origin: [0.5, 0], px: 9, color: open ? 0x9a3d1a : 0x6a2a8a }));
-      }
-      if (sel) s.keepD(s.add.rectangle(x, y, 54, 38).setStrokeStyle(2, 0xffffff));
-      var z = s.keepD(s.add.zone(x, y, 50, 34).setInteractive({ useHandCursor: true }));
-      z.on('pointerup', function () {
-        if (P.avatar === i) return;
-        if (!open) {
-          BK.ui.toast(s, BK.W / 2, b.y + b.h - 34, BK.L('Teljesítsd a Halloween éjszakát!', 'Finish Halloween Night first!'), 0xd8a0ff);
-          BK.audio.sfx('key_bad', { volume: 0.3 });
-          return;
+        // a small price tag (or a lock) in the corner
+        if (open) {
+          s.keepD(s.add.rectangle(x + 14, y - 9, 20, 9, 0xffe9a0, 0.95).setStrokeStyle(1, 0x5a3426));
+          s.keepD(BK.ui.text(s, x + 14, y - 9, String(h.price), { outline: false, origin: [0.5, 0.5], px: 7, bold: true, color: 0x9a3d1a }));
+        } else {
+          var lk = s.keepD(s.add.graphics());           // a little padlock
+          lk.lineStyle(1.5, 0x6a2a8a, 1).strokeCircle(x + 16, y - 9, 2.5);
+          lk.fillStyle(0x6a2a8a, 1).fillRect(x + 12.5, y - 8, 7, 5);
         }
-        if (!owned) {
-          if (P.coins < h.price) { BK.ui.toast(s, BK.W / 2, b.y + b.h - 34, BK.T.notEnough, 0xff9a7a); BK.audio.sfx('key_bad', { volume: 0.3 }); return; }
-          P.coins -= h.price;
-          P.figures = P.figures || [];
-          P.figures.push(h.id);
-          BK.audio.sfx('buy');
-          BK.audio.sfx('v_great', { volume: 0.5 });
-        } else BK.audio.sfx('ui');
-        P.avatar = i;
-        BK.save.persist();
+      }
+      if (i === sel) s.keepD(s.add.rectangle(x, y, 54, 34).setStrokeStyle(2, 0xffffff));
+      var z = s.keepD(s.add.zone(x, y, 50, 30).setInteractive({ useHandCursor: true }));
+      z.on('pointerup', function () {
+        if (owned) {
+          s.figSel = undefined;
+          if (P.avatar !== i) { P.avatar = i; BK.audio.sfx('ui'); BK.save.persist(); }
+        } else { s.figSel = i; BK.audio.sfx('ui'); }
         s.draw();
       });
     });
-    this.keepD(BK.ui.text(this, b.x + 14, b.y + 30, BK.T.figureNow + ' ' + BK.heroOf(P).name,
-      { outline: false, origin: [0, 0.5], color: 0x9a3d1a, fit: 96 }));
+    var h = BK.HEROES[sel], owned = BK.heroOwned(P, h), open = BK.heroUnlocked(P, h);
+    var y2 = b.y + 160;
+    if (owned) {
+      this.keepD(BK.ui.text(this, b.x + 20, y2, BK.T.figureNow + ' ' + BK.heroOf(P).name, { outline: false, origin: [0, 0.5], color: 0x4a2c1c, bold: true, fit: 180 }));
+      this.keepD(BK.ui.text(this, b.x + b.w - 20, y2, BK.L('Kattints egy figurára a váltáshoz', 'Click a figure to switch'), { outline: false, origin: [1, 0.5], px: 9, color: 0x9a8a80, fit: 140 }));
+    } else if (!open) {
+      this.keepD(BK.ui.text(this, b.x + 20, y2, h.name + ': ' + BK.L('teljesítsd a Halloween éjszakát!', 'finish Halloween Night first!'), { outline: false, origin: [0, 0.5], color: 0x6a2a8a, bold: true, fit: 300 }));
+    } else {
+      this.keepD(BK.ui.text(this, b.x + 20, y2, h.name + '  ·  ' + h.price + ' ' + BK.L('érme', 'coins'), { outline: false, origin: [0, 0.5], color: 0x4a2c1c, bold: true, fit: 160 }));
+      this.keepD(BK.ui.button(this, b.x + b.w - 62, y2, BK.T.buy, function () {
+        if (P.coins < h.price) { BK.ui.toast(s, BK.W / 2, b.y + b.h - 40, BK.T.notEnough, 0xff9a7a); BK.audio.sfx('key_bad', { volume: 0.3 }); return; }
+        P.coins -= h.price;
+        P.figures = P.figures || [];
+        P.figures.push(h.id);
+        P.avatar = sel;
+        s.figSel = undefined;
+        BK.audio.sfx('buy');
+        BK.audio.sfx('v_great', { volume: 0.5 });
+        BK.save.persist();
+        s.draw();
+      }, { w: 84, h: 16 }));
+    }
   }
   act(it, owned, wearing) {
     var P = this.P;

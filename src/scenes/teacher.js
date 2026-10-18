@@ -137,7 +137,7 @@ BK.TeacherScene = class extends Phaser.Scene {
     var s = this, esc = BK.html.esc;
     var rows = BK.save.profiles().map(function (p) {
       var m = s.summary(p);
-      return '<tr><td>' + esc(m.nick) + '</td><td>' + m.grade + '</td><td>' + esc(m.region) + '</td><td>' + m.stars + '</td><td>' + m.crowns + '</td><td>' + m.streak + '</td><td>' + m.levels +
+      return '<tr><td>' + esc(m.nick) + '</td><td>' + (m.grade === '5-6' ? BK.T.grade56 : BK.T.grade34) + '</td><td>' + esc(m.region) + '</td><td>' + m.stars + '</td><td>' + m.crowns + '</td><td>' + m.streak + '</td><td>' + m.levels +
         '</td><td>' + (m.levels ? m.acc + '%' : '') + '</td><td>' + (m.levels ? m.wpm : '') + '</td><td>' + m.best + '</td><td class="keys">' + esc(m.weak) +
         '</td><td>' + m.last + '</td><td><button data-code="' + p.id + '" class="mini">Code</button> <button data-del="' + p.id + '" class="mini danger">Delete</button></td></tr>';
     }).join('');
@@ -183,7 +183,7 @@ BK.TeacherScene = class extends Phaser.Scene {
     var lines = [head.join(';')];
     BK.save.profiles().forEach(function (p) {
       var m = s.summary(p);
-      var cells = [m.nick, 'grade ' + m.grade, m.lang, m.region, m.placed, m.stars, m.crowns, m.streak, m.endless, m.levels, m.levels ? m.acc : '', m.levels ? m.wpm : '', m.best, m.weak, m.coins, m.last];
+      var cells = [m.nick, (m.grade === '5-6' ? 'intermediate' : 'beginner'), m.lang, m.region, m.placed, m.stars, m.crowns, m.streak, m.endless, m.levels, m.levels ? m.acc : '', m.levels ? m.wpm : '', m.best, m.weak, m.coins, m.last];
       lines.push(cells.map(function (c) {
         c = String(c);
         if (/^\d+\.\d+$/.test(c)) c = c.replace('.', ',');  // Hungarian Excel expects a decimal comma

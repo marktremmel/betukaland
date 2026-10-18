@@ -172,6 +172,39 @@ def process(name, specs, K=18):
         out[kind] = fs
     return out
 
+# HD: since v0.10.1 the figures are kept at three times the game size (HD = 3) and the game shows
+# them at a third (manifest "hd": 3), so the detail of the drawings stays. No palette, no redrawn
+# outline: the drawings already have theirs. The magenta fringe is replaced by the nearest colour
+# from inside the figure before shrinking, and the edge is made hard again afterwards.
+HD = 3
+
+def process_hd(name, specs):
+    out = {}
+    for kind, n, H in specs:
+        src, files = (HW_SRC, HW_FILES) if name in HW_FILES else (SRC, FILES)
+        fr = frames(os.path.join(src, files[name][kind]), n)
+        hmax = max(m.shape[0] for a, m in fr)
+        fs = []
+        for a, m in fr:
+            Ht = max(8, round((H + 2) * HD * m.shape[0] / hmax))
+            inner = ndimage.binary_erosion(m, iterations=3)
+            if not inner.any(): inner = m
+            _, (iy, ix) = ndimage.distance_transform_edt(~inner, return_indices=True)
+            filled = a[iy, ix].astype(np.uint8)
+            Wt = max(1, round(m.shape[1] * Ht / m.shape[0]))
+            rgb = Image.fromarray(filled).resize((Wt, Ht), Image.BOX)
+            al = np.asarray(Image.fromarray((m * 255).astype(np.uint8)).resize((Wt, Ht), Image.BOX)) > 127
+            al = ndimage.binary_closing(np.pad(al, 1), CROSS)[1:-1, 1:-1]
+            lab, k = ndimage.label(al)
+            if k > 1:      # drop specks
+                sizes = ndimage.sum(al, lab, range(1, k + 1))
+                al = np.isin(lab, [i + 1 for i, sz in enumerate(sizes) if sz >= 12])
+            img = np.zeros((Ht, Wt, 4), np.uint8)
+            img[..., :3] = np.asarray(rgb); img[..., 3] = al * 255
+            fs.append(Image.fromarray(img))
+        out[kind] = fs
+    return out
+
 def anchor(im):
     a = np.asarray(im)[..., 3] > 0
     ys = np.where(a.any(1))[0]; top, bot = ys[0], ys[-1]
@@ -181,13 +214,16 @@ def anchor(im):
     cx = (head.sum(0) * np.arange(a.shape[1])).sum() / head.sum()
     return cx, bot
 
-def pack(fs):
+def pack(fs, grid=1):
     an = [anchor(f) for f in fs]
     L = max(int(np.ceil(cx)) for (cx, b) in an); R = max(f.width - int(np.floor(cx)) for f, (cx, b) in zip(fs, an))
-    half = max(L, R) + 1; fw = 2 * half
+    half = max(L, R) + 1
+    half = -(-half // grid) * grid       # HD sheets: sizes in whole game pixels
+    fw = 2 * half
     fh = max(b + 1 for f, (cx, b) in zip(fs, an)) 
     tops = [b + 1 - 0 for f, (cx, b) in zip(fs, an)]
     fh = max(b + 1 for (cx, b) in an)
+    fh = -(-fh // grid) * grid
     strip = Image.new('RGBA', (fw * len(fs), fh))
     for i, (f, (cx, b)) in enumerate(zip(fs, an)):
         strip.alpha_composite(f, (i * fw + half - int(round(cx)), fh - (b + 1)))
@@ -248,15 +284,16 @@ def decor():
 
 
 def main():
-    names = [n for n in sys.argv[1:] if n != 'hw_decor'] if sys.argv[1:] else list(CFG) + [n for n in HW_CFG if all(os.path.exists(os.path.join(HW_SRC, f)) for f in HW_FILES[n].values())]
+    args = [n for n in sys.argv[1:] if not n.startswith('--')]
+    names = [n for n in args if n != 'hw_decor'] if args else list(CFG) + [n for n in HW_CFG if all(os.path.exists(os.path.join(HW_SRC, f)) for f in HW_FILES[n].values())]
     for n in names:
         cfg, dst = (HW_CFG[n], HW_DST) if n in HW_CFG else (CFG[n], DST)
         os.makedirs(dst, exist_ok=True)
-        for kind, fs in process(n, cfg).items():
-            st, fw, fh = pack(fs)
+        for kind, fs in (process(n, cfg) if '--lowres' in sys.argv else process_hd(n, cfg)).items():
+            st, fw, fh = pack(fs, 1 if '--lowres' in sys.argv else HD)
             st.save(os.path.join(dst, "%s_%s.png" % (n, kind)))
             print("%-10s %-5s %d frames %dx%d" % (n, kind, len(fs), fw, fh))
-    if not sys.argv[1:] or "hw_decor" in sys.argv[1:]:
+    if not args or "hw_decor" in args:
         decor()
 
 

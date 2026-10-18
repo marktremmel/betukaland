@@ -79,7 +79,7 @@ BK.levelgen = {
         // the King sends marks to catch: slower and fewer for 3-4, faster for 5-6
         // only marks this child's computer can make (Settings: Jelek súgója)
         var chars = (BK.HW_SPECIALS[band] || BK.HW_SPECIALS['3-4']).filter(function (c) { return BK.keyHint(c, profile) !== null; });
-        specials = band === '3-4' ? { chars: chars, every: 7000, speed: 15 } : { chars: chars, every: 5000, speed: 21 };
+        specials = band === '3-4' ? { chars: chars, every: 10000, speed: 12 } : { chars: chars, every: 5000, speed: 21 };
       }
       out.push({ kind: 'boss', creature: reg.boss, tint: reg.bossTint, texts: texts, coins: 12 + regionId * 2, maxWidth: 170,
         name: reg.bossName, intro: reg.bossIntro, outro: reg.bossOutro, specials: specials });
@@ -170,8 +170,8 @@ BK.levelgen = {
       var picker = new BK.wordbank.Picker(regionId, (profile && profile.lang) || 'hu', band, rng, profile);
       boss.texts.splice(boss.texts.length - 1, 0, picker.sentence(), picker.sentence());
       var chars = (BK.HW_SPECIALS[band] || BK.HW_SPECIALS['3-4']).filter(function (c) { return BK.keyHint(c, profile) !== null; });
-      boss.specials = king ? { chars: chars, every: band === '3-4' ? 5200 : 3800, speed: band === '3-4' ? 18 : 25 }
-        : { chars: chars, every: band === '3-4' ? 6500 : 4800, speed: band === '3-4' ? 15 : 21 };
+      boss.specials = king ? { chars: chars, every: band === '3-4' ? 7500 : 3800, speed: band === '3-4' ? 15 : 25 }
+        : { chars: chars, every: band === '3-4' ? 9000 : 4800, speed: band === '3-4' ? 13 : 21 };
     }
     boss.coins = 0;                     // the arena pays at the end (more the first time)
     plan.encounters = [boss];
