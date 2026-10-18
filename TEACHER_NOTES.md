@@ -1,6 +1,6 @@
 # Betűkaland (Typing Adventure): teacher notes
 
-Version 0.8.4: all seven regions are playable, each with three levels and a boss, plus a practice corner (daily goals with a streak, sentence practice, a tricky-letter drill, the endless road, and a storybook) and crowns to win on every level of a finished region. The menus can be Hungarian or English, the text uses a font made for young readers (three to choose from), and the keyboard can be Hungarian or US English. Title screen, player profiles with a choice of thirteen figures, placement test, world map, shop, rest spots, results with stars and a chart, saving with a code and a file, the teacher screen with CSV export, and credits.
+Version 0.9.0: all seven regions are playable, each with three levels and a boss, plus a practice corner (daily goals with a streak, sentence practice, a tricky-letter drill, the endless road, and a storybook) and crowns to win on every level of a finished region. The menus can be Hungarian or English, the text uses a font made for young readers (three to choose from), and the keyboard can be Hungarian or US English. Title screen, player profiles with a choice of thirteen figures, placement test, world map, shop, rest spots, results with stars and a chart, saving with a code and a file, the teacher screen with CSV export, and credits.
 
 ## Running it
 
@@ -78,6 +78,10 @@ Adding a story: in `data/words_hu.js`, add an object to `BK_STORIES_HU` with an 
 ## Rewards
 
 Coins from every creature, chest and boss; treasures (fruit and sweets icons) in the Hátizsák; outfits (five colours of the child's figure) and pets (Rákocska, Homokbogár, Sirály) in Karou's shop, which walks behind the bunny. The map lights up as regions are cleared.
+
+## Magic shots (shop, Varázs tab)
+
+At every correct key a little magic flies from the hero to the creature. In the shop's Varázs (Magic) tab a child chooses its shape and its colours separately. Shapes: Pötty (dot, free), Csillag (star) 30, Kocka (box) 20, Szikra (sparkle) 40, Hullám (wave) 50, Villám (lightning) 60, Gravihullám (rings that roll out where they land) 80. Colours: Klasszikus (free), Alapszínek 25, Pasztell 35, Szivárvány (rainbow) 60. A click shows a test shot; the button buys it or puts it in use. Everything bought is in the save code (version 4 since v0.9; older codes still load).
 
 ## Settings (per child)
 

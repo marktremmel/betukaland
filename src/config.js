@@ -6,7 +6,7 @@
  */
 window.BK = window.BK || {};
 
-BK.VERSION = '0.8.4';
+BK.VERSION = '0.9.0';
 
 // Test mode for the teacher: open the game with ?debug at the end of the address.
 // Every region and level is open; in a level Tab finishes the current word and
@@ -222,6 +222,25 @@ Object.defineProperty(BK, 'FONT', { get: function () {
 
 // Scene music
 BK.MUSIC = { title: 'm_title', map: 'm_map', boss: 'm_boss', chill: 'm_chill', test: 'm_test' };
+
+// Shop: the magic the hero sends at each correct key. A shape and a colour set,
+// bought separately (dot and classic are free). Order is fixed: the save code
+// stores them by position, so new ones go at the END.
+BK.SHOT_SHAPES = [
+  { id: 'dot', name: 'Pötty', en: 'Dot', price: 0 },
+  { id: 'star', name: 'Csillag', en: 'Star', price: 30 },
+  { id: 'box', name: 'Kocka', en: 'Box', price: 20 },
+  { id: 'sparkle', name: 'Szikra', en: 'Sparkle', price: 40 },
+  { id: 'wave', name: 'Hullám', en: 'Wave', price: 50 },
+  { id: 'bolt', name: 'Villám', en: 'Lightning', price: 60 },
+  { id: 'grav', name: 'Gravihullám', en: 'Grav wave', price: 80 },
+];
+BK.SHOT_COLOURS = [
+  { id: 'classic', name: 'Klasszikus', en: 'Classic', price: 0, cols: [0xfff2a0] },
+  { id: 'basic', name: 'Alapszínek', en: 'Basic', price: 25, cols: [0xff4a4a, 0xffd23c, 0x4a8aff, 0x4ad17a] },
+  { id: 'pastel', name: 'Pasztell', en: 'Pastel', price: 35, cols: [0xffb8cc, 0xb8e4ff, 0xccf5b4, 0xfff0a8, 0xdcc6ff] },
+  { id: 'rainbow', name: 'Szivárvány', en: 'Rainbow', price: 60, rainbow: true },
+];
 
 // Shop catalogue: outfits (recoloured hero) and pets
 BK.OUTFITS = [

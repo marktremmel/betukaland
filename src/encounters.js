@@ -457,12 +457,80 @@ BK.fx = {
     s.play({ key: big ? 'fx_burst_b' : 'fx_burst', repeat: 0 });
     s.on('animationcomplete', function () { s.destroy(); });
   },
-  bolt: function (scene, x0, y0, x1, y1) {
-    // a small glowing dot flies from the hero to the target
-    var d = scene.add.rectangle(x0, y0, 3, 3, 0xfff2a0).setDepth(221);
-    scene.tweens.add({ targets: d, x: x1, y: y1, duration: 110, ease: 'Quad.easeIn', onComplete: function () {
-      d.destroy(); BK.fx.spark(scene, x1, y1);
-    } });
+  // The magic from the hero to the target at each correct key: the shape and
+  // colour set chosen in the shop (BK.SHOT_SHAPES / BK.SHOT_COLOURS).
+  bolt: function (scene, x0, y0, x1, y1, fx) {
+    fx = fx || (BK.state.profile && BK.state.profile.fx) || {};
+    var shape = fx.shape || 'dot', set = BK.SHOT_COLOURS.find(function (c) { return c.id === fx.colour; }) || BK.SHOT_COLOURS[0];
+    BK.fx.shotN = (BK.fx.shotN || 0) + 1;
+    var n = BK.fx.shotN;
+    var col = function (k) {
+      if (set.rainbow) return Phaser.Display.Color.HSVToRGB(((n * 0.09 + (k || 0) * 0.12) % 1), 0.75, 1).color;
+      return set.cols[(n + (k || 0)) % set.cols.length];
+    };
+    BK.fx.shotTextures(scene);
+    var hit = function () { BK.fx.spark(scene, x1, y1); };
+    var fly = function (obj, ms, extra) {
+      scene.tweens.add(Object.assign({ targets: obj, x: x1, y: y1, duration: ms || 110, ease: 'Quad.easeIn',
+        onComplete: function () { obj.destroy(); hit(); } }, extra || {}));
+    };
+    var dx = x1 - x0, dy = y1 - y0, len = Math.max(1, Math.sqrt(dx * dx + dy * dy)), nx = -dy / len, ny = dx / len;
+    if (shape === 'star' || shape === 'box' || shape === 'sparkle') {
+      var im = scene.add.image(x0, y0, 'shot_' + shape).setTint(col()).setDepth(221);
+      fly(im, 130, { angle: shape === 'sparkle' ? 0 : 360, scale: { from: 0.7, to: 1.2 } });
+      if (shape === 'sparkle') for (var i = 1; i <= 3; i++) (function (i) {
+        scene.time.delayedCall(i * 25, function () {
+          var t = scene.add.image(x0, y0, 'shot_dot').setTint(col(i)).setDepth(220).setScale(0.6);
+          scene.tweens.add({ targets: t, x: x0 + dx * 0.8, y: y0 + dy * 0.8 + (i - 2) * 4, alpha: 0, duration: 140, onComplete: function () { t.destroy(); } });
+        });
+      })(i);
+    } else if (shape === 'wave') {
+      // a dot that wiggles on the way, leaving a fading trail
+      var head = { t: 0 }, c = col();
+      scene.tweens.add({ targets: head, t: 1, duration: 170, ease: 'Linear',
+        onUpdate: function () {
+          var off = Math.sin(head.t * Math.PI * 4) * 5 * (1 - head.t);
+          var d = scene.add.image(x0 + dx * head.t + nx * off, y0 + dy * head.t + ny * off, 'shot_dot').setTint(c).setDepth(221).setScale(1.4);
+          scene.tweens.add({ targets: d, alpha: 0, scale: 0.3, duration: 160, onComplete: function () { d.destroy(); } });
+        }, onComplete: hit });
+    } else if (shape === 'bolt') {
+      // a zigzag of lightning, there at once, gone quickly
+      var g = scene.add.graphics().setDepth(221), steps = 5;
+      g.lineStyle(3, col(), 1).beginPath().moveTo(x0, y0);
+      for (var k = 1; k < steps; k++) { var j = (k % 2 ? 1 : -1) * (3 + Math.random() * 4); g.lineTo(x0 + dx * k / steps + nx * j, y0 + dy * k / steps + ny * j); }
+      g.lineTo(x1, y1).strokePath();
+      g.lineStyle(1, 0xffffff, 0.9).strokePath();
+      scene.tweens.add({ targets: g, alpha: 0, duration: 160, onComplete: function () { g.destroy(); } });
+      scene.time.delayedCall(30, hit);
+    } else if (shape === 'grav') {
+      // a ring that pulses on the way and rolls out wide where it lands
+      var r = scene.add.image(x0, y0, 'shot_ring').setTint(col()).setDepth(221).setScale(0.5);
+      scene.tweens.add({ targets: r, x: x1, y: y1, scale: 1, duration: 160, ease: 'Sine.easeIn', onComplete: function () {
+        r.destroy(); hit();
+        for (var q = 0; q < 2; q++) (function (q) {
+          var w = scene.add.image(x1, y1, 'shot_ring').setTint(col(q + 1)).setDepth(221).setScale(0.6);
+          scene.tweens.add({ targets: w, scale: 2.6 + q, alpha: 0, delay: q * 70, duration: 280, onComplete: function () { w.destroy(); } });
+        })(q);
+      } });
+    } else {
+      fly(scene.add.rectangle(x0, y0, 3, 3, col()).setDepth(221));
+    }
+  },
+  // small white shapes for the shots, drawn once and tinted per shot
+  shotTextures: function (scene) {
+    if (scene.textures.exists('shot_star')) return;
+    var g = scene.make.graphics({ x: 0, y: 0, add: false });
+    var star = function (cx, cy, pts, ro, ri) {
+      var p = [];
+      for (var i = 0; i < pts * 2; i++) { var a = -Math.PI / 2 + i * Math.PI / pts, r = i % 2 ? ri : ro; p.push({ x: cx + Math.cos(a) * r, y: cy + Math.sin(a) * r }); }
+      g.fillPoints(p, true);
+    };
+    g.fillStyle(0xffffff, 1); star(4.5, 4.5, 5, 4.5, 2); g.generateTexture('shot_star', 9, 9); g.clear();
+    g.fillStyle(0xffffff, 1); g.fillRect(0, 0, 5, 5); g.generateTexture('shot_box', 5, 5); g.clear();
+    g.fillStyle(0xffffff, 1); star(4.5, 4.5, 4, 4.5, 1.2); g.generateTexture('shot_sparkle', 9, 9); g.clear();
+    g.fillStyle(0xffffff, 1); g.fillRect(0, 0, 3, 3); g.generateTexture('shot_dot', 3, 3); g.clear();
+    g.lineStyle(1.5, 0xffffff, 1); g.strokeCircle(6, 6, 4.5); g.generateTexture('shot_ring', 12, 12);
+    g.destroy();
   },
   coins: function (scene, x, y, n) {
     var level = scene;
