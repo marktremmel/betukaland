@@ -29,50 +29,101 @@ BK.emblem = {
     var pts = []; for (var i = 0; i < 24; i++) pts.push({ x: Math.cos(i / 24 * Math.PI * 2) * h, y: Math.sin(i / 24 * Math.PI * 2) * h });
     return pts;
   },
-  // draws the sign; returns a container (destroy it to remove)
+  // polygon clipping against a convex outline (Sutherland-Hodgman), so the sign needs no mask
+  // and can live inside moving containers
+  clip: function (poly, clipPts) {
+    var out = poly;
+    for (var i = 0; i < clipPts.length && out.length; i++) {
+      var A = clipPts[i], B = clipPts[(i + 1) % clipPts.length], inp = out; out = [];
+      var side = function (P) { return (B.x - A.x) * (P.y - A.y) - (B.y - A.y) * (P.x - A.x); };
+      for (var j = 0; j < inp.length; j++) {
+        var P = inp[j], Q = inp[(j + 1) % inp.length], sp = side(P), sq = side(Q);
+        if (sp >= 0) out.push(P);
+        if ((sp >= 0) !== (sq >= 0)) { var t = sp / (sp - sq); out.push({ x: P.x + (Q.x - P.x) * t, y: P.y + (Q.y - P.y) * t }); }
+      }
+    }
+    return out;
+  },
+  // convex pieces of a field (the pennant has a notch, so it is two halves)
+  pieces: function (f, s) {
+    var pts = BK.emblem.fieldPts(f, s), h = s / 2;
+    if (f === 'pennant') return [[{ x: -h, y: -h }, { x: 0, y: -h }, { x: 0, y: h * 0.55 }, { x: -h, y: h }], [{ x: 0, y: -h }, { x: h, y: -h }, { x: h, y: h }, { x: 0, y: h * 0.55 }]];
+    // clip works with clockwise outlines in screen space (y down)
+    return [pts];
+  },
+  fillClipped: function (g, poly, pieces) {
+    pieces.forEach(function (pc) { var q = BK.emblem.clip(poly, pc); if (q.length > 2) g.fillPoints(q, true); });
+  },
+  shade: function (col, f) {
+    var r = (col >> 16) & 255, g = (col >> 8) & 255, b = col & 255;
+    var m = function (v) { return Math.max(0, Math.min(255, Math.round(f >= 0 ? v + (255 - v) * f : v * (1 + f)))); };
+    return (m(r) << 16) | (m(g) << 8) | m(b);
+  },
+  // draws the sign with a little depth: shadow, bevel, gloss, raised symbol. Returns a container.
   draw: function (scene, x, y, em, size) {
     em = em || BK.emblem.make();
-    var C = BK.EMBLEM_COLOURS, s = size, h = s / 2, c = scene.add.container(x, y);
-    var field = BK.emblem.FIELDS[em.field] || 'shield', pat = BK.emblem.PATTERNS[em.pattern] || 'none', sym = BK.emblem.SYMBOLS[em.symbol] || 'star';
-    var pts = BK.emblem.fieldPts(field, s);
-    // the field, with the pattern drawn inside it through a mask of the same shape
+    var E = BK.emblem, C = BK.EMBLEM_COLOURS, s = size, h = s / 2, c = scene.add.container(x, y);
+    var field = E.FIELDS[em.field] || 'shield', pat = E.PATTERNS[em.pattern] || 'none', sym = E.SYMBOLS[em.symbol] || 'star';
+    var pts = E.fieldPts(field, s), pcs = E.pieces(field, s), base = C[em.fc], d = Math.max(1, s / 20);
     var g = scene.add.graphics();
-    g.fillStyle(0x2b1a14, 1).fillPoints(BK.emblem.fieldPts(field, s + Math.max(2, s / 12)), true);
-    g.fillStyle(C[em.fc], 1).fillPoints(pts, true);
-    c.add(g);
+    // drop shadow and dark rim
+    g.fillStyle(0x000000, 0.3).fillPoints(E.fieldPts(field, s + d * 2).map(function (q) { return { x: q.x + d, y: q.y + d * 1.5 }; }), true);
+    g.fillStyle(0x2b1a14, 1).fillPoints(E.fieldPts(field, s + Math.max(2, s / 12)), true);
+    // the field: darker edge, base colour inside
+    g.fillStyle(E.shade(base, -0.3), 1).fillPoints(pts, true);
+    g.fillStyle(base, 1).fillPoints(E.fieldPts(field, s * 0.88), true);
+    var inner = E.pieces(field, s * 0.88);
+    // the pattern, clipped to the field
     if (pat !== 'none') {
-      var p = scene.add.graphics(); p.fillStyle(C[em.pc], 1);
-      if (pat === 'stripe') p.fillRect(-h, -s * 0.12, s, s * 0.24);
-      else if (pat === 'half') p.fillRect(0, -h, h, s);
-      else if (pat === 'cross') { p.fillRect(-h, -s * 0.09, s, s * 0.18); p.fillRect(-s * 0.09, -h, s * 0.18, s); }
-      else if (pat === 'chevron') p.fillTriangle(-h, h, 0, -h * 0.1, h, h);
-      else if (pat === 'dots') for (var dx = -1; dx <= 1; dx++) for (var dy = -1; dy <= 1; dy++) if ((dx + dy) % 2 === 0) p.fillCircle(dx * s * 0.3, dy * s * 0.3, s * 0.07);
-      var mg = scene.make.graphics({ add: false }); mg.fillStyle(0xffffff, 1);
-      mg.fillPoints(pts.map(function (q) { return { x: q.x + x, y: q.y + y }; }), true);
-      p.setMask(mg.createGeometryMask());
-      p.maskSource = mg;
-      c.add(p);
+      var pc = C[em.pc], R = function (x0, y0, w, hh) { return [{ x: x0, y: y0 }, { x: x0 + w, y: y0 }, { x: x0 + w, y: y0 + hh }, { x: x0, y: y0 + hh }]; };
+      var shapes = [];
+      if (pat === 'stripe') shapes.push(R(-h, -s * 0.12, s, s * 0.24));
+      else if (pat === 'half') shapes.push(R(0, -h, h, s));
+      else if (pat === 'cross') { shapes.push(R(-h, -s * 0.09, s, s * 0.18)); shapes.push(R(-s * 0.09, -h, s * 0.18, s)); }
+      else if (pat === 'chevron') shapes.push([{ x: 0, y: -h * 0.1 }, { x: h, y: h }, { x: -h, y: h }]);
+      else if (pat === 'dots') for (var dx = -1; dx <= 1; dx++) for (var dy = -1; dy <= 1; dy++) if ((dx + dy) % 2 === 0) {
+        var cp = []; for (var k = 0; k < 10; k++) cp.push({ x: dx * s * 0.3 + Math.cos(k / 10 * Math.PI * 2) * s * 0.07, y: dy * s * 0.3 + Math.sin(k / 10 * Math.PI * 2) * s * 0.07 });
+        shapes.push(cp);
+      }
+      g.fillStyle(E.shade(pc, -0.3), 1); shapes.forEach(function (q) { E.fillClipped(g, q, pcs); });
+      g.fillStyle(pc, 1); shapes.forEach(function (q) { E.fillClipped(g, q, inner); });
     }
-    var sg = scene.add.graphics(), col = C[em.sc], r = s * 0.28;
-    sg.fillStyle(col, 1);
-    var star = function (n, ro, ri, rot) { var q = []; for (var i = 0; i < n * 2; i++) { var a = (rot || -Math.PI / 2) + i * Math.PI / n, rr = i % 2 ? ri : ro; q.push({ x: Math.cos(a) * rr, y: Math.sin(a) * rr }); } sg.fillPoints(q, true); };
-    if (sym === 'star') star(5, r, r * 0.42);
-    else if (sym === 'heart') { sg.fillCircle(-r * 0.45, -r * 0.2, r * 0.5); sg.fillCircle(r * 0.45, -r * 0.2, r * 0.5); sg.fillTriangle(-r * 0.93, 0, r * 0.93, 0, 0, r * 0.95); }
-    else if (sym === 'moon') { sg.fillCircle(0, 0, r); sg.fillStyle(C[em.fc], 1); sg.fillCircle(r * 0.45, -r * 0.25, r * 0.8); }
-    else if (sym === 'crown') sg.fillPoints([{ x: -r, y: r * 0.6 }, { x: -r, y: -r * 0.5 }, { x: -r * 0.5, y: 0 }, { x: 0, y: -r * 0.8 }, { x: r * 0.5, y: 0 }, { x: r, y: -r * 0.5 }, { x: r, y: r * 0.6 }], true);
-    else if (sym === 'bolt') sg.fillPoints([{ x: r * 0.2, y: -r }, { x: -r * 0.6, y: r * 0.1 }, { x: -r * 0.05, y: r * 0.1 }, { x: -r * 0.3, y: r }, { x: r * 0.6, y: -r * 0.15 }, { x: r * 0.05, y: -r * 0.15 }], true);
-    else if (sym === 'sun') { star(10, r, r * 0.6, 0); sg.fillStyle(col, 1); sg.fillCircle(0, 0, r * 0.6); }
-    else if (sym === 'flower') { for (var k = 0; k < 5; k++) { var a = k / 5 * Math.PI * 2; sg.fillCircle(Math.cos(a) * r * 0.55, Math.sin(a) * r * 0.55, r * 0.42); } sg.fillStyle(0xffd23c, 1); sg.fillCircle(0, 0, r * 0.35); }
-    else if (sym === 'gem') sg.fillPoints([{ x: -r, y: -r * 0.3 }, { x: -r * 0.5, y: -r * 0.8 }, { x: r * 0.5, y: -r * 0.8 }, { x: r, y: -r * 0.3 }, { x: 0, y: r }], true);
-    else if (sym === 'arrow') sg.fillPoints([{ x: 0, y: -r }, { x: r * 0.8, y: -r * 0.1 }, { x: r * 0.3, y: -r * 0.1 }, { x: r * 0.3, y: r }, { x: -r * 0.3, y: r }, { x: -r * 0.3, y: -r * 0.1 }, { x: -r * 0.8, y: -r * 0.1 }], true);
-    else if (sym === 'paw') { sg.fillCircle(0, r * 0.3, r * 0.5); [-0.6, -0.2, 0.2, 0.6].forEach(function (f, i) { sg.fillCircle(f * r * 1.1, -r * (i % 3 === 0 ? 0.35 : 0.7), r * 0.24); }); }
-    c.add(sg);
+    // light from the top left: a soft band on the upper half, shade on the lower right
+    g.fillStyle(0xffffff, 0.18); E.fillClipped(g, [{ x: -h, y: -h }, { x: h, y: -h }, { x: -h, y: h * 0.3 }], inner);
+    g.fillStyle(0x000000, 0.14); E.fillClipped(g, [{ x: h, y: -h * 0.2 }, { x: h, y: h }, { x: -h * 0.4, y: h }], inner);
+    // gloss spot
+    var gl = []; for (var k2 = 0; k2 < 12; k2++) gl.push({ x: -h * 0.42 + Math.cos(k2 / 12 * Math.PI * 2) * s * 0.16, y: -h * 0.5 + Math.sin(k2 / 12 * Math.PI * 2) * s * 0.07 });
+    g.fillStyle(0xffffff, 0.35); E.fillClipped(g, gl, inner);
+    c.add(g);
+    // the symbol: shadow, dark outline, colour, a highlight
+    var col = C[em.sc], r = s * 0.28;
+    var drawSym = function (sg, colour, rr) {
+      sg.fillStyle(colour, 1);
+      var star = function (n, ro, ri, rot) { var q = []; for (var i = 0; i < n * 2; i++) { var a = (rot === undefined ? -Math.PI / 2 : rot) + i * Math.PI / n, v = i % 2 ? ri : ro; q.push({ x: Math.cos(a) * v, y: Math.sin(a) * v }); } sg.fillPoints(q, true); };
+      if (sym === 'star') star(5, rr, rr * 0.42);
+      else if (sym === 'heart') { sg.fillCircle(-rr * 0.45, -rr * 0.2, rr * 0.5); sg.fillCircle(rr * 0.45, -rr * 0.2, rr * 0.5); sg.fillTriangle(-rr * 0.93, 0, rr * 0.93, 0, 0, rr * 0.95); }
+      else if (sym === 'moon') { var mp = []; for (var i = 0; i <= 16; i++) { var a = Math.PI * 0.35 + i / 16 * Math.PI * 1.55; mp.push({ x: Math.cos(a) * rr, y: Math.sin(a) * rr }); } for (var j = 16; j >= 0; j--) { var b = Math.PI * 0.55 + j / 16 * Math.PI * 1.15; mp.push({ x: rr * 0.35 + Math.cos(b) * rr * 0.75, y: -rr * 0.2 + Math.sin(b) * rr * 0.75 }); } sg.fillPoints(mp, true); }
+      else if (sym === 'crown') sg.fillPoints([{ x: -rr, y: rr * 0.6 }, { x: -rr, y: -rr * 0.5 }, { x: -rr * 0.5, y: 0 }, { x: 0, y: -rr * 0.8 }, { x: rr * 0.5, y: 0 }, { x: rr, y: -rr * 0.5 }, { x: rr, y: rr * 0.6 }], true);
+      else if (sym === 'bolt') sg.fillPoints([{ x: rr * 0.2, y: -rr }, { x: -rr * 0.6, y: rr * 0.1 }, { x: -rr * 0.05, y: rr * 0.1 }, { x: -rr * 0.3, y: rr }, { x: rr * 0.6, y: -rr * 0.15 }, { x: rr * 0.05, y: -rr * 0.15 }], true);
+      else if (sym === 'sun') { star(10, rr, rr * 0.6, 0); sg.fillCircle(0, 0, rr * 0.6); }
+      else if (sym === 'flower') { for (var k = 0; k < 5; k++) { var a2 = k / 5 * Math.PI * 2; sg.fillCircle(Math.cos(a2) * rr * 0.55, Math.sin(a2) * rr * 0.55, rr * 0.42); } }
+      else if (sym === 'gem') sg.fillPoints([{ x: -rr, y: -rr * 0.3 }, { x: -rr * 0.5, y: -rr * 0.8 }, { x: rr * 0.5, y: -rr * 0.8 }, { x: rr, y: -rr * 0.3 }, { x: 0, y: rr }], true);
+      else if (sym === 'arrow') sg.fillPoints([{ x: 0, y: -rr }, { x: rr * 0.8, y: -rr * 0.1 }, { x: rr * 0.3, y: -rr * 0.1 }, { x: rr * 0.3, y: rr }, { x: -rr * 0.3, y: rr }, { x: -rr * 0.3, y: -rr * 0.1 }, { x: -rr * 0.8, y: -rr * 0.1 }], true);
+      else if (sym === 'paw') { sg.fillCircle(0, rr * 0.3, rr * 0.5); [-0.6, -0.2, 0.2, 0.6].forEach(function (f, i) { sg.fillCircle(f * rr * 1.1, -rr * (i % 3 === 0 ? 0.35 : 0.7), rr * 0.24); }); }
+    };
+    if (sym !== 'none' && sym !== 'letter') {
+      var sh = scene.add.graphics({ x: d * 0.8, y: d * 1.2 }); drawSym(sh, 0x000000, r); sh.setAlpha(0.35);
+      var ol = scene.add.graphics(); drawSym(ol, 0x2b1a14, r + Math.max(1, s / 28));
+      var sg = scene.add.graphics(); drawSym(sg, col, r);
+      var hl = scene.add.graphics({ x: -s * 0.02, y: -s * 0.03 }); drawSym(hl, E.shade(col, 0.45), r * 0.55); hl.setAlpha(0.55);
+      c.add([sh, ol, sg, hl]);
+      if (sym === 'flower') { var fc = scene.add.graphics(); fc.fillStyle(0xffd23c, 1).fillCircle(0, 0, r * 0.35); fc.fillStyle(0xffffff, 0.5).fillCircle(-r * 0.1, -r * 0.1, r * 0.12); c.add(fc); }
+    }
     if (sym === 'letter') {
-      var t = BK.ui.text(scene, 0, 0, em.letter || 'A', { outline: false, origin: [0.5, 0.5], px: Math.max(7, Math.round(s * 0.55)), bold: true, color: col });
-      c.add(t);
+      var px = Math.max(7, Math.round(s * 0.55));
+      c.add(BK.ui.text(scene, d * 0.8, d * 1.2, em.letter || 'A', { outline: false, origin: [0.5, 0.5], px: px, bold: true, color: 0x000000 }).setAlpha(0.35));
+      c.add(BK.ui.text(scene, 0, 0, em.letter || 'A', { outline: s >= 24, origin: [0.5, 0.5], px: px, bold: true, color: col }));
     }
-    // the mask moves with the container only if we move it too: emblems are drawn where they stay
-    c.once('destroy', function () { c.list.forEach(function (o) { if (o.maskSource) o.maskSource.destroy(); }); });
     return c;
   },
 };
@@ -95,11 +146,33 @@ BK.BADGES = [
   { id: 'cook', name: ['Kis szakács', 'Little cook'], icon: 114, test: function (p) { return Object.keys(p.dishes || {}).length >= 1; } },
   { id: 'chef', name: ['Mesterszakács', 'Master chef'], icon: 175, test: function (p) { return BK.RECIPES.every(function (r) { return p.dishes && p.dishes[r.id] !== undefined; }); } },
   { id: 'rare', name: ['Ritka kincs', 'A rare treasure'], icon: 58, test: function (p) { return BK.rareCount(p) > 0 || (p.fx && ['rtx', 'neon', 'chrome'].some(function (k) { return p.fx.owned.indexOf(k) >= 0; })); } },
-  { id: 'castle', name: ['Berendezett vár', 'A furnished castle'], icon: 123, test: function (p) { return ((p.castle && p.castle.floor) || []).filter(Boolean).length >= 5; } },
+  { id: 'castle', name: ['Berendezett vár', 'A furnished castle'], icon: 123, test: function (p) { return ((p.castle && p.castle.placed) || []).length >= 5 || ((p.castle && p.castle.floor) || []).filter(Boolean).length >= 5; } },
   { id: 'arena', name: ['Aréna-bajnok', 'Arena champion'], icon: 202, test: function (p) { return Object.keys(p.arena || {}).some(function (k) { return p.arena[k].h; }); } },
   { id: 'halloween', name: ['Halloween éjszaka', 'Halloween Night'], icon: 40, test: function (p) { return !!(p.halloween && p.halloween.stars && p.halloween.stars[3]); } },
   { id: 'crowns', name: ['Korona', 'A crown'], icon: 197, test: function (p) { return Object.keys(p.crowns || {}).length > 0; } },
 ];
+
+// Where the child is in the game: per region and level 'done', 'skipped' (an earlier level left
+// out while a later one was played, e.g. after the warm-up test jumped ahead), 'open' or 'locked'
+BK.progressMap = function (p) {
+  var regs = BK.REGIONS.filter(function (r) { return r.playable; }), out = {}, seen = false, skipped = 0;
+  for (var i = regs.length - 1; i >= 0; i--) {
+    var r = regs[i], st = (p.progress[r.id] || { stars: [0, 0, 0, 0] }).stars, row = [];
+    for (var l = 3; l >= 0; l--) {
+      var n = st[l] || 0, k;
+      if (n > 0) { k = 'done'; seen = true; }
+      else if (seen) { k = 'skipped'; skipped++; }
+      else k = BK.save.regionOpen(p, r.id) && BK.save.levelUnlocked(p, r.id, l) ? 'open' : 'locked';
+      row[l] = { stars: n, state: k };
+    }
+    out[r.id] = row;
+  }
+  out.skipped = skipped;
+  return out;
+};
+BK.regionSkipped = function (p, rid) {
+  var m = BK.progressMap(p); return (m[rid] || []).some(function (c) { return c.state === 'skipped'; });
+};
 
 BK.ProfileScene = class extends Phaser.Scene {
   constructor() { super('Profile'); }
@@ -111,11 +184,11 @@ BK.ProfileScene = class extends Phaser.Scene {
     BK.audio.music(BK.MUSIC.map);
     BK.ui.nine(this, 16, 4, 352, 182, 'ui_panel2');
     BK.ui.text(this, 192, 32, P.nick, { outline: false, size: 2, origin: [0.5, 0.5] });
-    var tabs = [BK.L('Jelvény', 'Sign'), BK.L('Háttér', 'Background'), BK.L('Kitűzők', 'Badges'), BK.L('Számok', 'Numbers')];
+    var tabs = [BK.L('Jelvény', 'Sign'), BK.L('Háttér', 'Background'), BK.L('Kitűzők', 'Badges'), BK.L('Haladás', 'Progress'), BK.L('Számok', 'Numbers')];
     tabs.forEach(function (t, i) {
-      var x = 72 + i * 80;
-      BK.ui.button(s, x, 50, t, function () { if (s.tab !== i) { s.tab = i; BK.audio.sfx('ui'); s.scene.restart({ tab: i }); } }, { w: 76, h: 16 });
-      if (i === s.tab) s.add.rectangle(x, 50, 80, 20).setStrokeStyle(1, 0x9a3d1a);
+      var x = 60 + i * 66;
+      BK.ui.button(s, x, 50, t, function () { if (s.tab !== i) { s.tab = i; BK.audio.sfx('ui'); s.scene.restart({ tab: i }); } }, { w: 62, h: 16 });
+      if (i === s.tab) s.add.rectangle(x, 50, 66, 20).setStrokeStyle(1, 0x9a3d1a);
     });
     this.page = [];
     this.drawTab();
@@ -125,7 +198,7 @@ BK.ProfileScene = class extends Phaser.Scene {
   drawTab() {
     this.page.forEach(function (o) { o.destroy(); });
     this.page = [];
-    [this.drawSign, this.drawBackground, this.drawBadges, this.drawNumbers][this.tab].call(this);
+    [this.drawSign, this.drawBackground, this.drawBadges, this.drawProgress, this.drawNumbers][this.tab].call(this);
   }
   // the sign: a big preview and a row of arrows for each part
   drawSign() {
@@ -169,15 +242,65 @@ BK.ProfileScene = class extends Phaser.Scene {
   }
   drawBadges() {
     var s = this, P = this.P, got = 0;
+    P.pins = (P.pins || []).filter(function (id) { return BK.BADGES.some(function (b) { return b.id === id && b.test(P); }); });
     BK.BADGES.forEach(function (b, i) {
-      var x = 44 + (i % 4) * 82, y = 70 + Math.floor(i / 4) * 19, ok = b.test(P);
+      var x = 44 + (i % 4) * 82, y = 68 + Math.floor(i / 4) * 19, ok = b.test(P), pinned = P.pins.indexOf(b.id) >= 0;
       if (ok) got++;
       s.keep(BK.ui.nine(s, x - 9, y - 9, 18, 18, ok ? 'ui_slot_sel' : 'ui_slot_off'));
       var im = s.keep(s.add.image(x, y, 'icons_food', b.icon).setScale(0.8));
       if (!ok) im.setTint(0x302828).setAlpha(0.5);
-      s.keep(BK.ui.text(s, x + 12, y, BK.L(b.name[0], b.name[1]), { outline: false, origin: [0, 0.5], px: 8, color: ok ? 0x4a2c1c : 0x9a8a80, fit: 66 }));
+      if (pinned) { var g = s.keep(s.add.graphics()); g.fillStyle(0x6b1a1a, 1).fillCircle(x + 7, y - 7, 3.5); g.fillStyle(0xe84a4a, 1).fillCircle(x + 7, y - 7, 2.5); g.fillStyle(0xffffff, 0.8).fillCircle(x + 6, y - 8, 0.9); }
+      s.keep(BK.ui.text(s, x + 12, y, BK.L(b.name[0], b.name[1]), { outline: false, origin: [0, 0.5], px: 8, color: pinned ? 0x9a1a1a : (ok ? 0x4a2c1c : 0x9a8a80), bold: pinned, fit: 66 }));
+      if (ok) {
+        var z = s.keep(s.add.zone(x + 30, y, 80, 18).setInteractive({ useHandCursor: true }));
+        z.on('pointerup', function () {
+          var k = P.pins.indexOf(b.id);
+          if (k >= 0) P.pins.splice(k, 1);
+          else { if (P.pins.length >= 3) P.pins.shift(); P.pins.push(b.id); }
+          BK.audio.sfx('ui'); BK.save.persist(); s.drawTab();
+        });
+      }
     });
-    this.keep(BK.ui.text(this, 192, 168, got + ' / ' + BK.BADGES.length + BK.L(' kitűző', ' badges'), { outline: false, origin: [0.5, 0.5], px: 9, color: 0x6b3a20 }));
+    this.keep(BK.ui.text(this, 192, 157, got + ' / ' + BK.BADGES.length + BK.L(' kitűző', ' badges'), { outline: false, origin: [0.5, 0.5], px: 9, color: 0x6b3a20 }));
+    this.keep(BK.ui.text(this, 192, 168, BK.L('Kattints egy megszerzettre, és kitűzöd a várad falára (legfeljebb 3).', 'Click one you have earned to pin it on your castle wall (up to 3).'),
+      { outline: false, origin: [0.5, 0.5], px: 7, color: 0x9a8a80 }));
+  }
+  // where am I in the game: every region and level, with what was left out
+  drawProgress() {
+    var s = this, P = this.P, m = BK.progressMap(P), regs = BK.REGIONS.filter(function (r) { return r.playable; });
+    var cols = ['1', '2', '3', BK.L('Főnök', 'Boss')];
+    cols.forEach(function (c, l) { s.keep(BK.ui.text(s, 140 + l * 38, 62, c, { outline: false, origin: [0.5, 0.5], px: 8, color: 0x6b3a20 })); });
+    regs.forEach(function (r, i) {
+      var y = 74 + i * 13;
+      s.keep(BK.ui.text(s, 34, y, r.id + '. ' + r.name, { outline: false, origin: [0, 0.5], px: 8, color: 0x4a2c1c, fit: 92 }));
+      m[r.id].forEach(function (c, l) {
+        var x = 140 + l * 38;
+        if (c.state === 'done') s.keep(BK.ui.stars(s, x, y, c.stars, 3, 9).setScale(0.8));
+        else if (c.state === 'skipped') {
+          s.keep(s.add.rectangle(x, y, 34, 10, 0xffb84a).setStrokeStyle(1, 0x9a3d1a));
+          s.keep(BK.ui.text(s, x, y, BK.L('kimaradt', 'skipped'), { outline: false, origin: [0.5, 0.5], px: 7, bold: true, color: 0x6b2a10 }));
+        } else if (c.state === 'open') s.keep(BK.ui.text(s, x, y, BK.L('nyitva', 'open'), { outline: false, origin: [0.5, 0.5], px: 7, color: 0x2e7d3e }));
+        else s.keep(BK.ui.text(s, x, y, '·', { outline: false, origin: [0.5, 0.5], px: 8, color: 0xb8a898 }));
+      });
+    });
+    // the rest of the game
+    var tales = Object.keys(P.tales || {}).filter(function (k) { return P.tales[k].done; }).length;
+    var arena = BK.arenaBosses(P), aw = arena.filter(function (a) { return (P.arena || {})[a.id]; }).length;
+    var stories = Object.keys(P.stories || {}).length;
+    var dishes = BK.RECIPES.filter(function (r) { return P.dishes && P.dishes[r.id] !== undefined; }).length;
+    var extra = [
+      [BK.L('Mesék', 'Tales'), tales + ' / ' + BK.TALES.length],
+      [BK.L('Történetek', 'Stories'), String(stories)],
+      [BK.L('Aréna', 'Arena'), aw + ' / ' + arena.length],
+      [BK.L('Receptek', 'Recipes'), dishes + ' / ' + BK.RECIPES.length],
+      ['Halloween', P.halloween && P.halloween.stars && P.halloween.stars[3] ? BK.L('kész', 'done') : '-'],
+    ];
+    extra.forEach(function (e, i) {
+      s.keep(BK.ui.text(s, 290, 66 + i * 15, e[0], { outline: false, origin: [0, 0.5], px: 8, color: 0x6b3a20 }));
+      s.keep(BK.ui.text(s, 356, 66 + i * 15, e[1], { outline: false, origin: [1, 0.5], px: 8, bold: true, color: 0x4a2c1c }));
+    });
+    this.keep(BK.ui.text(this, 192, 172, m.skipped ? BK.L('A narancssárgák kimaradtak. Érdemes visszamenni értük a térképen!', 'The orange ones were skipped. Go back for them on the map!')
+      : BK.L('Semmi sem maradt ki. Szép munka!', 'Nothing left out. Well done!'), { outline: false, origin: [0.5, 0.5], px: 8, color: m.skipped ? 0x9a3d1a : 0x2e7d3e }));
   }
   // speed over the last rounds, and a few numbers
   drawNumbers() {

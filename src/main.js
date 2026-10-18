@@ -89,6 +89,8 @@
     if (!document.hasFocus()) show(true);
   }
 
+  BK.debug.init();      // the teacher's debug menu (secret word, then F2)
+
   // Space, quote and slash would scroll or open quick-find in some browsers
   window.addEventListener('keydown', function (e) {
     if (BK.DEBUG && e.key === 'Tab') e.preventDefault();

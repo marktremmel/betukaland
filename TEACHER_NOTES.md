@@ -101,15 +101,23 @@ A child types a part (8 lines for Kezdő, 10 for Haladó, fewer for a slower typ
 
 ## Kitchen, dishes and rare treasures (Hátizsák)
 
-The bag has three tabs. Kincsek: the treasures from chests, as before. Konyha: nine recipes (Palacsinta, Gyümölcssaláta, Zöldségleves, Almás pite, Répatorta, Fagyikehely, Gyümölcsturmix, Sajtos pogácsa, Ünnepi torta), each needing two or three treasures. Cooking starts a short round at a crackling hearth where the child types the recipe's five sentences; at the end the treasures are used up and the dish goes on the Polc. Polc: a dish can be sold for 14-28 coins, or three different dishes traded for a rare treasure (Gyémánt, Kristály, Aranyrúd, Aranyrög, Tűzgömb, Kincses térkép). Rare treasures pay for RTX, neon, chrome, the brightest bubble lights and the finest castle things. This gives the treasures a use, and slows down the coin inflation: the expensive things now need some cooking (typing) as well as coins. Cooking works from the map (not from a paused level). The recipe sentences use every letter, so a beginner meets keys from later regions here; the on-screen keyboard shows them.
+The bag has three tabs. Kincsek: the treasures from chests, as before. Konyha: nine recipes (Palacsinta, Gyümölcssaláta, Zöldségleves, Almás pite, Répatorta, Fagyikehely, Gyümölcsturmix, Sajtos pogácsa, Ünnepi torta), each needing two or three treasures. Cooking starts a short round at a crackling hearth where the child types the recipe's five sentences; at the end the treasures are used up and the dish goes on the Polc. Polc: a dish can be sold for 14-28 coins, or two different dishes traded for a rare treasure (Gyémánt, Kristály, Aranyrúd, Aranyrög, Tűzgömb, Kincses térkép). Rare treasures pay for RTX, neon, chrome, the brightest bubble lights and the finest castle things. This gives the treasures a use, and slows down the coin inflation: the expensive things now need some cooking (typing) as well as coins. Cooking works from the map (not from a paused level). The recipe sentences use every letter, so a beginner meets keys from later regions here; the on-screen keyboard shows them.
 
 ## Váram (the castle room, map menu)
 
-A room to furnish with coins: seven places on the floor and four picture frames on the wall. A click on an empty place opens the list of 33 things (crates, barrels, chairs, tables, a feast table, pots, plants, vases, pumpkins, a potion desk, statues, a scarecrow, an indoor tree, a burning hearth...), 12-90 coins, the finest ones also 1-2 rare treasures. A bought thing can be moved or put away for free. Frames cost 20 coins each and show any treasure, dish or rare treasure the child has. The flag in the middle shows the child's sign from the profile page; clicking it opens the sign maker. The art is from the GandalfHardcore FREE Platformer Assets in your library (tools/build_castle.py cuts the props out of art/castle/).
+A wide room (two screens; the < > buttons or the arrow keys scroll it). "+ Tárgy" opens the list of 33 things (crates, barrels, chairs, tables, a feast table, pots, plants, vases, pumpkins, a potion desk, statues, a scarecrow, an indoor tree, a burning hearth...), 12-90 coins, the finest ones also 1-2 rare treasures. Several of the same kind can be bought, up to 60 things in the room. Things are dragged freely along the floor or onto another thing: a vase on a table, a crate on a crate. Whatever stands on a thing moves with it. A click without dragging puts the thing back in the store, and it can be placed again for free.
+
+On the wall: four picture frames (20 coins each) for any treasure, dish or rare treasure, the flag with the child's sign (a click opens the sign maker), and a board with up to three badges pinned on the profile page.
+
+Three friends live in the room and say what to do next: Karou (today's goals, a click opens them), Denevérke (the tale the child is in the middle of) and Brekus the frog (how many stories are still waiting). A click on them goes there.
+
+Vendégek: up to three other players from this computer can be invited. They walk around the room; a click on one opens a short chat made only of ready-made friendly sentences (Szia!, Szép a jelvényed!, Mit főztél?...), and their own castle can be visited (only to look, nothing changes there). Nothing leaves the computer.
+
+The art is from the GandalfHardcore FREE Platformer Assets in your library (tools/build_castle.py cuts the props out of art/castle/). The save code keeps how many of each thing the child owns and roughly where the first seven stand; the exact layout stays on the computer.
 
 ## Profilom (the child's page)
 
-Opened from the map menu or by clicking the name in the top bar. Jelvény: a sign made of a field shape (pajzs, kör, négyzet, zászló, rombusz), a pattern (csík, fél, kereszt, ék, pöttyök) and a symbol (csillag, szív, hold, korona, villám, nap, virág, drágakő, nyíl, kezdőbetű, mancs), each in one of 12 colours; it shows next to the name and on the castle flag. Háttér: the sky behind the menus. Kitűzők: 20 badges worked out from what the child has done (first level, stars, bosses, a flawless level, 20 and 35 words a minute, streaks, the endless road, tales, cooking, rare treasures, the castle, the arena, Halloween, crowns). Számok: speed over the last 30 rounds, number of rounds, time, best speed, accuracy, stars and the trickiest keys.
+Opened from the map menu or by clicking the name in the top bar. Jelvény: a sign made of a field shape (pajzs, kör, négyzet, zászló, rombusz), a pattern (csík, fél, kereszt, ék, pöttyök) and a symbol (csillag, szív, hold, korona, villám, nap, virág, drágakő, nyíl, kezdőbetű, mancs), each in one of 12 colours; it shows next to the name and on the castle flag. Háttér: the sky behind the menus. Kitűzők: 20 badges worked out from what the child has done (first level, stars, bosses, a flawless level, 20 and 35 words a minute, streaks, the endless road, tales, cooking, rare treasures, the castle, the arena, Halloween, crowns). A click on an earned badge pins it on the castle wall (up to three, a click again takes it off). Haladás: every region and level with its stars; a level shows "kimaradt" in orange when a later one was already played (for example after the warm-up test jumped the child ahead), and the map marks those regions and levels with an orange "!". It also counts tales, stories, arena wins, recipes and Halloween. Számok: speed over the last 30 rounds, number of rounds, time, best speed, accuracy, stars and the trickiest keys.
 
 The level (Kezdő or Haladó) can now also be changed in Settings (Szint).
 
@@ -219,6 +227,10 @@ Child-facing text: `src/strings_hu.js` and `src/strings_en.js` (same keys); Engl
 
 Assets: `tools/build_assets.py` copies what the game uses from the Game Assets library (it never changes the library), packs sprite strips and converts sounds to MP3. The fonts are not from the library; they live in `assets/fonts/`. Then `tools/build_pack.py` rebuilds the offline bundle.
 
+## Keyboard looks (shop, Billentyűzet tab)
+
+The on-screen keyboard can be changed in the shop: Klasszikus (free), Színátmenet and Pasztell (25), Szivárványhullám (50), four colour waves (Óceán, Naplemente, Erdő, Cukorka, 40 each) and Neon (60 and a rare treasure). The waves keep the finger colour as a stripe at the bottom of every key, so the finger hint stays. Three effects can be switched on and off freely once bought: Felvillan (the pressed key lights up, 20), Ugrál (the pressed key jumps, 25), Kattog (a soft click, 20). With finger colours switched off in Settings every look is plain again.
+
 ## Known limits of this version
 
 Music was picked by title, not by listening: swap tracks in `tools/build_assets.py` (MUSIC table). The voice praise clips are English words ("Great!", "Wow!"); on-screen praise follows the interface language.
@@ -226,6 +238,8 @@ Music was picked by title, not by listening: swap tracks in `tools/build_assets.
 ## Testing everything quickly
 
 Test mode: add `?debug` to the end of the address (for example `index.html?debug` or `https://<you>.github.io/<repo>/?debug`). Every region and level opens for every profile. Inside a level, Tab finishes the current word (press it again for the next one) and Ctrl+Enter (Cmd+Enter on a Mac) finishes the whole level, so you can jump straight to bosses and results. The title screen says "TESZT MÓD" so you know it is on. Students never see it unless the address has `?debug`.
+
+Teacher's debug menu: type the word tmdebug anywhere in the game (nothing shows while typing it; a small note says "Debug: BE"), then press F2. The menu gives coins, rare treasures, all treasures and dishes, opens every region, finishes Halloween, unlocks all magic, keyboards and figures, fills the castle store, finishes the tales, makes a "skipped level" test case, wins the running level with 3 stars or goes back to the map. Typing tmdebug again switches it off. It is kept on that computer only, and it changes the current profile like playing would, so use a test profile.
 
 Ready-made test profiles: on the player screen press "Mentőkód" and paste a code.
 

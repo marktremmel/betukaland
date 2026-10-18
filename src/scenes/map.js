@@ -90,6 +90,12 @@ BK.MapScene = class extends Phaser.Scene {
       else if (!cleared) ic.setTint(0xd8d0c8);
       var num = BK.ui.text(s, x - 13, y - 15, String(reg.id), { color: cleared ? 0xffd23c : 0xffffff });
       if (cleared) s.add.image(x + 12, y - 12, 'star_on');
+      // something left out here (a later level was played first)
+      if (open && BK.regionSkipped && BK.regionSkipped(P, reg.id)) {
+        var dot = s.add.circle(x + 12, y + 10, 4.5, 0xffb84a).setStrokeStyle(1, 0x6b2a10);
+        BK.ui.text(s, x + 12, y + 10, '!', { outline: false, origin: [0.5, 0.5], px: 8, bold: true, color: 0x6b2a10 });
+        s.tweens.add({ targets: dot, scale: 1.25, duration: 600, yoyo: true, repeat: -1 });
+      }
       var z = s.add.zone(x, y, 34, 34).setInteractive({ useHandCursor: true });
       z.on('pointerup', function () { s.select(reg.id); });
       s.nodes.push({ slot: slot, x: x, y: y });
@@ -134,6 +140,10 @@ BK.MapScene = class extends Phaser.Scene {
           { w: l === 3 ? 62 : 54, h: 18, disabled: !unlocked }));
         if (l === s.levelSel) keep(s.add.rectangle(x, y, (l === 3 ? 62 : 54) + 4, 22).setStrokeStyle(1, 0xffffff));
         keep(BK.ui.stars(s, x, 196, P.progress[s.sel].stars[l], 3, 10));
+        if (BK.progressMap && BK.progressMap(P)[s.sel][l].state === 'skipped') {
+          keep(s.add.circle(x - (l === 3 ? 31 : 27), y - 9, 4, 0xffb84a).setStrokeStyle(1, 0x6b2a10));
+          keep(BK.ui.text(s, x - (l === 3 ? 31 : 27), y - 9, '!', { outline: false, origin: [0.5, 0.5], px: 7, bold: true, color: 0x6b2a10 }));
+        }
         // crown goal, once the region's boss is beaten
         if (BK.save.regionCleared(P, s.sel)) keep(s.add.image(x + 22, 195, (P.crowns[s.sel] || [])[l] ? 'crown_on' : 'crown_off'));
       })(l);
@@ -147,7 +157,7 @@ BK.MapScene = class extends Phaser.Scene {
       [BK.T.shop, function () { s.openOverlay('Shop'); }],
       [BK.T.bag, function () { s.openOverlay('Bag'); }],
       [BK.T.settings, function () { s.openOverlay('Settings'); }],
-      [BK.T.saveCode, function () { BK.SaveCodeUI.open(P, function () { s.scene.restart(); }); }],
+      [BK.T.saveCode, function () { BK.SaveCodeUI.open(P, function () { s.scene.restart({}); }); }],
       [BK.L('Váram', 'My castle'), function () { BK.audio.sfx('chime'); s.scene.start('Castle'); }],
       [BK.L('Profilom', 'Profile'), function () { BK.audio.sfx('chime'); s.scene.start('Profile'); }],
       [BK.T.switchPlayer, function () { s.scene.start('Profiles'); }],
@@ -168,7 +178,7 @@ BK.MapScene = class extends Phaser.Scene {
 
   openOverlay(name, extra) {
     var s = this;
-    this.scene.launch(name, Object.assign({ from: 'Map', onClose: function () { s.scene.restart(); } }, extra || {}));
+    this.scene.launch(name, Object.assign({ from: 'Map', onClose: function () { s.scene.restart({}); } }, extra || {}));
     this.scene.pause();
   }
 

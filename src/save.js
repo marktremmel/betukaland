@@ -91,11 +91,14 @@ BK.save = (function () {
     p.fx.tone = p.fx.tone || 0;
     p.fx.impact = p.fx.impact || 'spark';          // v0.10: impacts
     p.fx.glow = p.fx.glow || 'g_none';             // v0.10.1: light on the word bubble
-    ['spark', 'g_none'].forEach(function (k) { if (p.fx.owned.indexOf(k) < 0) p.fx.owned.push(k); });
+    p.fx.kb = p.fx.kb || 'kb_classic';             // v0.12: keyboard look and effects
+    p.fx.kbOn = p.fx.kbOn || [];
+    ['spark', 'g_none', 'kb_classic'].forEach(function (k) { if (p.fx.owned.indexOf(k) < 0) p.fx.owned.push(k); });
     p.dishes = p.dishes || {};                     // kitchen: dish id -> how many
     p.rares = p.rares || {};                       // rare treasures: id -> how many
     p.castle = Object.assign({ props: [], floor: [], frames: 0, framed: [] }, p.castle || {});   // the castle room
     p.emblem = p.emblem || null;                   // the child's own sign (profile page)
+    p.pins = p.pins || [];                         // up to three badges pinned to the castle board
     p.menuBg = p.menuBg || 0;                      // menu background (profile page)
     p.tales = p.tales || {};                       // Mesék: id -> { at: next line, done: stars }
     p.arena = p.arena || {};                       // boss arena: id -> { n: stars, h: stars }
@@ -136,7 +139,7 @@ BK.save = (function () {
     (inc.figures || []).forEach(function (f) { if (local.figures.indexOf(f) < 0) local.figures.push(f); });
     if (inc.halloween && (!local.halloween || !local.halloween.stars[3])) local.halloween = inc.halloween;
     ['rest', 'kbHint'].forEach(function (k) { if (inc.settings[k] !== undefined) local.settings[k] = inc.settings[k]; });
-    if (inc.fx) { (inc.fx.owned || []).forEach(function (o) { if (local.fx.owned.indexOf(o) < 0) local.fx.owned.push(o); }); local.fx.shape = inc.fx.shape; local.fx.colour = inc.fx.colour; local.fx.tone = inc.fx.tone || 0; local.fx.impact = inc.fx.impact || local.fx.impact; local.fx.glow = inc.fx.glow || local.fx.glow; }
+    if (inc.fx) { (inc.fx.owned || []).forEach(function (o) { if (local.fx.owned.indexOf(o) < 0) local.fx.owned.push(o); }); local.fx.shape = inc.fx.shape; local.fx.colour = inc.fx.colour; local.fx.tone = inc.fx.tone || 0; local.fx.impact = inc.fx.impact || local.fx.impact; local.fx.glow = inc.fx.glow || local.fx.glow; local.fx.kb = inc.fx.kb || local.fx.kb; local.fx.kbOn = inc.fx.kbOn || local.fx.kbOn; }
     ['dishes', 'rares'].forEach(function (k) {
       local[k] = local[k] || {};
       Object.keys(inc[k] || {}).forEach(function (id) { local[k][id] = Math.max(local[k][id] || 0, inc[k][id] || 0); });
@@ -147,8 +150,14 @@ BK.save = (function () {
       local.castle.frames = Math.max(local.castle.frames || 0, inc.castle.frames || 0);
       if ((inc.castle.floor || []).some(Boolean)) local.castle.floor = inc.castle.floor.slice();
       if ((inc.castle.framed || []).some(Boolean)) local.castle.framed = inc.castle.framed.slice();
+      if (inc.castle.inv) {
+        local.castle.inv = local.castle.inv || {};
+        Object.keys(inc.castle.inv).forEach(function (k) { local.castle.inv[k] = Math.max(local.castle.inv[k] || 0, inc.castle.inv[k]); });
+        if ((inc.castle.placed || []).length && !(local.castle.placed || []).length) local.castle.placed = inc.castle.placed.slice();
+      }
     }
     if (inc.emblem) local.emblem = inc.emblem;
+    if ((inc.pins || []).length) local.pins = inc.pins.slice(0, 3);
     if (inc.menuBg) local.menuBg = inc.menuBg;
     local.arena = local.arena || {};
     Object.keys(inc.arena || {}).forEach(function (k) {
@@ -261,11 +270,11 @@ BK.save = (function () {
   }
 
   function encode(p) {
-    // version 9 (v0.11): plus kitchen, rare treasures, castle, sign, menu background and finished tales. Version 8 (v0.10.1): plus bubble lights; written as 0 then the version in 5 bits. Version 7 (v0.10): plus impacts and the boss arena. Version 6 (v0.9.5): plus Halloween figures. Version 5 (v0.9.1): magic shots with single colours, RTX and chrome. Version 4 (v0.9): the shop's magic shots. Version 3 (v0.7): two more figure bits. Version 2 (v0.6.2) made codes shorter: the per-key skill levels are left out (the game relearns
+    // version 10 (v0.12): plus keyboard looks and effects. Version 9 (v0.11): plus kitchen, rare treasures, castle, sign, menu background and finished tales. Version 8 (v0.10.1): plus bubble lights; written as 0 then the version in 5 bits. Version 7 (v0.10): plus impacts and the boss arena. Version 6 (v0.9.5): plus Halloween figures. Version 5 (v0.9.1): magic shots with single colours, RTX and chrome. Version 4 (v0.9): the shop's magic shots. Version 3 (v0.7): two more figure bits. Version 2 (v0.6.2) made codes shorter: the per-key skill levels are left out (the game relearns
     // them in a few rounds) and trailing zeros are dropped. Version 1 codes still load.
     var b = new Bits();
     b.put(0, 3);                            // 0 = look at the next 5 bits (versions 8 and up)
-    b.put(9, 5);
+    b.put(10, 5);
     b.put(p.avatar & 7, 3);
     b.put(p.grade === '5-6' ? 1 : 0, 1);
     b.put(p.lang === 'en' ? 1 : 0, 1);
@@ -313,13 +322,23 @@ BK.save = (function () {
     BK.RARES.forEach(function (r) { b.put(Math.min(7, (p.rares || {})[r.id] || 0), 3); });
     var cs = p.castle || { props: [], floor: [] };
     BK.CASTLE_PROPS.forEach(function (o) { b.put((cs.props || []).indexOf(o.id) >= 0 ? 1 : 0, 1); });
-    for (var fi = 0; fi < 7; fi++) b.put((cs.floor || [])[fi] ? BK.CASTLE_PROPS.findIndex(function (o) { return o.id === cs.floor[fi]; }) + 1 : 0, 6);
+    // the first seven things on the floor (a rough layout for another computer)
+    var fl = cs.placed ? cs.placed.slice().sort(function (a, c) { return a.x - c.x; }).slice(0, 7).map(function (q) { return q.id; }) : (cs.floor || []);
+    for (var fi = 0; fi < 7; fi++) b.put(fl[fi] ? BK.CASTLE_PROPS.findIndex(function (o) { return o.id === fl[fi]; }) + 1 : 0, 6);
     b.put(Math.min(4, cs.frames || 0), 3);
     var em = p.emblem;
     b.put(em ? 1 : 0, 1);
     if (em) { b.put(em.field, 3); b.put(em.fc, 4); b.put(em.pattern, 3); b.put(em.pc, 4); b.put(em.symbol, 4); b.put(em.sc, 4); }
     b.put(p.menuBg || 0, 4);
     BK.TALES.forEach(function (t) { b.put(((p.tales || {})[t.id] || {}).done ? 1 : 0, 1); });
+    // v10 (v0.12): keyboard looks and effects, the look in use, the effects switched on
+    BK.KB_THEMES.forEach(function (o) { b.put(own.indexOf(o.id) >= 0 ? 1 : 0, 1); });
+    b.put(Math.max(0, BK.KB_THEMES.findIndex(function (o) { return o.id === fx.kb; })), 4);
+    BK.KB_EFFECTS.forEach(function (o) { b.put(own.indexOf(o.id) >= 0 ? 1 : 0, 1); b.put((fx.kbOn || []).indexOf(o.id) >= 0 ? 1 : 0, 1); });
+    // castle store: how many of each thing (the layout itself stays on this computer); pinned badges
+    var inv = (p.castle && p.castle.inv) || {};
+    BK.CASTLE_PROPS.forEach(function (o) { b.put(Math.min(7, inv[o.id] || ((cs.props || []).indexOf(o.id) >= 0 ? 1 : 0)), 3); });
+    for (var pi = 0; pi < 3; pi++) { var bi = BK.BADGES ? BK.BADGES.findIndex(function (x) { return x.id === (p.pins || [])[pi]; }) : -1; b.put(bi + 1, 5); }
     storyOrder().forEach(function (k) { b.put(Math.min(3, (p.stories || {})[k] || 0), 2); });
     while (b.a.length > 5 && b.a.lastIndexOf(1) < b.a.length - 5) b.a.length -= 5;   // drop trailing zero groups
     while (b.a.length % 5) b.a.push(0);
@@ -345,7 +364,7 @@ BK.save = (function () {
     var rd = new Reader(body);
     var ver = rd.get(3);
     if (ver === 0) ver = rd.get(5);          // version 8 and up
-    if (ver < 1 || ver > 9) throw new Error('version');
+    if (ver < 1 || ver > 10) throw new Error('version');
     var avatar = rd.get(3), grade = rd.get(1) ? '5-6' : '3-4', lang = rd.get(1) ? 'en' : 'hu', placed = rd.get(3) || null;
     var nl = rd.get(4), nick = '';
     for (i = 0; i < nl; i++) nick += NICK[rd.get(7)] || '';
@@ -414,6 +433,17 @@ BK.save = (function () {
       if (rd.get(1)) p.emblem = { field: rd.get(3), fc: rd.get(4), pattern: rd.get(3), pc: rd.get(4), symbol: rd.get(4), sc: rd.get(4), letter: (p.nick || 'A').charAt(0).toUpperCase() };
       p.menuBg = rd.get(4);
       p.tales = {}; BK.TALES.forEach(function (t) { if (rd.get(1)) p.tales[t.id] = { at: 0, done: 1 }; });
+    }
+    p.fx.kb = 'kb_classic'; p.fx.kbOn = [];
+    if (p.fx.owned.indexOf('kb_classic') < 0) p.fx.owned.push('kb_classic');
+    if (ver >= 10) {
+      BK.KB_THEMES.forEach(function (o) { if (rd.get(1) && p.fx.owned.indexOf(o.id) < 0) p.fx.owned.push(o.id); });
+      var ki = BK.KB_THEMES[rd.get(4)] || BK.KB_THEMES[0];
+      p.fx.kb = p.fx.owned.indexOf(ki.id) >= 0 ? ki.id : 'kb_classic';
+      BK.KB_EFFECTS.forEach(function (o) { var ow = rd.get(1), on = rd.get(1); if (ow && p.fx.owned.indexOf(o.id) < 0) p.fx.owned.push(o.id); if (ow && on) p.fx.kbOn.push(o.id); });
+      p.castle.inv = {}; p.castle.placed = null;
+      BK.CASTLE_PROPS.forEach(function (o) { var v = rd.get(3); if (v) { p.castle.inv[o.id] = v; if (p.castle.props.indexOf(o.id) < 0) p.castle.props.push(o.id); } });
+      p.pins = []; for (var pi = 0; pi < 3; pi++) { var bi = rd.get(5); if (bi && BK.BADGES && BK.BADGES[bi - 1]) p.pins.push(BK.BADGES[bi - 1].id); }
     }
     storyOrder().forEach(function (k) { var v = rd.get(2); if (v) p.stories[k] = v; });
     return p;

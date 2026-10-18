@@ -442,6 +442,7 @@ BK.LevelScene = class extends Phaser.Scene {
     this.stats.chars++;
     this.streak++;
     BK.audio.sfx('key_ok', { volume: 0.4, detune: Math.min(this.streak, 12) * 50 });
+    this.kb.press(ch);
     var hp = this.enc.hitPos();
     BK.fx.bolt(this, this.hero.x + 8, this.hero.y - 24, hp.x, hp.y);
     if (res === 'ok' || res === 'chunk') { this.kb.setNext(this.enc.next); return; }

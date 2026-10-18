@@ -6,7 +6,7 @@
  */
 window.BK = window.BK || {};
 
-BK.VERSION = '0.11.0';
+BK.VERSION = '0.12.0';
 
 // Test mode for the teacher: open the game with ?debug at the end of the address.
 // Every region and level is open; in a level Tab finishes the current word and
@@ -377,6 +377,26 @@ BK.ITEMS = [
   { id: 'macaron', name: 'macaron', frame: 197 },
   { id: 'candycane', name: 'cukorpálca', frame: 202 },
   { id: 'pizza', name: 'pizza', frame: 102 },
+];
+
+// On-screen keyboard looks (shop: Billentyűzet). The finger colours always stay in some
+// form: on the colour-wave themes as a stripe at the bottom of each key.
+BK.KB_THEMES = [
+  { id: 'kb_classic', name: 'Klasszikus', en: 'Classic', price: 0 },
+  { id: 'kb_gradient', name: 'Színátmenet', en: 'Gradient', price: 25 },
+  { id: 'kb_pastel', name: 'Pasztell', en: 'Pastel', price: 25 },
+  { id: 'kb_rainbow', name: 'Szivárványhullám', en: 'Rainbow wave', price: 50, wave: 'rainbow' },
+  { id: 'kb_ocean', name: 'Óceán', en: 'Ocean', price: 40, wave: [0x1a4a8a, 0x2e8fd8, 0x3ad0e0, 0x9ff0f0] },
+  { id: 'kb_sunset', name: 'Naplemente', en: 'Sunset', price: 40, wave: [0x8a2a5a, 0xd8486a, 0xff9a3a, 0xffd23c] },
+  { id: 'kb_forest', name: 'Erdő', en: 'Forest', price: 40, wave: [0x2a4a1a, 0x4a8a3a, 0x8ac04a, 0xd8e08a] },
+  { id: 'kb_candy', name: 'Cukorka', en: 'Candy', price: 40, wave: [0xff8ac8, 0xc89aff, 0x8ad8ff, 0xfff08a] },
+  { id: 'kb_neon', name: 'Neon', en: 'Neon', price: 60, rare: 1, neon: true },
+];
+// keyboard effects: each can be switched on and off once bought
+BK.KB_EFFECTS = [
+  { id: 'kbe_react', name: 'Felvillan', en: 'Light up', price: 20 },
+  { id: 'kbe_bounce', name: 'Ugrál', en: 'Bounce', price: 25 },
+  { id: 'kbe_click', name: 'Kattog', en: 'Click', price: 20 },
 ];
 
 // Kitchen (Hátizsák → Konyha): treasures + typing the recipe = a dish. Dishes can be sold to
