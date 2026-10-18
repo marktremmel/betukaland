@@ -1,6 +1,6 @@
 # Betűkaland (Typing Adventure): teacher notes
 
-Version 0.7.1: all seven regions are playable, each with three levels and a boss, plus a practice corner (daily goals with a streak, sentence practice, a tricky-letter drill, the endless road, and a storybook) and crowns to win on every level of a finished region. The menus can be Hungarian or English, the text uses a font made for young readers (three to choose from), and the keyboard can be Hungarian or US English. Title screen, player profiles with a choice of thirteen figures, placement test, world map, shop, rest spots, results with stars and a chart, saving with a code and a file, the teacher screen with CSV export, and credits.
+Version 0.8.0: all seven regions are playable, each with three levels and a boss, plus a practice corner (daily goals with a streak, sentence practice, a tricky-letter drill, the endless road, and a storybook) and crowns to win on every level of a finished region. The menus can be Hungarian or English, the text uses a font made for young readers (three to choose from), and the keyboard can be Hungarian or US English. Title screen, player profiles with a choice of thirteen figures, placement test, world map, shop, rest spots, results with stars and a chart, saving with a code and a file, the teacher screen with CSV export, and credits.
 
 ## Running it
 
@@ -114,7 +114,15 @@ If school computers wipe browser data at logout, ask students to save a code at 
 
 ## The 4.B figures
 
-Class 4.B suggested seven new animals. They were drawn with ChatGPT image generation (the prompts are in `new_animals/CHATGPT_PROMPTS.md`) and turned into game sprites by `tools/clean_ai_sprites.py`: it removes the magenta background, cuts the frames, shrinks them to the game's pixel size with one shared palette, adds an outline and lines the frames up. The cleaned strips live in `art/animals/`; `tools/build_assets.py` packs them like the library sprites, outfit colours included. The raw ChatGPT pictures stay in `new_animals/` and are not part of the game or git. To redo one animal from new pictures: save them in `new_animals/`, fix the file names at the top of the tool, run `python3 tools/clean_ai_sprites.py tiger`, then `python3 tools/build_assets.py --no-audio` and `python3 tools/build_pack.py`. The Credits screen thanks 4.B.
+Class 4.B suggested seven new animals. They were drawn with ChatGPT image generation (the prompts are in `new_animals/CHATGPT_PROMPTS.md`) and turned into game sprites by `tools/clean_ai_sprites.py`: it removes the magenta background, cuts the frames, shrinks them to the game's pixel size with one shared palette, adds an outline and lines the frames up. The cleaned strips live in `art/animals/`; `tools/build_assets.py` packs them like the library sprites, outfit colours included. The raw ChatGPT pictures stay in `new_animals/` and are not part of the game or git. To redo one animal from new pictures: save them in `new_animals/`, fix the file names at the top of the tool, run `python3 tools/clean_ai_sprites.py tiger`, then `python3 tools/build_assets.py --local` (no asset library needed) and `python3 tools/build_pack.py`. Since v0.8 the cleanup takes colours only from inside the figure and draws one even outline, so the edges are crisp. The Credits screen thanks 4.B.
+
+## Halloween Night (switch in the Teacher screen)
+
+"Halloween Night: off/on" in the Teacher screen puts a Halloween button on every child's map on this computer, and "Boldog Halloweent!" on the title screen. It opens a small friendly spooky story in four stages: Tökös ösvény, Ködös erdő, Denevérhíd (with a clumsy mummy) and A Tökkirály kertje, where the Pumpkin King is grumpy because nobody came to his party. Typing his sentences makes him laugh and hand out candy, and the child gets a new pet. The stages open one after the other and give stars like levels.
+
+The typing uses only the keys of the child's newest region, with Halloween words and sentences mixed in where they fit those keys (`data/halloween.js`), so a child in region 1 and one in region 6 both get the right material. Normal progress, stars and crowns are not touched. The Halloween stars stay on this computer and are not in the save code; the pet is. Switch it off again after Halloween; the pet stays.
+
+Until the drawn characters exist (prompts in `halloween/HALLOWEEN_PROMPTS.md`), the stages use tinted stand-ins from the library (mushrooms, frogs, a crow, the toad, the baby dragon) on the night sky. When the pictures are saved in `halloween/` with the names from the prompts: `python3 tools/clean_ai_sprites.py`, then `python3 tools/build_assets.py --local` and `python3 tools/build_pack.py`. The game picks each drawn character up by itself.
 
 ## Teacher screen
 

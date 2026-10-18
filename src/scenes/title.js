@@ -16,6 +16,10 @@ BK.TitleScene = class extends Phaser.Scene {
     BK.ui.text(this, BK.W / 2, 74, BK.T.subtitle, { size: 2, origin: [0.5, 0.5], color: 0xfff2dc });
     this.tweens.add({ targets: title, y: 47, duration: 1200, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
 
+    if (BK.save.halloween()) {
+      var hw = BK.ui.text(this, BK.W / 2, 94, BK.L('Boldog Halloweent!', 'Happy Halloween!'), { origin: [0.5, 0.5], color: 0xffa040 });
+      this.tweens.add({ targets: hw, angle: { from: -3, to: 3 }, duration: 900, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+    }
     var press = BK.ui.text(this, BK.W / 2, 118, BK.T.pressKey, { origin: [0.5, 0.5], color: 0xffffff });
     this.tweens.add({ targets: press, alpha: 0.3, duration: 700, yoyo: true, repeat: -1 });
 

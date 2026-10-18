@@ -10,10 +10,12 @@
 BK.levelgen = {
   build: function (regionId, levelIdx, profile, rng, opts) {
     if (levelIdx === 'practice' || levelIdx === 'story' || levelIdx === 'weak' || levelIdx === 'endless') return this.practice(regionId, levelIdx, profile, rng, opts || {});
-    var reg = BK.REGIONS[regionId - 1];
+    if (levelIdx === 'halloween') return this.halloween(regionId, profile, rng, opts || {});
+    var reg = (opts && opts.reg) || BK.REGIONS[regionId - 1];
     var band = (profile && profile.grade) || '3-4';
     var lang = (profile && profile.lang) || 'hu';
     var picker = new BK.wordbank.Picker(regionId, lang, band, rng, profile);
+    if (reg.theme) picker = BK.levelgen.themed(picker, lang, rng);
     var daily = levelIdx === 'daily';
     var li = daily ? 1 : levelIdx;
     var phases = daily ? ['syllables', 'words', 'pairs'] : BK.LEVEL_PHASES[li];
@@ -43,7 +45,8 @@ BK.levelgen = {
       else for (var b = 0; b < n; b++) texts.push(picker.numbers && b % 2 ? picker.get('pairs') : picker.sentence());
       // a short warm-up road before the boss
       for (var w = 0; w < 4; w++) {
-        out.push({ kind: w === 2 ? 'chest' : 'walker', creature: rng.pick(walkers), tint: reg.tint,
+        var cw = rng.pick(walkers);
+        out.push({ kind: w === 2 ? 'chest' : 'walker', creature: cw, tint: (reg.tints || {})[cw] || reg.tint,
           texts: [w < 2 ? picker.get('words') : picker.get('pairs')],
           coins: w === 2 ? 3 : 1, item: w === 2 ? rng.pick(BK.ITEMS).id : undefined });
       }
@@ -98,8 +101,9 @@ BK.levelgen = {
       var phase = phaseOf();
       var flyer = flyers.length > 0 && rng.chance(0.25);
       var t = picker.get(phase);
-      out.push({ kind: flyer ? 'flyer' : 'walker', creature: flyer ? 'gull' : rng.pick(walkers), texts: [t], coins: 1,
-        tint: flyer ? reg.flyerTint : reg.tint });
+      var cr = flyer ? (reg.flyer || 'gull') : rng.pick(walkers);
+      out.push({ kind: flyer ? 'flyer' : 'walker', creature: cr, texts: [t], coins: 1,
+        tint: (reg.tints || {})[cr] || (flyer ? reg.flyerTint : reg.tint) });
       used += t.length + 1;
       count++;
     }
@@ -110,11 +114,53 @@ BK.levelgen = {
       var chunks = [], per = Math.ceil(sent.length / (sent.length > 4 ? 3 : 2));
       for (var i = 0; i < sent.length; i += per) chunks.push(sent.slice(i, i + per).join(' '));
       out.push({ kind: 'mini', creature: reg.mini, tint: reg.miniTint, texts: chunks, coins: 6,
-        intro: BK.L((BK.CREATURE_NAMES[reg.mini] || 'Valaki') + ' állja az utat!', (BK.CREATURE_NAMES[reg.mini] || 'Someone') + ' blocks the way!') });
+        intro: BK.L((reg.miniName || BK.CREATURE_NAMES[reg.mini] || 'Valaki') + ' állja az utat!', (reg.miniName || BK.CREATURE_NAMES[reg.mini] || 'Someone') + ' blocks the way!') });
     }
 
     var music = daily ? 'm_level3' : (reg.music ? reg.music[li % reg.music.length] : 'm_level1');
     return { encounters: out, sky: sky, bdTint: bdTint, weather: weather, music: music };
+  },
+
+  /*
+   * Halloween Night: opts.stage 0..2 are built like level 3 (stage 2 keeps its
+   * mini-boss, the mummy), stage 3 like a boss level with the Pumpkin King, all with the keys of
+   * regionId and the night look from BK.halloweenRegion. No warm-up.
+   */
+  halloween: function (regionId, profile, rng, opts) {
+    var stage = Math.max(0, Math.min(3, opts.stage || 0));
+    var reg = BK.halloweenRegion(regionId, stage);
+    // built like level 3 (words and pairs, no single-letter drills), or the boss level
+    var plan = this.build(regionId, stage === 3 ? 3 : 2, profile, rng, { reg: reg });
+    if (stage < 2) plan.encounters = plan.encounters.filter(function (e) { return e.kind !== 'mini'; });
+    plan.reg = reg;
+    plan.practice = 'halloween';
+    plan.stage = stage;
+    plan.sky = reg.sky[0];         // always the stage's own night (or dusk) sky
+    if (!plan.boss) { plan.weather = rng.pick(['clear', 'leaves', 'leaves', 'wind']); plan.music = 'm_moon'; }
+    return plan;
+  },
+
+  /*
+   * A picker that mixes Halloween words and sentences into the normal word
+   * bank, but only those that fit the keys (picker.set). Anything else is the
+   * normal material.
+   */
+  themed: function (picker, lang, rng) {
+    var fits = function (t) { return BK.wordbank.fits(t, picker.set) && !BK.wordbank.blocked(t); };
+    var words = (BK.HALLOWEEN_WORDS[lang] || []).filter(fits);
+    var sents = (BK.HALLOWEEN_SENTENCES[lang] || []).filter(fits);
+    var get = picker.get.bind(picker), sentence = picker.sentence.bind(picker);
+    picker.get = function (phase) {
+      if (words.length && (phase === 'words' || phase === 'syllables') && rng.chance(0.5)) return rng.pick(words);
+      if (words.length > 1 && phase === 'pairs' && rng.chance(0.5)) {
+        var a = rng.pick(words), b = rng.pick(words), p2 = a + ' ' + b;
+        if (a !== b && fits(p2)) return p2;
+      }
+      return get(phase);
+    };
+    var queue = rng.shuffle(sents.slice());
+    picker.sentence = function () { return queue.length && rng.chance(0.85) ? queue.pop() : sentence(); };   // no sentence twice
+    return picker;
   },
 
   /*

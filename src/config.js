@@ -6,7 +6,7 @@
  */
 window.BK = window.BK || {};
 
-BK.VERSION = '0.7.1';
+BK.VERSION = '0.8.0';
 
 // Test mode for the teacher: open the game with ?debug at the end of the address.
 // Every region and level is open; in a level Tab finishes the current word and
@@ -119,6 +119,61 @@ BK.REGIONS = [
     bossMusic: 'm_final', music: ['m_sky', 'm_level3', 'm_sky'], playable: true },
 ];
 
+// Halloween Night (switched on in the Teacher screen): four stages on a night
+// road, played with the keys of the child's newest region (see levelgen
+// "halloween"). Each creature names the drawn sprite and a stand-in from the
+// library with a tint, used until the drawn one is in assets/manifest.js.
+BK.HW_CREATURES = {
+  ghost:   { art: 'hw_ghost_float', stand: 'mush', tint: 0xe8e0ff },
+  pumpkin: { art: 'hw_pumpkin_walk', stand: 'mush', tint: 0xffa04a },
+  cat:     { art: 'hw_cat_walk', stand: 'frog', tint: 0x8a70c0 },
+  bat:     { art: 'hw_bat_fly', stand: 'crow' },
+  mummy:   { art: 'hw_mummy_walk', stand: 'toad', tint: 0xf0e0c0 },
+  king:    { art: 'hw_king_idle', stand: 'babydragon', tint: 0xffa860 },
+};
+BK.HALLOWEEN = {
+  stages: [
+    { name: 'Tökös ösvény', en: 'Pumpkin Path', walkers: ['ghost', 'pumpkin'], flyers: [], sky: 3 },
+    { name: 'Ködös erdő', en: 'Misty Woods', walkers: ['cat', 'ghost'], flyers: ['bat'], sky: 3 },
+    { name: 'Denevérhíd', en: 'Bat Bridge', walkers: ['pumpkin', 'cat', 'ghost'], flyers: ['bat'], sky: 3, mini: 'mummy' },
+    { name: 'A Tökkirály kertje', en: 'The Pumpkin King\'s Garden', walkers: ['ghost', 'pumpkin', 'cat'], flyers: ['bat'], sky: 7,
+      boss: 'king', bossName: 'Tökkirály', bossNameEn: 'Pumpkin King',
+      bossIntro: 'Itt a Tökkirály! Üres a kosara...', bossIntroEn: 'Here is the Pumpkin King! His basket is empty...',
+      bossOutro: 'A Tökkirály nevet, és cukrot oszt!', bossOutroEn: 'The Pumpkin King laughs and hands out candy!' },
+  ],
+  look: { backdrop: null, ground: 'ground', groundTint: 0x8070b0, decor: null, music: ['m_moon'], bossMusic: 'm_boss' },
+  pet: 'bat',             // the reward for making the King smile
+};
+// A region-like object for a Halloween stage (the keys stay those of regionId)
+BK.halloweenRegion = function (regionId, stage) {
+  var st = BK.HALLOWEEN.stages[stage], en = BK.uiLang === 'en';
+  var r = Object.assign({}, BK.REGIONS[regionId - 1], BK.HALLOWEEN.look);
+  var pick = function (id) {
+    var c = BK.HW_CREATURES[id], drawn = window.BK_MANIFEST && BK_MANIFEST.sprites[c.art];
+    var key = drawn ? 'hw_' + id : c.stand;
+    if (drawn) BK.CREATURES[key] = c.art;
+    return { key: key, tint: drawn ? undefined : c.tint };
+  };
+  r.tints = {};
+  var list = function (ids) { return ids.map(function (id) { var c = pick(id); if (c.tint) r.tints[c.key] = c.tint; return c.key; }); };
+  r.walkers = list(st.walkers);
+  r.flyers = list(st.flyers);
+  r.flyer = r.flyers[0];
+  r.mini = st.mini ? list([st.mini])[0] : r.mini;
+  r.miniTint = st.mini ? r.tints[r.mini] : undefined;
+  r.miniName = BK.L('Egy ügyetlen múmia', 'A clumsy mummy');
+  if (st.boss) { r.boss = list([st.boss])[0]; r.bossTint = r.tints[r.boss]; }
+  r.bossName = en ? st.bossNameEn : st.bossName;
+  r.bossIntro = en ? st.bossIntroEn : st.bossIntro;
+  r.bossOutro = en ? st.bossOutroEn : st.bossOutro;
+  r.sky = [st.sky || 3];
+  r.bdTint = null;
+  r.name = en ? st.en : st.name;
+  r.theme = 'halloween';
+  r.stories = false;       // the story regions write the boss from stories; here the themed sentences do
+  return r;
+};
+
 // Phases used inside a region: level index -> phase mix
 BK.LEVEL_PHASES = [
   ['letters', 'syllables'],    // level 1
@@ -179,6 +234,10 @@ BK.PETS = [
   { id: 'crabkid', name: 'Rákocska', word: 'rák', sprite: 'crabkid_walk', price: 25 },
   { id: 'sandbug', name: 'Homokbogár', word: 'bogár', sprite: 'sandbug_walk', price: 35 },
   { id: 'gull', name: 'Sirály', word: 'sirály', sprite: 'gull_fly', price: 50, flies: true },
+  // Halloween Night reward, not for sale: the drawn bat, or the library crow until it exists
+  (window.BK_MANIFEST && BK_MANIFEST.sprites.hw_bat_fly)
+    ? { id: 'bat', name: 'Denevér', word: 'denevér', sprite: 'hw_bat_fly', price: 0, flies: true, reward: true }
+    : { id: 'bat', name: 'Varjú', word: 'varjú', sprite: 'crow_fly', price: 0, flies: true, reward: true },
 ];
 
 // Collectible items: frames of the Addin food sheet "icons_food" (20 columns, 16 px)
@@ -233,7 +292,7 @@ BK.outfitKey = function (key, p) { return (p && p.outfit && p.outfit !== 'base')
 
 // Which way the creatures look in the source art. Enemies must face left
 // (towards the hero), pets must face right. true = faces left already.
-BK.FACES_LEFT = { babydragon: false, slime: false, bunny: false, frog: false, mush: false, toad: false, bigbird: false, sandbug: false,
+BK.FACES_LEFT = { crow: true, babydragon: false, slime: false, bunny: false, frog: false, mush: false, toad: false, bigbird: false, sandbug: false,
   crab: false, crabkid: false, gull: true, frogknight: true, dragon: true, starfish: false, octopus: false, shell: false, karou: false };
 
 // Names shown when a mini-boss appears ("X állja az utat!")

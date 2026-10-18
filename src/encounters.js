@@ -127,7 +127,7 @@ BK.Walker = class extends BK.Encounter {
 /** A gull that flies in and hovers. */
 BK.Flyer = class extends BK.Walker {
   spawn(x) {
-    this.kindKey = 'gull';
+    this.kindKey = this.def.creature && BK.CREATURES[this.def.creature] ? this.def.creature : 'gull';
     super.spawn(x);
     this.spr.y = BK.GROUND_Y - 40;
     this.baseY = this.spr.y;
@@ -440,7 +440,7 @@ BK.ENCOUNTERS = { walker: BK.Walker, flyer: BK.Flyer, gate: BK.Gate, bridge: BK.
 
 // creature id -> animation key
 BK.CREATURES = { frog: 'frog_walk', mush: 'mush_walk', crab: 'crab_walk', crabkid: 'crabkid_walk', sandbug: 'sandbug_walk',
-  starfish: 'starfish_idle', octopus: 'octopus_idle', shell: 'shell_idle', gull: 'gull_fly', toad: 'toad_idle',
+  starfish: 'starfish_idle', octopus: 'octopus_idle', shell: 'shell_idle', gull: 'gull_fly', crow: 'crow_fly', toad: 'toad_idle',
   frogknight: 'frogknight_idle', bigbird: 'bigbird_fly', dragon: 'dragon_fly', babydragon: 'babydragon_idle', slime: 'slime_idle' };
 
 // ---------------------------------------------------------------------------

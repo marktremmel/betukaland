@@ -7,10 +7,14 @@ Input: new_animals/*.png, one row of frames on a flat magenta background
 which tools/build_assets.py packs like the library sprites (outfit colours too).
 
 Steps per animal: key out the magenta, split the row into frames, shrink each
-frame to the target height by area sampling, share one 18-colour palette
-between the idle and the run sheet, drop specks, add a 1 px dark outline, and
+frame to the target height by area sampling (after shaving off the magenta
+fringe), share one 18-colour palette between the idle and the run sheet,
+smooth the silhouette, clean up stray pixels, draw one even 1 px outline, and
 line the frames up on the feet (bottom) and the head (horizontal centre), so
 the figure doesn't jitter.
+
+The Halloween characters (halloween/*.png) go the same way into art/halloween/.
+Afterwards: python3 tools/build_assets.py --local (packs art/ into assets/), then tools/build_pack.py.
 
 Needs numpy, scipy, scikit-learn, Pillow.  Run: python3 tools/clean_ai_sprites.py [names]
 """
@@ -39,15 +43,37 @@ CFG = {
     "seahorse": [("idle", 4, 40), ("run", 6, 40)],
     "polar": [("idle", 4, 41), ("run", 6, 40)],
 }
+
+# Halloween Night characters: halloween/<file> -> art/halloween/<name>_<kind>.png
+# (the game uses them as soon as tools/build_assets.py --local has packed them)
+HW_SRC = os.path.join(ROOT, "halloween"); HW_DST = os.path.join(ROOT, "art", "halloween")
+HW_FILES = {
+    "hw_ghost": {"float": "ghost_float.png"}, "hw_bat": {"fly": "bat_fly.png"}, "hw_cat": {"walk": "cat_walk.png"},
+    "hw_pumpkin": {"walk": "pumpkin_walk.png"}, "hw_mummy": {"walk": "mummy_walk.png"}, "hw_king": {"idle": "king_idle.png"},
+}
+HW_CFG = {
+    "hw_ghost": [("float", 6, 34)], "hw_bat": [("fly", 4, 22)], "hw_cat": [("walk", 6, 38)],
+    "hw_pumpkin": [("walk", 6, 34)], "hw_mummy": [("walk", 6, 46)], "hw_king": [("idle", 6, 78)],
+}
 import numpy as np
 from PIL import Image
 from scipy import ndimage
 from sklearn.cluster import KMeans
 def load(path):
-    a=np.asarray(Image.open(path).convert('RGB')).astype(int)
-    r,g,b=a[...,0],a[...,1],a[...,2]
-    bg=(np.minimum(r,b)-g)>110
-    return a,~bg
+    """picture -> (rgb, figure mask). Works with a transparent PNG, or any flat background
+    colour (magenta, green...): the colour is read from the picture's border."""
+    im = Image.open(path)
+    if im.mode in ("RGBA", "LA") or (im.mode == "P" and "transparency" in im.info):
+        rgba = np.asarray(im.convert("RGBA")).astype(int)
+        if (rgba[..., 3] < 128).mean() > 0.2:          # really transparent
+            return rgba[..., :3], rgba[..., 3] >= 128
+    a = np.asarray(im.convert("RGB")).astype(int)
+    border = np.concatenate([a[:4].reshape(-1, 3), a[-4:].reshape(-1, 3), a[:, :4].reshape(-1, 3), a[:, -4:].reshape(-1, 3)])
+    bgc = np.median(border, 0)
+    dist = np.sqrt(((a - bgc) ** 2).sum(2))
+    return a, dist > 110
+
+
 def frames(path,n):
     a,m=load(path)
     cols=m.sum(0); on=cols>2; runs=[];s=None
@@ -68,8 +94,10 @@ def frames(path,n):
         out.append((a[y0:y1,x0:x1],mm[y0:y1]))
     return out
 
-def downs(a, m, H):
-    """area-downsample one frame to height H; returns rgb float, alpha frac"""
+def downs(a, m, H, mc=None):
+    """area-downsample one frame to height H; returns rgb float, alpha frac.
+    m gives the shape; colours come only from mc (the mask without the fringe) where it has pixels."""
+    if mc is None: mc = m
     h, w = m.shape; s = h / H; W = int(round(w / s))
     rgb = np.zeros((H, W, 3)); al = np.zeros((H, W))
     for y in range(H):
@@ -79,45 +107,65 @@ def downs(a, m, H):
             mm = m[y0:y1, x0:x1]; f = mm.mean() if mm.size else 0
             al[y, x] = f
             if mm.any():
-                px = a[y0:y1, x0:x1][mm]
+                cm = mc[y0:y1, x0:x1]
+                if not cm.any(): cm = mm
+                px = a[y0:y1, x0:x1][cm]
                 # inner part of the cell only, so blended edges count less
                 cy0, cy1 = y0 + (y1 - y0) // 4, y1 - (y1 - y0) // 4
                 cx0, cx1 = x0 + (x1 - x0) // 4, x1 - (x1 - x0) // 4
-                im = m[cy0:cy1, cx0:cx1]
+                im = mc[cy0:cy1, cx0:cx1]
                 if im.any(): px = a[cy0:cy1, cx0:cx1][im]
                 rgb[y, x] = np.median(px, 0)
     return rgb, al
 
+CROSS = [[0, 1, 0], [1, 1, 1], [0, 1, 0]]
+
+
 def process(name, specs, K=18):
     small = []
     for kind, n, H in specs:
-        fr = frames(os.path.join(SRC, FILES[name][kind]), n)
-        small.append([downs(a, m, H) for a, m in fr])
+        src, files = (HW_SRC, HW_FILES) if name in HW_FILES else (SRC, FILES)
+        fr = frames(os.path.join(src, files[name][kind]), n)
+        # colours never come from the magenta-blended fringe (the outline is drawn again below)
+        small.append([downs(a, m, H + 2, ndimage.binary_erosion(m, iterations=3)) for a, m in fr])
     # shared palette per animal
     pts = np.concatenate([r[al > .5] for st in small for r, al in st])
     km = KMeans(K, n_init=4, random_state=0).fit(pts)
     pal = km.cluster_centers_
-    dark = pal[np.argmin(pal.sum(1))]
+    luma = pal @ [0.3, 0.59, 0.11]
+    dark_i = int(np.argmin(luma))
+    dark = pal[dark_i]
+    keep = set(np.argsort(luma)[:2]) | set(np.argsort(luma)[-1:])   # eyes and highlights may be single pixels
     out = {}
     for (kind, n, H), st in zip(specs, small):
         fs = []
         for rgb, al in st:
             op = al > .45
-            op = ndimage.binary_opening(op, np.ones((1, 1)))
-            # drop specks
+            # smooth the silhouette: fill one-pixel notches, drop loose pixels
+            op = ndimage.binary_closing(np.pad(op, 1), CROSS)[1:-1, 1:-1]
+            # lone pixels sticking out sideways (one neighbour, and not part of a thin line like an antenna)
+            nbc = ndimage.convolve(op.astype(int), [[1, 1, 1], [1, 0, 1], [1, 1, 1]], mode='constant')
+            op = op & ~(nbc == 0)
             lab, k = ndimage.label(op)
-            if k > 1:
+            if k > 1:      # drop specks
                 sizes = ndimage.sum(op, lab, range(1, k + 1))
                 op = np.isin(lab, [i + 1 for i, s in enumerate(sizes) if s >= 4])
             idx = km.predict(rgb.reshape(-1, 3)).reshape(op.shape)
+            # single stray pixels inside the figure take the colour of their neighbours
+            h, w = op.shape
+            for y in range(1, h - 1):
+                for x in range(1, w - 1):
+                    if not op[y, x] or idx[y, x] in keep: continue
+                    nb = [idx[y + dy, x + dx] for dy, dx in ((-1, 0), (1, 0), (0, -1), (0, 1)) if op[y + dy, x + dx]]
+                    if len(nb) == 4 and idx[y, x] not in nb:
+                        vals, cnt = np.unique(nb, return_counts=True)
+                        idx[y, x] = vals[np.argmax(cnt)]
             img = np.zeros(op.shape + (4,), np.uint8)
             img[..., :3] = pal[idx].round().clip(0, 255); img[..., 3] = op * 255
-            # 1 px dark outline around the silhouette, where the edge is not dark already
-            pad = np.pad(op, 1)
-            ring = ndimage.binary_dilation(pad, [[0, 1, 0], [1, 1, 1], [0, 1, 0]]) & ~pad
-            img2 = np.zeros((op.shape[0] + 2, op.shape[1] + 2, 4), np.uint8); img2[1:-1, 1:-1] = img
-            img2[ring] = list(dark.round().astype(int)) + [255]
-            fs.append(Image.fromarray(img2))
+            # one clean, even outline: the outermost pixels of the figure in the darkest colour
+            edge = op & ~ndimage.binary_erosion(np.pad(op, 1), CROSS)[1:-1, 1:-1]
+            img[edge] = list(dark.round().astype(int)) + [255]
+            fs.append(Image.fromarray(img))
         out[kind] = fs
     return out
 
@@ -144,12 +192,14 @@ def pack(fs):
 
 
 def main():
-    os.makedirs(DST, exist_ok=True)
-    for n in sys.argv[1:] or list(CFG):
-        for kind, fs in process(n, CFG[n]).items():
+    names = sys.argv[1:] or list(CFG) + [n for n in HW_CFG if all(os.path.exists(os.path.join(HW_SRC, f)) for f in HW_FILES[n].values())]
+    for n in names:
+        cfg, dst = (HW_CFG[n], HW_DST) if n in HW_CFG else (CFG[n], DST)
+        os.makedirs(dst, exist_ok=True)
+        for kind, fs in process(n, cfg).items():
             st, fw, fh = pack(fs)
-            st.save(os.path.join(DST, "%s_%s.png" % (n, kind)))
-            print("%-9s %-4s %d frames %dx%d" % (n, kind, len(fs), fw, fh))
+            st.save(os.path.join(dst, "%s_%s.png" % (n, kind)))
+            print("%-10s %-5s %d frames %dx%d" % (n, kind, len(fs), fw, fh))
 
 
 if __name__ == "__main__":

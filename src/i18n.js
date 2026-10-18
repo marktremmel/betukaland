@@ -45,7 +45,7 @@ BK.i18nField = function (obj, field, en) {
   });
   var names = function (list, map) { list.forEach(function (o) { BK.i18nField(o, 'name', map[o.id]); }); };
   names(BK.OUTFITS, { base: 'Classic', blue: 'Sky blue', mint: 'Mint', pink: 'Pink', night: 'Night', gold: 'Gold' });
-  names(BK.PETS, { crabkid: 'Little Crab', sandbug: 'Sand Bug', gull: 'Seagull' });
+  names(BK.PETS, { crabkid: 'Little Crab', sandbug: 'Sand Bug', gull: 'Seagull', bat: BK.PETS[3] && BK.PETS[3].sprite === 'crow_fly' ? 'Crow' : 'Bat' });
   names(BK.HEROES, { bunny: 'Bunny', berie: 'Berie', frog: 'Frog', mush: 'Mushroom', crab: 'Crab', gull: 'Seagull',
     cheetah: 'Cheetah', panda: 'Panda', firefox: 'Fire Fox', roach: 'Cockroach', tiger: 'Tiger', seahorse: 'Seahorse', polar: 'Polar Bear' });
   names(BK.ITEMS, {

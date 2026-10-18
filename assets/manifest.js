@@ -850,42 +850,42 @@ window.BK_MANIFEST = {
   },
   "roach_idle": {
    "url": "assets/sprites/roach_idle.png",
-   "fw": 42,
+   "fw": 40,
    "fh": 48,
    "frames": 4,
    "fps": 6
   },
   "roach_idle_blue": {
    "url": "assets/sprites/roach_idle_blue.png",
-   "fw": 42,
+   "fw": 40,
    "fh": 48,
    "frames": 4,
    "fps": 6
   },
   "roach_idle_mint": {
    "url": "assets/sprites/roach_idle_mint.png",
-   "fw": 42,
+   "fw": 40,
    "fh": 48,
    "frames": 4,
    "fps": 6
   },
   "roach_idle_pink": {
    "url": "assets/sprites/roach_idle_pink.png",
-   "fw": 42,
+   "fw": 40,
    "fh": 48,
    "frames": 4,
    "fps": 6
   },
   "roach_idle_gold": {
    "url": "assets/sprites/roach_idle_gold.png",
-   "fw": 42,
+   "fw": 40,
    "fh": 48,
    "frames": 4,
    "fps": 6
   },
   "roach_idle_night": {
    "url": "assets/sprites/roach_idle_night.png",
-   "fw": 42,
+   "fw": 40,
    "fh": 48,
    "frames": 4,
    "fps": 6
@@ -976,84 +976,84 @@ window.BK_MANIFEST = {
   },
   "tiger_run": {
    "url": "assets/sprites/tiger_run.png",
-   "fw": 50,
+   "fw": 52,
    "fh": 41,
    "frames": 6,
    "fps": 12
   },
   "tiger_run_blue": {
    "url": "assets/sprites/tiger_run_blue.png",
-   "fw": 50,
+   "fw": 52,
    "fh": 41,
    "frames": 6,
    "fps": 12
   },
   "tiger_run_mint": {
    "url": "assets/sprites/tiger_run_mint.png",
-   "fw": 50,
+   "fw": 52,
    "fh": 41,
    "frames": 6,
    "fps": 12
   },
   "tiger_run_pink": {
    "url": "assets/sprites/tiger_run_pink.png",
-   "fw": 50,
+   "fw": 52,
    "fh": 41,
    "frames": 6,
    "fps": 12
   },
   "tiger_run_gold": {
    "url": "assets/sprites/tiger_run_gold.png",
-   "fw": 50,
+   "fw": 52,
    "fh": 41,
    "frames": 6,
    "fps": 12
   },
   "tiger_run_night": {
    "url": "assets/sprites/tiger_run_night.png",
-   "fw": 50,
+   "fw": 52,
    "fh": 41,
    "frames": 6,
    "fps": 12
   },
   "seahorse_idle": {
    "url": "assets/sprites/seahorse_idle.png",
-   "fw": 34,
+   "fw": 32,
    "fh": 42,
    "frames": 4,
    "fps": 6
   },
   "seahorse_idle_blue": {
    "url": "assets/sprites/seahorse_idle_blue.png",
-   "fw": 34,
+   "fw": 32,
    "fh": 42,
    "frames": 4,
    "fps": 6
   },
   "seahorse_idle_mint": {
    "url": "assets/sprites/seahorse_idle_mint.png",
-   "fw": 34,
+   "fw": 32,
    "fh": 42,
    "frames": 4,
    "fps": 6
   },
   "seahorse_idle_pink": {
    "url": "assets/sprites/seahorse_idle_pink.png",
-   "fw": 34,
+   "fw": 32,
    "fh": 42,
    "frames": 4,
    "fps": 6
   },
   "seahorse_idle_gold": {
    "url": "assets/sprites/seahorse_idle_gold.png",
-   "fw": 34,
+   "fw": 32,
    "fh": 42,
    "frames": 4,
    "fps": 6
   },
   "seahorse_idle_night": {
    "url": "assets/sprites/seahorse_idle_night.png",
-   "fw": 34,
+   "fw": 32,
    "fh": 42,
    "frames": 4,
    "fps": 6
@@ -1102,87 +1102,94 @@ window.BK_MANIFEST = {
   },
   "polar_idle": {
    "url": "assets/sprites/polar_idle.png",
-   "fw": 36,
+   "fw": 34,
    "fh": 43,
    "frames": 4,
    "fps": 6
   },
   "polar_idle_blue": {
    "url": "assets/sprites/polar_idle_blue.png",
-   "fw": 36,
+   "fw": 34,
    "fh": 43,
    "frames": 4,
    "fps": 6
   },
   "polar_idle_mint": {
    "url": "assets/sprites/polar_idle_mint.png",
-   "fw": 36,
+   "fw": 34,
    "fh": 43,
    "frames": 4,
    "fps": 6
   },
   "polar_idle_pink": {
    "url": "assets/sprites/polar_idle_pink.png",
-   "fw": 36,
+   "fw": 34,
    "fh": 43,
    "frames": 4,
    "fps": 6
   },
   "polar_idle_gold": {
    "url": "assets/sprites/polar_idle_gold.png",
-   "fw": 36,
+   "fw": 34,
    "fh": 43,
    "frames": 4,
    "fps": 6
   },
   "polar_idle_night": {
    "url": "assets/sprites/polar_idle_night.png",
-   "fw": 36,
+   "fw": 34,
    "fh": 43,
    "frames": 4,
    "fps": 6
   },
   "polar_run": {
    "url": "assets/sprites/polar_run.png",
-   "fw": 38,
+   "fw": 36,
    "fh": 42,
    "frames": 6,
    "fps": 12
   },
   "polar_run_blue": {
    "url": "assets/sprites/polar_run_blue.png",
-   "fw": 38,
+   "fw": 36,
    "fh": 42,
    "frames": 6,
    "fps": 12
   },
   "polar_run_mint": {
    "url": "assets/sprites/polar_run_mint.png",
-   "fw": 38,
+   "fw": 36,
    "fh": 42,
    "frames": 6,
    "fps": 12
   },
   "polar_run_pink": {
    "url": "assets/sprites/polar_run_pink.png",
-   "fw": 38,
+   "fw": 36,
    "fh": 42,
    "frames": 6,
    "fps": 12
   },
   "polar_run_gold": {
    "url": "assets/sprites/polar_run_gold.png",
-   "fw": 38,
+   "fw": 36,
    "fh": 42,
    "frames": 6,
    "fps": 12
   },
   "polar_run_night": {
    "url": "assets/sprites/polar_run_night.png",
-   "fw": 38,
+   "fw": 36,
    "fh": 42,
    "frames": 6,
    "fps": 12
+  },
+  "crow_fly": {
+   "url": "assets/sprites/crow_fly.png",
+   "fw": 48,
+   "fh": 48,
+   "frames": 2,
+   "fps": 6
   }
  },
  "images": {

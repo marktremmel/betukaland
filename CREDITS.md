@@ -1,7 +1,7 @@
 # Credits
 
 Art
-- Ansimuz, Legacy Collection: Sunny Land (bunny, frog, mushroom, dragon, colourful tileset), Tiny RPG Battle Sprites (Frog Knight), Gothicvania (mutant toad). https://ansimuz.itch.io
+- Ansimuz, Legacy Collection: Sunny Land (bunny, frog, mushroom, dragon, colourful tileset), Tiny RPG Battle Sprites (Frog Knight), Gothicvania (mutant toad, crow). https://ansimuz.itch.io
 - Crabby Beach Assets Pack (crabs, coins, hearts, sign, effects).
 - Berie's Adventure: Seaside (gull, sandbug, starfish, octopus, shell, Karou, big bird, chest, effects).
 - Complete UI Essential Pack by Crusenho, licensed CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). https://crusenho.itch.io. Pieces used unchanged, cut into 9-slice frames.

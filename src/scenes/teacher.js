@@ -147,9 +147,12 @@ BK.TeacherScene = class extends Phaser.Scene {
       (rows || '<tr><td colspan="13">No profiles yet.</td></tr>') + '</tbody></table></div>' +
       '<p id="msg" class="msg"></p>' +
       '<div class="row"><button id="csv">Export CSV</button><button id="imp">Import save files</button><input type="file" id="fi" multiple accept=".json" style="display:none">' +
-      '<button id="pin" class="secondary">Change PIN</button><button id="close" class="secondary">Close</button></div>');
+      '<button id="pin" class="secondary">Change PIN</button><button id="hw" class="secondary">Halloween Night: ' + (BK.save.halloween() ? 'on' : 'off') + '</button>' +
+      '<button id="close" class="secondary">Close</button></div>' +
+      '<p class="small">Halloween Night adds a button on every child\'s map on this computer: four friendly spooky stages with the keys the child already knows, and the Pumpkin King, who gives a pet. Normal progress is not changed.</p>');
     el.querySelector('#close').onclick = function () { s.back(); };
     el.querySelector('#pin').onclick = function () { s.gate(true); };
+    el.querySelector('#hw').onclick = function () { BK.save.halloween(!BK.save.halloween()); s.dashboard(); };
     el.querySelector('#csv').onclick = function () { s.exportCsv(); };
     var fi = el.querySelector('#fi');
     el.querySelector('#imp').onclick = function () { fi.click(); };

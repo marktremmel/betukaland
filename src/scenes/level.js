@@ -5,7 +5,7 @@
  * text -> it plays its ending -> walk on ... -> results.
  * Nothing can fail: creatures stop and wait, bridges only wobble.
  *
- * data: { region: 1, level: 0..3 | 'daily', seed (optional) }
+ * data: { region: 1, level: 0..3 | 'daily' | a practice mode | 'halloween' (with stage 0..3), seed (optional) }
  */
 BK.LevelScene = class extends Phaser.Scene {
   constructor() { super('Level'); }
@@ -14,13 +14,14 @@ BK.LevelScene = class extends Phaser.Scene {
     this.regionId = data.region || 1;
     this.levelIdx = data.level === undefined ? 0 : data.level;
     this.daily = this.levelIdx === 'daily';
-    this.practiceMode = ['practice', 'story', 'weak', 'endless'].indexOf(this.levelIdx) >= 0 ? this.levelIdx : null;
+    this.practiceMode = ['practice', 'story', 'weak', 'endless', 'halloween'].indexOf(this.levelIdx) >= 0 ? this.levelIdx : null;
+    this.hwStage = data.stage || 0;
     this.endless = this.levelIdx === 'endless';
     this.storyId = data.storyId || null;
     this.profile = BK.state.profile;
     var seed = data.seed !== undefined ? data.seed : Math.floor(Math.random() * 1e9);
     this.rng = BK.util.rng(seed);
-    this.plan = BK.levelgen.build(this.regionId, this.levelIdx, this.profile, this.rng, { storyId: this.storyId });
+    this.plan = BK.levelgen.build(this.regionId, this.levelIdx, this.profile, this.rng, { storyId: this.storyId, stage: this.hwStage });
     this.queue = this.plan.encounters.slice();
     this.total = this.queue.length;
     this.doneCount = 0;
@@ -73,7 +74,7 @@ BK.LevelScene = class extends Phaser.Scene {
 
   // ------------------------------------------------------------ background
   buildBackground() {
-    var reg = this.reg = BK.REGIONS[this.regionId - 1];
+    var reg = this.reg = this.plan.reg || BK.REGIONS[this.regionId - 1];
     this.skyLayers = [];
     if (reg.backdrop) {
       // parallax backdrop (beach, mountains, canyon, moonlit forest): far layers move slowest
@@ -85,7 +86,7 @@ BK.LevelScene = class extends Phaser.Scene {
         if (this.plan.bdTint) b.setTint(this.plan.bdTint);
         this.skyLayers.push(b);
       }
-      this.night = reg.backdrop === 'moon';
+      this.night = reg.backdrop === 'moon' || reg.theme === 'halloween';
       this.dusk = !!this.plan.bdTint;
     } else {
       var n = this.plan.sky, layers = BK_MANIFEST.skies[n].length;
@@ -164,6 +165,7 @@ BK.LevelScene = class extends Phaser.Scene {
     var label = this.daily ? BK.T.daily : this.practiceMode === 'story' ? this.plan.storyTitle :
       this.practiceMode === 'weak' ? BK.T.weak + ': ' + this.plan.storyTitle :
       this.endless ? BK.T.endless + ' · 0 ' + BK.T.wordsUnit :
+      this.practiceMode === 'halloween' ? 'Halloween · ' + this.reg.name :
       this.practiceMode ? BK.T.practice + ' · ' + BK.REGIONS[this.regionId - 1].name : (BK.REGIONS[this.regionId - 1].name + ' · ' +
       (this.levelIdx === 3 ? BK.T.boss : this.regionId + '-' + (this.levelIdx + 1)));
     this.add.rectangle(BK.W / 2, 9, 140, 13, 0x2b1a14, 0.45).setDepth(259);
@@ -198,6 +200,7 @@ BK.LevelScene = class extends Phaser.Scene {
     if (this.practiceMode === 'story') msg = this.plan.storyTitle;
     if (this.practiceMode === 'weak') msg = BK.T.weak + ': ' + this.plan.storyTitle;
     if (this.endless) msg = BK.T.endless;
+    if (this.practiceMode === 'halloween') msg = this.reg.name;
     var t = BK.ui.text(this, BK.W / 2, 60, msg, { size: 2, origin: [0.5, 0.5], color: 0xfff2dc }).setDepth(400);
     this.time.delayedCall(1100, function () {
       t.destroy();
@@ -542,9 +545,10 @@ BK.LevelScene = class extends Phaser.Scene {
     var stars = 1;
     if (acc >= BK.STARS.two) stars = 2;
     if (acc >= BK.STARS.three && wpm >= target) stars = 3;
-    var bonus = stars * (this.practiceMode ? 1 : 3) + (this.levelIdx === 3 ? 10 : 0);
-    var lcode = this.daily ? -1 : ({ practice: -2, story: -3, weak: -4, endless: -5 })[this.practiceMode] || this.levelIdx;
-    var res = { r: this.regionId, l: lcode, practice: this.practiceMode, storyId: this.plan.storyId,
+    var hwBoss = this.practiceMode === 'halloween' && this.plan.boss;
+    var bonus = stars * (this.practiceMode && this.practiceMode !== 'halloween' ? 1 : 3) + (this.levelIdx === 3 || hwBoss ? 10 : 0);
+    var lcode = this.daily ? -1 : ({ practice: -2, story: -3, weak: -4, endless: -5, halloween: -6 })[this.practiceMode] || this.levelIdx;
+    var res = { r: this.regionId, l: lcode, practice: this.practiceMode, storyId: this.plan.storyId, stage: this.plan.stage,
       chars: st.chars, words: this.wordsDone, weakKeys: this.plan.weakKeys, wpm: wpm, acc: acc, stars: stars,
       ms: Math.round(performance.now() - this.startedAt), coins: bonus, earned: this.levelCoins + bonus, bonus: bonus,
       daily: this.daily, target: target, levelCoins: this.levelCoins };
@@ -558,7 +562,21 @@ BK.LevelScene = class extends Phaser.Scene {
     this.tweens.add({ targets: this.hero.sprite, x: BK.W + 40, duration: 1200, ease: 'Quad.easeIn' });
     BK.audio.sfx('v_alldone', { volume: 0.6 });
     if (this.practiceMode === 'story') this.time.delayedCall(1300, function () { s.storyRecap(res); });
+    else if (this.practiceMode === 'halloween' && this.plan.boss) this.time.delayedCall(1300, function () { s.halloweenEnd(res); });
     else this.time.delayedCall(1300, function () { s.scene.start('Results', res); });
+  }
+
+  // Halloween Night: the end of the little story, once the Pumpkin King smiles
+  halloweenEnd(res) {
+    var s = this, story = BK.HALLOWEEN_STORY[BK.uiLang === 'en' ? 'en' : 'hu'];
+    this.add.rectangle(BK.W / 2, BK.H / 2, BK.W, BK.H, 0x000000, 0.45).setDepth(900);
+    BK.ui.nine(this, 40, 24, BK.W - 80, 132, 'ui_panel2').setDepth(901);
+    BK.ui.text(this, BK.W / 2, 50, story.title, { outline: false, size: 2, origin: [0.5, 0.5], color: 0x6a2a8a }).setDepth(902);
+    BK.ui.text(this, BK.W / 2, 86, story.end, { outline: false, origin: [0.5, 0.5], width: BK.W - 124, align: 1, color: 0x4a2a18 }).setDepth(902);
+    BK.fx.confetti(this, BK.W / 2, 50);
+    BK.audio.sfx('chime');
+    var b = BK.ui.button(this, BK.W / 2, 120, BK.T.next + ' (Enter)', function () { s.scene.start('Results', res); }, { w: 86, h: 18, key: 'ENTER' });
+    b.setDepth && b.setDepth(902);
   }
 
   // The whole story on one page, read back once it is typed

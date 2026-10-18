@@ -149,6 +149,13 @@ BK.save = (function () {
       var cr = p.crowns[res.r] || (p.crowns[res.r] = [0, 0, 0, 0]);
       if (!cr[res.l]) { cr[res.l] = 1; res.crownNew = true; }
     }
+    if (res.practice === 'halloween') {
+      // Halloween Night: stars per stage on this computer (not in the save code); the King gives a pet
+      var hw = p.halloween || (p.halloween = { stars: [0, 0, 0, 0] });
+      hw.stars[res.stage] = Math.max(hw.stars[res.stage] || 0, res.stars);
+      var pet = BK.HALLOWEEN.pet;
+      if (res.stage === 3 && p.pets.indexOf(pet) < 0) { p.pets.push(pet); res.newPet = pet; }
+    }
     if (res.practice === 'endless') { res.prevEndless = p.best.endless; p.best.endless = Math.max(p.best.endless, res.words || 0); }
     p.coins = Math.min(16000, p.coins + (res.coins || 0));
     p.history.push({ d: BK.util.today(), r: res.r, l: res.l, wpm: Math.round(res.wpm * 10) / 10,
@@ -305,5 +312,7 @@ BK.save = (function () {
     },
     pinHash: pinHash,
     teacher: function () { return load().teacher; },
+    // Halloween Night on this computer (Teacher screen switch)
+    halloween: function (v) { var t = load().teacher; if (v !== undefined) { t.halloween = !!v; persist(); } return !!t.halloween; },
   };
 })();

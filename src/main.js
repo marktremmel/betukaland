@@ -27,7 +27,7 @@
 
   // every scene: camera shows the 384x216 world at BK.RES
   var scenes = [BK.BootScene, BK.TitleScene, BK.CreditsScene, BK.ProfilesScene, BK.NewProfileScene, BK.PlacementScene,
-    BK.MapScene, BK.PracticeScene, BK.LevelScene, BK.ResultsScene, BK.ShopScene, BK.BagScene, BK.SettingsScene, BK.TeacherScene];
+    BK.MapScene, BK.PracticeScene, BK.LevelScene, BK.ResultsScene, BK.ShopScene, BK.BagScene, BK.SettingsScene, BK.TeacherScene, BK.HalloweenScene];
   scenes.forEach(function (C) {
     var create = C.prototype.create;
     C.prototype.create = function () {

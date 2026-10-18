@@ -147,6 +147,10 @@ BK.MapScene = class extends Phaser.Scene {
       var x = 286 + (i % 2) * 64, y = 140 + Math.floor(i / 2) * 24;
       var b = BK.ui.button(s, x, y, it[0], it[1], { w: 62, h: 20 });
     });
+    // Halloween Night, while the teacher has it switched on
+    if (BK.save.halloween()) {
+      BK.ui.button(s, 318, 114, 'Halloween', function () { BK.audio.sfx('chime'); s.scene.start('Halloween'); }, { w: 126, h: 18, color: 0xb8480c });
+    }
   }
 
   openOverlay(name) {

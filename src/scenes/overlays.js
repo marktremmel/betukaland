@@ -50,7 +50,8 @@ BK.ShopScene = class extends BK.OverlayBase {
     this.keepD(this.add.rectangle(b.x + 76 + this.tab * 70, b.y + 46, 68, 20).setStrokeStyle(1, 0x9a3d1a));
     this.karou.setVisible(this.tab !== 2);
     if (this.tab === 2) { this.drawFigures(); return; }
-    var list = this.tab === 0 ? BK.OUTFITS : BK.PETS;
+    // reward pets (Halloween) are not for sale; they show once the child has one
+    var list = this.tab === 0 ? BK.OUTFITS : BK.PETS.filter(function (p) { return !p.reward || P.pets.indexOf(p.id) >= 0; });
     list.forEach(function (it, i) {
       var col = i % 3, row = Math.floor(i / 3);
       var x = b.x + 16 + col * 92, y = b.y + 58 + row * 56;

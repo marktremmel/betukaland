@@ -12,7 +12,7 @@ BK.ResultsScene = class extends Phaser.Scene {
     BK.menuBackground(this, 2, { groundY: 200 });
     BK.audio.music(BK.MUSIC.map);
     BK.ui.nine(this, 16, 4, 352, 182, 'ui_panel2');
-    var modeName = { practice: BK.T.practice, weak: BK.T.weak, endless: BK.T.endless }[r.practice];
+    var modeName = { practice: BK.T.practice, weak: BK.T.weak, endless: BK.T.endless, halloween: 'Halloween' }[r.practice];
     var head = r.daily ? BK.T.daily + BK.L(': kész!', ': done!') : modeName ? modeName + BK.L(': kész!', ': done!') : BK.T.results;
     BK.ui.text(this, 192, 35, head, { outline: false, size: 2, origin: [0.5, 0.5] });
 
@@ -83,6 +83,7 @@ BK.ResultsScene = class extends Phaser.Scene {
     }
     this.chart(196, 52, 160, 92, P.history.slice(-12));
 
+    if (r.practice === 'halloween') { this.halloweenButtons(r); return; }
     if (r.daily || r.practice) { this.practiceButtons(r); return; }
     var nextLevel = (r.l < 3) ? r.l + 1 : null, nextRegion = r.r;
     if (!r.daily && r.l === 3 && r.r < BK.REGIONS.length && BK.save.regionOpen(P, r.r + 1)) {
@@ -115,6 +116,23 @@ BK.ResultsScene = class extends Phaser.Scene {
     BK.ui.button(this, 306, 196, BK.T.next + ' (Enter)', function () { s.scene.start('Practice', { tab: tab, mode: mode }); }, { w: 86, h: 18, key: 'ENTER' });
   }
 
+  // Halloween Night: again, the next stage, or back to the Halloween page
+  halloweenButtons(r) {
+    var s = this, P = BK.state.profile, last = r.stage >= 3;
+    if (last) {
+      BK.fx.confetti(this, 192, 60);
+      if (r.newPet) {
+        var pd = BK.PETS.find(function (p) { return p.id === r.newPet; });
+        this.time.delayedCall(1600, function () { BK.ui.toast(s, 192, 160, BK.L('Új kedvenc: ', 'New pet: ') + pd.name + '!', 0xffd23c, 1, 2400); BK.audio.sfx('level_up', { volume: 0.5 }); });
+      }
+    }
+    BK.ui.button(this, 78, 196, BK.T.retry, function () { s.scene.start('Level', { region: r.r, level: 'halloween', stage: r.stage }); }, { w: 66, h: 18 });
+    BK.ui.button(this, 192, 196, BK.T.map, function () { s.scene.start('Map'); }, { w: 66, h: 18, key: 'ESC' });
+    BK.ui.button(this, 306, 196, BK.T.next + ' (Enter)', function () {
+      if (last) s.scene.start('Halloween'); else s.scene.start('Halloween', { sel: r.stage + 1 });
+    }, { w: 86, h: 18, key: 'ENTER' });
+  }
+
   // WPM line + accuracy bars for the last levels
   chart(x, y, w, h, hist) {
     var g = this.add.graphics();
@@ -124,7 +142,7 @@ BK.ResultsScene = class extends Phaser.Scene {
     for (var gy = 0; gy <= 4; gy++) g.lineBetween(x, y + 4 + gy * (h - 20) / 4, x + w, y + 4 + gy * (h - 20) / 4);
     if (!hist.length) return;
     var maxW = Math.max(10, Math.max.apply(null, hist.map(function (h) { return h.wpm; })) * 1.15);
-    var n = hist.length, step = w / 12, base = y + h - 16, top = y + 4;
+    var n = hist.length, step = w / 12, base = y + h - 16, top = y + 4, x0 = x;
     x += (12 - n) * step;   // newest level always on the right
     // accuracy bars (light), WPM line (dark)
     hist.forEach(function (hh, i) {
@@ -142,7 +160,7 @@ BK.ResultsScene = class extends Phaser.Scene {
       var px = x + i * step + step / 2, py = base - (base - top) * hh.wpm / maxW;
       g.fillStyle(0x9a3d1a, 1).fillRect(Math.round(px) - 1, Math.round(py) - 1, 3, 3);
     });
-    BK.ui.text(this, x, base + 3, BK.L('oszlop: pontosság\nvonal: szó/perc', 'bars: accuracy\nline: words/min'), { outline: false, color: 0x6b3a20 });
+    BK.ui.text(this, x0, base + 3, BK.L('oszlop: pontosság\nvonal: szó/perc', 'bars: accuracy\nline: words/min'), { outline: false, color: 0x6b3a20 });
     BK.ui.text(this, x - 2, top, String(Math.round(maxW)), { outline: false, origin: [1, 0], color: 0x9a3d1a });
   }
 };

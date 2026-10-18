@@ -5,3 +5,4 @@ push_to_github.command
 itch/*.zip
 new_animals/*.png
 !new_animals/style_reference.png
+halloween/*.png
