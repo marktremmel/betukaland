@@ -7,6 +7,8 @@
 // Run "python3 tools/check_words.py" to see how many words each region gets.
 window.BK_WORDS_HU = `
 kés kék fél dél fék lék séf kél lé sas dal fal falak falka kakas laska dada sakk lakk jaj adj add akad fakad kas alj
+dalak fajd lakj kaja kajak sakkal salak kakasdal
+gép egér ég hal halak kapu kapuk kard kardok part lufi lufik pite tészta szép szél szia szeret szekér hupikék iskola kréta festék lepkék hiéna kéz fog has
 kalap lap lepke kert kertek kerti tej tea tigris tigrisek pipa papa ruha haj fej hegy hegyek hegyi este reggel
 kifli kiflik liget lift dupla repked fut ugrik ugrat tart juh juhok jut sereg tojik hold toll tolla kis kiskert
 ugat pipi tipeg topog totyog fagyi fagy hideg huhog hely helyes jegy keret kerek kettes lila pici picike piros
@@ -36,6 +38,8 @@ repül talál lát segít nyávog lassú jön kabát nadrág radír papír oszt�
 // Sentences. Lowercase ones are used before capitals are taught.
 // A sentence is used only when every character in it is unlocked.
 window.BK_SENTENCES_HU = [
+  // more for Region 1 (a s d f j k l é)
+  'a kajak kék', 'a fajd fél', 'a kakas jaj', 'jaj a kés', 'a dada sakk', 'kék kajak', 'a kakasdal',
   // region 1 (a s d f j k l é)
   "a kék sas fél", "a kakas fél", "a falka akad", "a sas kél", "kék dal", "a kés kék",
   "jaj a sas", "a lakk kék", "fél a falka", "a kakas dala", "a sas dala", "a séf fél",

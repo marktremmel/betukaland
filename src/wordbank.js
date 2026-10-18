@@ -140,7 +140,8 @@ BK.wordbank = (function () {
   Picker.prototype._fresh = function (tok) {
     if (this.recent.indexOf(tok) >= 0) return false;
     this.recent.push(tok);
-    if (this.recent.length > 10) this.recent.shift();
+    // remember about half of what this region can offer (at most 24), so a small word list repeats less
+    if (this.recent.length > Math.max(6, Math.min(24, Math.floor((this.words ? this.words.length : 20) / 2)))) this.recent.shift();
     return true;
   };
 

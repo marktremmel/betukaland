@@ -6,7 +6,7 @@
  */
 window.BK = window.BK || {};
 
-BK.VERSION = '0.9.0';
+BK.VERSION = '0.9.2';
 
 // Test mode for the teacher: open the game with ?debug at the end of the address.
 // Every region and level is open; in a level Tab finishes the current word and
@@ -79,6 +79,19 @@ BK.setLayout = function (id) {
 };
 BK.setLayout('hu');
 
+// How to type a mark that is not on a plain key (shown under the Pumpkin King's
+// bubbles). Shift marks come from the layout; AltGr marks are for the Hungarian
+// PC layout (on a Mac: Option, and some keys differ).
+BK.ALTGR_HU = { '@': 'V', '#': 'X', '&': 'C', '$': 'É', '€': 'U', '<': 'Í', '>': 'Y', ';': ',', '*': '-', '[': 'F', ']': 'G', '{': 'B', '}': 'N' };
+BK.keyHint = function (ch) {
+  var base = BK.SHIFT_MAP[ch];
+  if (base) return 'Shift + ' + base.toUpperCase();
+  if (BK.layout.id === 'hu' && BK.ALTGR_HU[ch]) return 'AltGr + ' + BK.ALTGR_HU[ch];
+  return '';
+};
+// The marks the Pumpkin King sends, by grade band (the US keyboard has no €)
+BK.HW_SPECIALS = { '3-4': ['!', '?', ':', '-', '(', ')', ',', '@'], '5-6': ['#', '$', '€', '&', ';', '/', '<', '>', '=', '%'] };
+
 // Fingers: 0..3 left pinky..index, 4..7 right index..pinky, 8 thumbs
 BK.FINGER_NAMES = ['bal kisujj', 'bal gyűrűsujj', 'bal középső ujj', 'bal mutatóujj',
   'jobb mutatóujj', 'jobb középső ujj', 'jobb gyűrűsujj', 'jobb kisujj', 'hüvelykujj'];
@@ -138,8 +151,8 @@ BK.HALLOWEEN = {
     { name: 'Denevérhíd', en: 'Bat Bridge', walkers: ['pumpkin', 'cat', 'ghost'], flyers: ['bat'], sky: 3, mini: 'mummy' },
     { name: 'A Tökkirály kertje', en: 'The Pumpkin King\'s Garden', walkers: ['ghost', 'pumpkin', 'cat'], flyers: ['bat'], sky: 7,
       boss: 'king', bossName: 'Tökkirály', bossNameEn: 'Pumpkin King',
-      bossIntro: 'Itt a Tökkirály! Üres a kosara...', bossIntroEn: 'Here is the Pumpkin King! His basket is empty...',
-      bossOutro: 'A Tökkirály nevet, és cukrot oszt!', bossOutroEn: 'The Pumpkin King laughs and hands out candy!' },
+      bossIntro: 'Itt a morcos Tökkirály! Kapd el a jeleit!', bossIntroEn: 'Here is the grumpy Pumpkin King! Catch his marks!',
+      bossOutro: 'A Tökkirály elneveti magát!', bossOutroEn: 'The Pumpkin King bursts out laughing!' },
   ],
   look: { backdrop: null, ground: 'ground', groundTint: 0x8070b0, decor: null, music: ['m_moon'], bossMusic: 'm_boss' },
   pet: 'bat',             // the reward for making the King smile
@@ -223,24 +236,33 @@ Object.defineProperty(BK, 'FONT', { get: function () {
 // Scene music
 BK.MUSIC = { title: 'm_title', map: 'm_map', boss: 'm_boss', chill: 'm_chill', test: 'm_test' };
 
-// Shop: the magic the hero sends at each correct key. A shape and a colour set,
-// bought separately (dot and classic are free). Order is fixed: the save code
-// stores them by position, so new ones go at the END.
+// Shop: the magic the hero sends at each correct key. A shape and a colour,
+// bought separately (the wave and the classic yellow are free). The order is
+// fixed: the save code stores them by position, so new ones go at the END.
+// (v0.9.0 had dot, box and wave at positions 0, 2 and 4.)
 BK.SHOT_SHAPES = [
-  { id: 'dot', name: 'Pötty', en: 'Dot', price: 0 },
+  { id: 'wave', name: 'Hullám', en: 'Wave', price: 0 },
   { id: 'star', name: 'Csillag', en: 'Star', price: 30 },
-  { id: 'box', name: 'Kocka', en: 'Box', price: 20 },
+  { id: 'code', name: 'Kód', en: 'Code', price: 40 },
   { id: 'sparkle', name: 'Szikra', en: 'Sparkle', price: 40 },
-  { id: 'wave', name: 'Hullám', en: 'Wave', price: 50 },
+  { id: 'comet', name: 'Üstökös', en: 'Comet', price: 50 },
   { id: 'bolt', name: 'Villám', en: 'Lightning', price: 60 },
   { id: 'grav', name: 'Gravihullám', en: 'Grav wave', price: 80 },
 ];
+// Colour sets. In "basic" and "pastel" the child picks one of the colours
+// (fx.tone); rainbow changes colour with every shot; RTX adds glow and lens
+// flares; chrome shines like metal.
 BK.SHOT_COLOURS = [
   { id: 'classic', name: 'Klasszikus', en: 'Classic', price: 0, cols: [0xfff2a0] },
-  { id: 'basic', name: 'Alapszínek', en: 'Basic', price: 25, cols: [0xff4a4a, 0xffd23c, 0x4a8aff, 0x4ad17a] },
-  { id: 'pastel', name: 'Pasztell', en: 'Pastel', price: 35, cols: [0xffb8cc, 0xb8e4ff, 0xccf5b4, 0xfff0a8, 0xdcc6ff] },
+  { id: 'basic', name: 'Alapszínek', en: 'Basic', price: 25, pick: true,
+    cols: [0xff4a4a, 0xff9a2a, 0xffd23c, 0x4ad17a, 0x3ad0e0, 0x4a8aff, 0xa86aff, 0xff5ab4] },
+  { id: 'pastel', name: 'Pasztell', en: 'Pastel', price: 35, pick: true,
+    cols: [0xffb8b8, 0xffd2a8, 0xfff0a8, 0xc8f2b4, 0xb4ecf0, 0xb8d4ff, 0xdcc6ff, 0xffc4e4] },
   { id: 'rainbow', name: 'Szivárvány', en: 'Rainbow', price: 60, rainbow: true },
+  { id: 'rtx', name: 'RTX', en: 'RTX', price: 80, cols: [0xfff8e8], rtx: true },
+  { id: 'chrome', name: 'Króm', en: 'Chrome', price: 70, cols: [0xc8d0dc], chrome: true },
 ];
+BK.FX_DEFAULT = function () { return { v: 2, shape: 'wave', colour: 'classic', tone: 0, owned: ['wave', 'classic'] }; };
 
 // Shop catalogue: outfits (recoloured hero) and pets
 BK.OUTFITS = [

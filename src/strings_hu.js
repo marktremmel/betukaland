@@ -118,7 +118,7 @@ BK.STR.hu = {
   slowDown: 'Tipp: lassíts egy kicsit, a pontosság a fontosabb!',
   bestChart: 'Az utolsó pályáid',
 
-  buy: 'Veszem',
+  buy: 'Vásárlás',
   owned: 'Megvan',
   wear: 'Felveszem',
   wearing: 'Rajtad',

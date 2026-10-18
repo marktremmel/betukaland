@@ -200,7 +200,7 @@ BK.LevelScene = class extends Phaser.Scene {
     if (this.practiceMode === 'story') msg = this.plan.storyTitle;
     if (this.practiceMode === 'weak') msg = BK.T.weak + ': ' + this.plan.storyTitle;
     if (this.endless) msg = BK.T.endless;
-    if (this.practiceMode === 'halloween') msg = this.reg.name;
+    if (this.practiceMode === 'halloween') { this.halloweenIntro(); return; }
     var t = BK.ui.text(this, BK.W / 2, 60, msg, { size: 2, origin: [0.5, 0.5], color: 0xfff2dc }).setDepth(400);
     this.time.delayedCall(1100, function () {
       t.destroy();
@@ -354,6 +354,12 @@ BK.LevelScene = class extends Phaser.Scene {
     if (ch !== expected && ch.toLowerCase() === expected && e.getModifierState && e.getModifierState('CapsLock') && !this.capsWarned) {
       this.capsWarned = true;
       BK.ui.toast(this, BK.W / 2, 80, BK.T.capsOn, 0xffd23c);
+    }
+    // a special-character bubble from the boss is caught first
+    if (this.enc.trySpecial && this.enc.trySpecial(ch)) {
+      this.stats.correct++; this.stats.chars++;
+      BK.audio.sfx('key_ok', { volume: 0.5, detune: 600 });
+      return;
     }
     var res = this.enc.type(ch);
     var ok = res !== 'bad';
@@ -562,21 +568,50 @@ BK.LevelScene = class extends Phaser.Scene {
     this.tweens.add({ targets: this.hero.sprite, x: BK.W + 40, duration: 1200, ease: 'Quad.easeIn' });
     BK.audio.sfx('v_alldone', { volume: 0.6 });
     if (this.practiceMode === 'story') this.time.delayedCall(1300, function () { s.storyRecap(res); });
-    else if (this.practiceMode === 'halloween' && this.plan.boss) this.time.delayedCall(1300, function () { s.halloweenEnd(res); });
+    else if (this.practiceMode === 'halloween') this.time.delayedCall(1300, function () { s.halloweenEnd(res); });
     else this.time.delayedCall(1300, function () { s.scene.start('Results', res); });
   }
 
-  // Halloween Night: the end of the little story, once the Pumpkin King smiles
+  // Halloween Night: the story before each stage (Enter starts)
+  halloweenIntro() {
+    var s = this, story = BK.HALLOWEEN_STORY[BK.uiLang === 'en' ? 'en' : 'hu'], ui = [];
+    var keep = function (o) { ui.push(o); if (o.zone) ui.push(o.zone); return o; };
+    keep(BK.ui.nine(this, 40, 18, BK.W - 80, 110, 'ui_panel2').setDepth(401));
+    keep(BK.ui.text(this, BK.W / 2, 42, this.reg.name, { outline: false, size: 2, origin: [0.5, 0.5], color: 0x6a2a8a }).setDepth(402));
+    keep(BK.ui.text(this, BK.W / 2, 74, story.stages[this.plan.stage], { outline: false, origin: [0.5, 0.5], width: BK.W - 124, align: 1, color: 0x4a2a18 }).setDepth(402));
+    var b = keep(BK.ui.button(this, BK.W / 2, 106, BK.T.go + ' (Enter)', function () {
+      ui.forEach(function (o) { o.destroy(); });
+      BK.audio.sfx('v_letsgo', { volume: 0.6 });
+      s.beginWalk();
+    }, { w: 86, h: 18, key: 'ENTER' }));
+    b.setDepth && b.setDepth(402);
+  }
+
+  // Halloween Night: what happened, after each stage; the ending (with everyone dancing) after the King
   halloweenEnd(res) {
-    var s = this, story = BK.HALLOWEEN_STORY[BK.uiLang === 'en' ? 'en' : 'hu'];
+    var s = this, story = BK.HALLOWEEN_STORY[BK.uiLang === 'en' ? 'en' : 'hu'], last = this.plan.stage >= 3;
     this.add.rectangle(BK.W / 2, BK.H / 2, BK.W, BK.H, 0x000000, 0.45).setDepth(900);
-    BK.ui.nine(this, 40, 24, BK.W - 80, 132, 'ui_panel2').setDepth(901);
-    BK.ui.text(this, BK.W / 2, 50, story.title, { outline: false, size: 2, origin: [0.5, 0.5], color: 0x6a2a8a }).setDepth(902);
-    BK.ui.text(this, BK.W / 2, 86, story.end, { outline: false, origin: [0.5, 0.5], width: BK.W - 124, align: 1, color: 0x4a2a18 }).setDepth(902);
-    BK.fx.confetti(this, BK.W / 2, 50);
+    var top = last ? 8 : 30, h = last ? 168 : 110;
+    BK.ui.nine(this, 32, top, BK.W - 64, h, 'ui_panel2').setDepth(901);
+    BK.ui.text(this, BK.W / 2, top + 22, last ? story.title : this.reg.name, { outline: false, size: 2, origin: [0.5, 0.5], color: 0x6a2a8a }).setDepth(902);
+    BK.ui.text(this, BK.W / 2, top + (last ? 34 : 38), last ? story.end : story.after[this.plan.stage],
+      { outline: false, origin: [0.5, 0], width: BK.W - 100, align: 1, color: 0x4a2a18, px: last ? 9 : undefined }).setDepth(902);
+    if (last) {
+      // the guests dance at the party
+      var S = BK_MANIFEST.sprites, guests = ['hw_ghost_float', 'hw_bat_fly', 'hw_cat_walk', 'hw_king_idle', 'hw_mummy_walk', 'hw_pumpkin_walk'].filter(function (k) { return S[k]; });
+      guests.forEach(function (k, i) {
+        var x = 70 + i * (244 / Math.max(1, guests.length - 1)), g = s.add.sprite(x, top + h - 30, k).setOrigin(0.5, 1).setDepth(903);
+        g.play(k);
+        if (g.height > 40) g.setScale(40 / g.height);
+        s.tweens.add({ targets: g, y: g.y - 5, duration: 300 + i * 40, yoyo: true, repeat: -1, ease: 'Sine.easeInOut', delay: i * 90 });
+        s.tweens.add({ targets: g, angle: { from: -6, to: 6 }, duration: 420, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+      });
+      BK.fx.confetti(this, BK.W / 2, 40);
+      this.time.addEvent({ delay: 1200, repeat: 4, callback: function () { BK.fx.confetti(s, 60 + Math.random() * 264, 30 + Math.random() * 40); } });
+    }
     BK.audio.sfx('chime');
-    var b = BK.ui.button(this, BK.W / 2, 120, BK.T.next + ' (Enter)', function () { s.scene.start('Results', res); }, { w: 86, h: 18, key: 'ENTER' });
-    b.setDepth && b.setDepth(902);
+    var b = BK.ui.button(this, BK.W / 2, top + h - 17, BK.T.next + ' (Enter)', function () { s.scene.start('Results', res); }, { w: 86, h: 18, key: 'ENTER' });
+    b.setDepth && b.setDepth(904);
   }
 
   // The whole story on one page, read back once it is typed

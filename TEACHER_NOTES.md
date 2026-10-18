@@ -1,6 +1,6 @@
 # Betűkaland (Typing Adventure): teacher notes
 
-Version 0.9.0: all seven regions are playable, each with three levels and a boss, plus a practice corner (daily goals with a streak, sentence practice, a tricky-letter drill, the endless road, and a storybook) and crowns to win on every level of a finished region. The menus can be Hungarian or English, the text uses a font made for young readers (three to choose from), and the keyboard can be Hungarian or US English. Title screen, player profiles with a choice of thirteen figures, placement test, world map, shop, rest spots, results with stars and a chart, saving with a code and a file, the teacher screen with CSV export, and credits.
+Version 0.9.2: all seven regions are playable, each with three levels and a boss, plus a practice corner (daily goals with a streak, sentence practice, a tricky-letter drill, the endless road, and a storybook) and crowns to win on every level of a finished region. The menus can be Hungarian or English, the text uses a font made for young readers (three to choose from), and the keyboard can be Hungarian or US English. Title screen, player profiles with a choice of thirteen figures, placement test, world map, shop, rest spots, results with stars and a chart, saving with a code and a file, the teacher screen with CSV export, and credits.
 
 ## Running it
 
@@ -81,7 +81,11 @@ Coins from every creature, chest and boss; treasures (fruit and sweets icons) in
 
 ## Magic shots (shop, Varázs tab)
 
-At every correct key a little magic flies from the hero to the creature. In the shop's Varázs (Magic) tab a child chooses its shape and its colours separately. Shapes: Pötty (dot, free), Csillag (star) 30, Kocka (box) 20, Szikra (sparkle) 40, Hullám (wave) 50, Villám (lightning) 60, Gravihullám (rings that roll out where they land) 80. Colours: Klasszikus (free), Alapszínek 25, Pasztell 35, Szivárvány (rainbow) 60. A click shows a test shot; the button buys it or puts it in use. Everything bought is in the save code (version 4 since v0.9; older codes still load).
+At every correct key a little magic flies from the hero to the creature. In the shop's Varázs (Magic) tab a child chooses its shape and its colour separately; the shape pictures always show the colour in use.
+
+Shapes: Hullám (wave, free, the standard), Csillag (spinning star) 30, Kód (bits of code streaming to the target, like in the films) 40, Szikra (sparkle with a trail) 40, Üstökös (comet with a tail of embers) 50, Villám (lightning) 60, Gravihullám (rings that roll out where they land) 80.
+
+Colours: Klasszikus (yellow, free); Alapszínek 25 and Pasztell 35, where the child then picks one of eight colours; Szivárvány (a new colour every shot) 60; RTX 80 (glowing light and a lens flare where it lands, like a game camera); Króm 70 (shiny metal with a glint). A click shows a test shot; the button buys it or puts it in use. Everything bought is in the save code (version 5 since v0.9.1; older codes still load).
 
 ## Settings (per child)
 
@@ -124,9 +128,13 @@ Class 4.B suggested seven new animals. They were drawn with ChatGPT image genera
 
 The "Halloween: ki/be" button in the top left of the title screen (or "Halloween Night: off/on" in the Teacher screen) puts a Halloween button on every child's map on this computer, and "Boldog Halloweent!" on the title screen. It opens a small friendly spooky story in four stages: Tökös ösvény, Ködös erdő, Denevérhíd (with a clumsy mummy) and A Tökkirály kertje, where the Pumpkin King is grumpy because nobody came to his party. Typing his sentences makes him laugh and hand out candy, and the child gets a new pet. The stages open one after the other and give stars like levels.
 
-The typing uses the keys of the child's newest region, but at least those of region 3 (every lower-case letter), so beginners get real Halloween words too; the on-screen keyboard shows them where the new keys are. About two words in three are Halloween words (`data/halloween.js`), the rest come from the normal word bank. Capitals and accents only appear once the child has learnt them. Normal progress, stars and crowns are not touched. The Halloween stars stay on this computer and are not in the save code; the pet is. Switch it off again after Halloween; the pet stays.
+The typing uses the keys of the child's newest region, but at least those of region 3 (every lower-case letter), so beginners get real Halloween words too; the on-screen keyboard shows them where the new keys are. About two words in three are Halloween words (`data/halloween.js`), the rest come from the normal word bank. Capitals and accents only appear once the child has learnt them. Each stage starts with a short piece of the story and ends with what happened next (the ghosts come along, the witch cat finds her hat, the mummy untangles himself). The Pumpkin King says his own lines in order, grumpy at first and softer at the end, and is a longer fight than the normal bosses. Every few seconds he sends a slow bubble with a mark: grade 3-4 gets ! ? : - ( ) , @ and grade 5-6 gets # $ € & ; / < > = %. Typing the mark pops it for a coin; the hint under the bubble says which keys make it (Shift + 4, AltGr + V...; the AltGr hints are for the Hungarian PC layout, on a Mac it is Option and some keys differ; the US keyboard has no €). A bubble that reaches the hero only bumps him. The marks per grade are in `BK.HW_SPECIALS` (src/config.js). At the end all the guests dance at the party. Normal progress, stars and crowns are not touched. The Halloween stars stay on this computer and are not in the save code; the pet is. Switch it off again after Halloween; the pet stays.
 
 The characters (ghost, pumpkin head, witch cat, bat, mummy, Pumpkin King) and 25 roadside decorations (pumpkins, lanterns, the BÚ tombstone, a scarecrow, a well, crooked trees...) were drawn with ChatGPT (prompts in `halloween/HALLOWEEN_PROMPTS.md`) and cut out by `tools/clean_ai_sprites.py` into `art/halloween/`; the file names it reads are at the top of the tool, and `HW_DECOR` picks the props (characters, the skull and the coffin are left out). After changing a picture: `python3 tools/clean_ai_sprites.py`, then `python3 tools/build_assets.py --local` and `python3 tools/build_pack.py`. With Halloween on, the title screen shows the pumpkin head and the bat. The pet for the Pumpkin King is the bat.
+
+## Taking the warm-up test again
+
+A child who skipped the warm-up test (Kihagyom), or who has improved a lot, can take it again from Settings on the map: "Bemelegítés: Újra". A new result can only move the start forward; no region is ever taken away.
 
 ## Teacher screen
 

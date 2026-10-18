@@ -53,6 +53,7 @@ BK.KeyboardView = class {
   setNext(ch) {
     if (!ch) { this.next = null; this.shiftNeeded = null; this.hint.setText(''); this.draw(); return; }
     var base = BK.util.baseKey(ch);
+    if (BK.layout.id === 'hu' && BK.ALTGR_HU[ch]) base = BK.ALTGR_HU[ch].toLowerCase();   // AltGr marks: show their key
     this.next = base;
     this.shiftNeeded = null;
     if (BK.util.needsShift(ch)) {

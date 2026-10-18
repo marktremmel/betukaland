@@ -107,7 +107,8 @@ BK.PlacementScene = class extends Phaser.Scene {
 
   finish(region) {
     var P = this.P, s = this;
-    P.placed = Math.min(7, region);
+    // taking it again (Settings) can only move the start forward, never take a region away
+    P.placed = Math.max(P.placed || 0, Math.min(7, region));
     BK.save.persist();
     this.clear();
     if (this.bubble) { this.bubble.destroy(false); this.bubble = null; }

@@ -39,9 +39,15 @@ BK.levelgen = {
 
     if (li === 3 && !daily) {
       // Boss: sentences only
-      var n = band === '3-4' ? 5 : 7;
+      var n = (band === '3-4' ? 5 : 7) + (reg.theme ? 2 : 0);   // the Pumpkin King is a longer fight
       var texts = [];
-      if (reg.stories) { picker.newStory(); for (var b0 = 0; b0 < n; b0++) texts.push(picker.storyLine()); }
+      if (reg.theme === 'halloween') {
+        // the Pumpkin King says his own lines, in story order (those that fit the keys)
+        var kl = (BK.HALLOWEEN_KING[lang] || BK.HALLOWEEN_KING.hu).map(BK.util.norm).filter(function (t) { return BK.wordbank.fits(t, picker.set); });
+        if (kl.length > n) { var all = kl; kl = []; for (var q = 0; q < n; q++) kl.push(all[Math.round(q * (all.length - 1) / (n - 1))]); }   // spread over the story
+        texts = kl.slice(0, n);
+        while (texts.length < n) texts.splice(Math.max(0, texts.length - 1), 0, picker.sentence());   // fill before the last line
+      } else if (reg.stories) { picker.newStory(); for (var b0 = 0; b0 < n; b0++) texts.push(picker.storyLine()); }
       else for (var b = 0; b < n; b++) texts.push(picker.numbers && b % 2 ? picker.get('pairs') : picker.sentence());
       // a short warm-up road before the boss
       for (var w = 0; w < 4; w++) {
@@ -50,8 +56,15 @@ BK.levelgen = {
           texts: [w < 2 ? picker.get('words') : picker.get('pairs')],
           coins: w === 2 ? 3 : 1, item: w === 2 ? rng.pick(BK.ITEMS).id : undefined });
       }
+      var specials = null;
+      if (reg.theme === 'halloween') {
+        // the King sends marks to catch: slower and fewer for 3-4, faster for 5-6
+        var chars = BK.HW_SPECIALS[band] || BK.HW_SPECIALS['3-4'];
+        if (!BK.layout.accents) chars = chars.filter(function (c) { return c !== '€'; });   // no € on a US keyboard
+        specials = band === '3-4' ? { chars: chars, every: 7000, speed: 15 } : { chars: chars, every: 5000, speed: 21 };
+      }
       out.push({ kind: 'boss', creature: reg.boss, tint: reg.bossTint, texts: texts, coins: 12 + regionId * 2, maxWidth: 170,
-        name: reg.bossName, intro: reg.bossIntro, outro: reg.bossOutro });
+        name: reg.bossName, intro: reg.bossIntro, outro: reg.bossOutro, specials: specials });
       look.sky = sky; look.weather = 'clear';
       return { encounters: out, sky: sky, bdTint: bdTint, weather: 'clear', music: reg.bossMusic || 'm_boss', boss: true };
     }

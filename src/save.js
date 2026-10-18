@@ -49,7 +49,7 @@ BK.save = (function () {
       items: {},                          // item id -> count
       outfits: ['base'], outfit: 'base',
       pets: [], pet: null,
-      fx: { shape: 'dot', colour: 'classic', owned: ['dot', 'classic'] },   // the shop's magic shots
+      fx: BK.FX_DEFAULT(),                // the shop's magic shots
       keys: {},                           // per-key stats, see adaptive.js
       history: [],                        // last 100 levels
       best: { wpm: 0, acc: 0 },
@@ -77,7 +77,16 @@ BK.save = (function () {
       if (p.stories[st.id] && !huToo && !p.stories['en:' + st.id]) { p.stories['en:' + st.id] = p.stories[st.id]; delete p.stories[st.id]; }
     });
     p.crowns = p.crowns || {};             // regionId -> [l1, l2, l3, boss] 1 = crown earned
-    p.fx = p.fx || { shape: 'dot', colour: 'classic', owned: ['dot', 'classic'] };
+    p.fx = p.fx || BK.FX_DEFAULT();
+    // v0.9.0 shapes: the dot became the (free) wave, the box became code, the old wave the comet
+    var ren = { dot: 'wave', box: 'code', wave: 'comet' };
+    if (!p.fx.v) {
+      p.fx.owned = p.fx.owned.map(function (o) { return ren[o] || o; });
+      if (ren[p.fx.shape]) p.fx.shape = ren[p.fx.shape];
+      if (p.fx.owned.indexOf('wave') < 0) p.fx.owned.push('wave');
+      p.fx.v = 2;
+    }
+    p.fx.tone = p.fx.tone || 0;
     if (!(p.avatar >= 0 && p.avatar < BK.HEROES.length)) p.avatar = 0;   // figure list changed in v0.2
     return p;
   }
@@ -112,7 +121,7 @@ BK.save = (function () {
     local.best.endless = Math.max(local.best.endless || 0, inc.best.endless || 0);
     local.placed = Math.max(local.placed || 0, inc.placed || 0) || null;
     local.avatar = inc.avatar;
-    if (inc.fx) { (inc.fx.owned || []).forEach(function (o) { if (local.fx.owned.indexOf(o) < 0) local.fx.owned.push(o); }); local.fx.shape = inc.fx.shape; local.fx.colour = inc.fx.colour; }              // the figure can change, the code carries the latest choice
+    if (inc.fx) { (inc.fx.owned || []).forEach(function (o) { if (local.fx.owned.indexOf(o) < 0) local.fx.owned.push(o); }); local.fx.shape = inc.fx.shape; local.fx.colour = inc.fx.colour; local.fx.tone = inc.fx.tone || 0; }              // the figure can change, the code carries the latest choice
     ['layout', 'ui', 'font'].forEach(function (k) { if (inc.settings[k]) local.settings[k] = inc.settings[k]; });
     return local;
   }
@@ -192,10 +201,10 @@ BK.save = (function () {
   }
 
   function encode(p) {
-    // version 4 (v0.9): plus the shop's magic shots. Version 3 (v0.7): two more figure bits. Version 2 (v0.6.2) made codes shorter: the per-key skill levels are left out (the game relearns
+    // version 5 (v0.9.1): magic shots with single colours, RTX and chrome. Version 4 (v0.9): the shop's magic shots. Version 3 (v0.7): two more figure bits. Version 2 (v0.6.2) made codes shorter: the per-key skill levels are left out (the game relearns
     // them in a few rounds) and trailing zeros are dropped. Version 1 codes still load.
     var b = new Bits();
-    b.put(4, 3);
+    b.put(5, 3);
     b.put(p.avatar & 7, 3);
     b.put(p.grade === '5-6' ? 1 : 0, 1);
     b.put(p.lang === 'en' ? 1 : 0, 1);
@@ -220,12 +229,14 @@ BK.save = (function () {
     b.put(Math.max(0, BK.FONTS.findIndex(function (f) { return f.id === p.settings.font; })), 2);
     b.put(Math.min(255, (p.best && p.best.endless) || 0), 8);
     b.put((p.avatar >> 3) & 3, 2);          // v3 (v0.7): more than 8 figures
-    // v4 (v0.9): magic shots from the shop: owned shapes and colours, and the ones in use
+    // v4 (v0.9) / v5 (v0.9.1): magic shots from the shop: owned shapes (7 bits) and colour sets
+    // (6 bits), the shape, the colour set and the colour in it (tone) in use
     var fx = p.fx || {}, own = fx.owned || [];
     BK.SHOT_SHAPES.forEach(function (o) { b.put(own.indexOf(o.id) >= 0 ? 1 : 0, 1); });
     BK.SHOT_COLOURS.forEach(function (o) { b.put(own.indexOf(o.id) >= 0 ? 1 : 0, 1); });
     b.put(Math.max(0, BK.SHOT_SHAPES.findIndex(function (o) { return o.id === fx.shape; })), 3);
-    b.put(Math.max(0, BK.SHOT_COLOURS.findIndex(function (o) { return o.id === fx.colour; })), 2);
+    b.put(Math.max(0, BK.SHOT_COLOURS.findIndex(function (o) { return o.id === fx.colour; })), 3);
+    b.put((fx.tone || 0) & 7, 3);
     storyOrder().forEach(function (k) { b.put(Math.min(3, (p.stories || {})[k] || 0), 2); });
     while (b.a.length > 5 && b.a.lastIndexOf(1) < b.a.length - 5) b.a.length -= 5;   // drop trailing zero groups
     while (b.a.length % 5) b.a.push(0);
@@ -250,7 +261,7 @@ BK.save = (function () {
     if (sum !== check) throw new Error('checksum');
     var rd = new Reader(body);
     var ver = rd.get(3);
-    if (ver < 1 || ver > 4) throw new Error('version');
+    if (ver < 1 || ver > 5) throw new Error('version');
     var avatar = rd.get(3), grade = rd.get(1) ? '5-6' : '3-4', lang = rd.get(1) ? 'en' : 'hu', placed = rd.get(3) || null;
     var nl = rd.get(4), nick = '';
     for (i = 0; i < nl; i++) nick += NICK[rd.get(7)] || '';
@@ -280,12 +291,15 @@ BK.save = (function () {
     p.best.endless = rd.get(8);
     if (ver >= 3) { p.avatar |= rd.get(2) << 3; if (p.avatar >= BK.HEROES.length) p.avatar = 0; }
     if (ver >= 4) {
-      var own = [];
+      // shapes are read by position (v4's dot, box, wave are now wave, code, comet); v4 had 4 colour sets
+      var own = [], nc = ver >= 5 ? BK.SHOT_COLOURS.length : 4;
       BK.SHOT_SHAPES.forEach(function (o) { if (rd.get(1)) own.push(o.id); });
-      BK.SHOT_COLOURS.forEach(function (o) { if (rd.get(1)) own.push(o.id); });
-      ['dot', 'classic'].forEach(function (k) { if (own.indexOf(k) < 0) own.push(k); });
-      var si = BK.SHOT_SHAPES[rd.get(3)] || BK.SHOT_SHAPES[0], ci = BK.SHOT_COLOURS[rd.get(2)] || BK.SHOT_COLOURS[0];
-      p.fx = { owned: own, shape: own.indexOf(si.id) >= 0 ? si.id : 'dot', colour: own.indexOf(ci.id) >= 0 ? ci.id : 'classic' };
+      BK.SHOT_COLOURS.slice(0, nc).forEach(function (o) { if (rd.get(1)) own.push(o.id); });
+      ['wave', 'classic'].forEach(function (k) { if (own.indexOf(k) < 0) own.push(k); });
+      var si = BK.SHOT_SHAPES[rd.get(3)] || BK.SHOT_SHAPES[0], ci = BK.SHOT_COLOURS[rd.get(ver >= 5 ? 3 : 2)] || BK.SHOT_COLOURS[0];
+      var tone = ver >= 5 ? rd.get(3) : 0;
+      p.fx = { v: 2, owned: own, shape: own.indexOf(si.id) >= 0 ? si.id : 'wave', colour: own.indexOf(ci.id) >= 0 ? ci.id : 'classic',
+        tone: ci.cols && tone < ci.cols.length ? tone : 0 };
     }
     storyOrder().forEach(function (k) { var v = rd.get(2); if (v) p.stories[k] = v; });
     return p;
