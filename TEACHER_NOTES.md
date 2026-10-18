@@ -1,6 +1,6 @@
 # Betűkaland (Typing Adventure): teacher notes
 
-Version 0.8.2: all seven regions are playable, each with three levels and a boss, plus a practice corner (daily goals with a streak, sentence practice, a tricky-letter drill, the endless road, and a storybook) and crowns to win on every level of a finished region. The menus can be Hungarian or English, the text uses a font made for young readers (three to choose from), and the keyboard can be Hungarian or US English. Title screen, player profiles with a choice of thirteen figures, placement test, world map, shop, rest spots, results with stars and a chart, saving with a code and a file, the teacher screen with CSV export, and credits.
+Version 0.8.3: all seven regions are playable, each with three levels and a boss, plus a practice corner (daily goals with a streak, sentence practice, a tricky-letter drill, the endless road, and a storybook) and crowns to win on every level of a finished region. The menus can be Hungarian or English, the text uses a font made for young readers (three to choose from), and the keyboard can be Hungarian or US English. Title screen, player profiles with a choice of thirteen figures, placement test, world map, shop, rest spots, results with stars and a chart, saving with a code and a file, the teacher screen with CSV export, and credits.
 
 ## Running it
 
@@ -118,7 +118,7 @@ Class 4.B suggested seven new animals. They were drawn with ChatGPT image genera
 
 ## Halloween Night (switch in the Teacher screen)
 
-"Halloween Night: off/on" in the Teacher screen puts a Halloween button on every child's map on this computer, and "Boldog Halloweent!" on the title screen. It opens a small friendly spooky story in four stages: Tökös ösvény, Ködös erdő, Denevérhíd (with a clumsy mummy) and A Tökkirály kertje, where the Pumpkin King is grumpy because nobody came to his party. Typing his sentences makes him laugh and hand out candy, and the child gets a new pet. The stages open one after the other and give stars like levels.
+The "Halloween: ki/be" button in the top left of the title screen (or "Halloween Night: off/on" in the Teacher screen) puts a Halloween button on every child's map on this computer, and "Boldog Halloweent!" on the title screen. It opens a small friendly spooky story in four stages: Tökös ösvény, Ködös erdő, Denevérhíd (with a clumsy mummy) and A Tökkirály kertje, where the Pumpkin King is grumpy because nobody came to his party. Typing his sentences makes him laugh and hand out candy, and the child gets a new pet. The stages open one after the other and give stars like levels.
 
 The typing uses only the keys of the child's newest region, with Halloween words and sentences mixed in where they fit those keys (`data/halloween.js`), so a child in region 1 and one in region 6 both get the right material. Normal progress, stars and crowns are not touched. The Halloween stars stay on this computer and are not in the save code; the pet is. Switch it off again after Halloween; the pet stays.
 
