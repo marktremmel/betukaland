@@ -14,14 +14,15 @@ BK.LevelScene = class extends Phaser.Scene {
     this.regionId = data.region || 1;
     this.levelIdx = data.level === undefined ? 0 : data.level;
     this.daily = this.levelIdx === 'daily';
-    this.practiceMode = ['practice', 'story', 'weak', 'endless', 'halloween'].indexOf(this.levelIdx) >= 0 ? this.levelIdx : null;
+    this.practiceMode = ['practice', 'story', 'weak', 'endless', 'halloween', 'arena'].indexOf(this.levelIdx) >= 0 ? this.levelIdx : null;
     this.hwStage = data.stage || 0;
     this.endless = this.levelIdx === 'endless';
     this.storyId = data.storyId || null;
+    this.arenaBoss = data.boss || null; this.arenaHard = !!data.hard;
     this.profile = BK.state.profile;
     var seed = data.seed !== undefined ? data.seed : Math.floor(Math.random() * 1e9);
     this.rng = BK.util.rng(seed);
-    this.plan = BK.levelgen.build(this.regionId, this.levelIdx, this.profile, this.rng, { storyId: this.storyId, stage: this.hwStage });
+    this.plan = BK.levelgen.build(this.regionId, this.levelIdx, this.profile, this.rng, { storyId: this.storyId, stage: this.hwStage, boss: this.arenaBoss, hard: this.arenaHard });
     this.queue = this.plan.encounters.slice();
     this.total = this.queue.length;
     this.doneCount = 0;
@@ -155,7 +156,53 @@ BK.LevelScene = class extends Phaser.Scene {
         this.particles.push(l);
       }
     }
-    this.windBoost = w === 'wind' ? 3 : 1;
+    if (w === 'blow') this.blowFx();
+    // now and then something funny flies past on the wind (not in boss fights)
+    if (!this.plan.boss && Math.random() < 0.18) this.time.delayedCall(8000 + Math.random() * 30000, function () { s.flyingThing(); });
+    this.windBoost = w === 'wind' || w === 'blow' ? 3 : 1;
+  }
+
+  // What the wind carries in each region: dandelion seeds and petals on the meadow, sand and
+  // feathers on the beach, foam bubbles in the bay, snow on the mountain, dust and a rolling
+  // tumbleweed in the canyon, fireflies in the twilight wood, cloud wisps at the castle.
+  blowFx() {
+    BK.fx.windTextures(this);
+    var s = this, kind = this.reg.theme === 'halloween' ? 'halloween' : ({ 1: 'meadow', 2: 'beach', 3: 'bay', 4: 'snow', 5: 'canyon', 6: 'fireflies', 7: 'clouds' })[this.regionId] || 'meadow';
+    var add = function (key, n, o) {
+      for (var i = 0; i < n; i++) {
+        var p = s.add.image(Math.random() * BK.W, Math.random() * BK.GROUND_Y, key).setDepth(100);
+        p.vx = o.vx[0] + Math.random() * (o.vx[1] - o.vx[0]); p.vy = o.vy[0] + Math.random() * (o.vy[1] - o.vy[0]);
+        p.wob = o.wob || 0; p.ph = Math.random() * 6.28; p.spin = o.spin ? (Math.random() - 0.5) * o.spin : 0;
+        if (o.tint) p.setTint(o.tint[i % o.tint.length]);
+        if (o.alpha) p.setAlpha(o.alpha);
+        if (o.add) p.setBlendMode(Phaser.BlendModes.ADD);
+        p.pulse = o.pulse || 0;
+        s.particles.push(p);
+      }
+    };
+    if (kind === 'meadow') { add('wind_seed', 8, { vx: [-34, -20], vy: [-4, 6], wob: 6 }); add('wind_petal', 5, { vx: [-40, -26], vy: [6, 14], spin: 4, tint: [0xffb8d8, 0xffffff, 0xffe070] }); }
+    else if (kind === 'beach') { add('wind_dot', 22, { vx: [-90, -60], vy: [2, 10], tint: [0xf0d8a0, 0xe0c080], alpha: 0.8 }); add('wind_feather', 2, { vx: [-36, -24], vy: [-2, 8], wob: 5, spin: 1 }); }
+    else if (kind === 'bay') { add('wind_bubble', 10, { vx: [-26, -14], vy: [-12, -4], wob: 4, alpha: 0.85 }); add('wind_dot', 10, { vx: [-80, -50], vy: [2, 8], tint: [0xf0d8a0], alpha: 0.7 }); }
+    else if (kind === 'snow') add('wind_snow', 26, { vx: [-40, -20], vy: [14, 26], wob: 3 });
+    else if (kind === 'canyon') {
+      add('wind_dot', 18, { vx: [-100, -70], vy: [0, 8], tint: [0xd88050, 0xc06a40], alpha: 0.7 });
+      // the tumbleweed rolls along the ground
+      var t = this.add.image(BK.W + 20, BK.GROUND_Y - 6, 'wind_tumble').setDepth(30);
+      t.vx = -55; t.vy = 0; t.spin = -9; t.roll = true; t.ph = 0;
+      this.particles.push(t);
+    } else if (kind === 'fireflies') add('shot_glow_small', 12, { vx: [-10, 6], vy: [-6, 6], wob: 6, add: true, tint: [0xfff07a, 0xd8ff7a], pulse: 1 });
+    else if (kind === 'clouds') add('wind_wisp', 6, { vx: [-50, -30], vy: [-2, 2], alpha: 0.6 });
+    else add('wind_petal', 8, { vx: [-40, -24], vy: [6, 14], spin: 4, tint: [0xff9a3a, 0xc85a20, 0x8a3a8a] });
+  }
+
+  // An easter egg: a hat, a sock, an umbrella, a paper plane or a kite blows across the sky once
+  flyingThing() {
+    if (this.state === 'end' || !this.sys.isActive()) return;
+    BK.fx.windTextures(this);
+    var key = BK.pick(['wind_hat', 'wind_sock', 'wind_umbrella', 'wind_plane', 'wind_kite']);
+    var y = 30 + Math.random() * 40, o = this.add.image(BK.W + 16, y, key).setDepth(99).setScale(2);
+    this.tweens.add({ targets: o, x: -20, duration: 6500, ease: 'Linear', onComplete: function () { o.destroy(); } });
+    this.tweens.add({ targets: o, y: y + 10, angle: key === 'wind_plane' ? 8 : 25, duration: 900, yoyo: true, repeat: 3, ease: 'Sine.easeInOut' });
   }
 
   // ------------------------------------------------------------ HUD
@@ -166,6 +213,7 @@ BK.LevelScene = class extends Phaser.Scene {
       this.practiceMode === 'weak' ? BK.T.weak + ': ' + this.plan.storyTitle :
       this.endless ? BK.T.endless + ' · 0 ' + BK.T.wordsUnit :
       this.practiceMode === 'halloween' ? 'Halloween · ' + this.reg.name :
+      this.practiceMode === 'arena' ? BK.L('Aréna', 'Arena') + (this.plan.hard ? BK.L(' · nehéz', ' · hard') : '') :
       this.practiceMode ? BK.T.practice + ' · ' + BK.REGIONS[this.regionId - 1].name : (BK.REGIONS[this.regionId - 1].name + ' · ' +
       (this.levelIdx === 3 ? BK.T.boss : this.regionId + '-' + (this.levelIdx + 1)));
     this.add.rectangle(BK.W / 2, 9, 140, 13, 0x2b1a14, 0.45).setDepth(259);
@@ -282,9 +330,19 @@ BK.LevelScene = class extends Phaser.Scene {
     // particles
     this.particles.forEach(function (p) {
       p.x += p.vx * dt / 1000; p.y += p.vy * dt / 1000;
+      if (p.wob) { p.ph += dt / 400; p.y += Math.sin(p.ph) * p.wob * dt / 1000; }
+      if (p.pulse) p.setAlpha(0.45 + 0.55 * Math.abs(Math.sin(p.ph * 1.7)));
       if (p.spin) p.angle += p.spin;
+      if (p.roll) {
+        // little hops, and back from the right after a while
+        p.ph += dt; p.y = BK.GROUND_Y - 6 - Math.abs(Math.sin(p.ph / 220)) * 6;
+        if (p.x < -20) { p.x = BK.W + 200 + Math.random() * 300; }
+        return;
+      }
       if (p.y > BK.GROUND_Y) { p.y = -4; p.x = Math.random() * (BK.W + 60); }
+      if (p.y < -8) { p.y = BK.GROUND_Y - 2; p.x = Math.random() * (BK.W + 60); }
       if (p.x < -6) p.x = BK.W + 4;
+      if (p.x > BK.W + 8) p.x = -4;
     });
     // clouds drift a little even when standing
     this.skyLayers.forEach(function (t) { t.tilePositionX += t.speed * 0.15 * s.windBoost * dt / 16; });
@@ -553,8 +611,14 @@ BK.LevelScene = class extends Phaser.Scene {
     if (acc >= BK.STARS.three && wpm >= target) stars = 3;
     var hwBoss = this.practiceMode === 'halloween' && this.plan.boss;
     var bonus = stars * (this.practiceMode && this.practiceMode !== 'halloween' ? 1 : 3) + (this.levelIdx === 3 || hwBoss ? 10 : 0);
-    var lcode = this.daily ? -1 : ({ practice: -2, story: -3, weak: -4, endless: -5, halloween: -6 })[this.practiceMode] || this.levelIdx;
+    if (this.practiceMode === 'arena') {
+      // the first win on each difficulty pays well, later ones a little
+      var ar = (P.arena || {})[this.plan.arenaId] || {};
+      bonus = stars * 2 + (ar[this.plan.hard ? 'h' : 'n'] ? 0 : (this.plan.hard ? 25 : 12));
+    }
+    var lcode = this.daily ? -1 : ({ practice: -2, story: -3, weak: -4, endless: -5, halloween: -6, arena: -7 })[this.practiceMode] || this.levelIdx;
     var res = { r: this.regionId, l: lcode, practice: this.practiceMode, storyId: this.plan.storyId, stage: this.plan.stage,
+      arenaId: this.plan.arenaId, hard: this.plan.hard,
       chars: st.chars, words: this.wordsDone, weakKeys: this.plan.weakKeys, wpm: wpm, acc: acc, stars: stars,
       ms: Math.round(performance.now() - this.startedAt), coins: bonus, earned: this.levelCoins + bonus, bonus: bonus,
       daily: this.daily, target: target, levelCoins: this.levelCoins };

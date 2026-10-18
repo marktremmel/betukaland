@@ -6,7 +6,7 @@
  */
 window.BK = window.BK || {};
 
-BK.VERSION = '0.9.5';
+BK.VERSION = '0.10.0';
 
 // Test mode for the teacher: open the game with ?debug at the end of the address.
 // Every region and level is open; in a level Tab finishes the current word and
@@ -287,10 +287,32 @@ BK.SHOT_COLOURS = [
   { id: 'pastel', name: 'Pasztell', en: 'Pastel', price: 35, pick: true,
     cols: [0xffb8b8, 0xffd2a8, 0xfff0a8, 0xc8f2b4, 0xb4ecf0, 0xb8d4ff, 0xdcc6ff, 0xffc4e4] },
   { id: 'rainbow', name: 'Szivárvány', en: 'Rainbow', price: 60, rainbow: true },
-  { id: 'rtx', name: 'RTX', en: 'RTX', price: 80, cols: [0xfff8e8], rtx: true },
+  { id: 'rtx', name: 'RTX', en: 'RTX', price: 80, cols: [0x5ae8ff, 0xff6ad8, 0xffb040, 0xa98aff], rtx: true },
   { id: 'chrome', name: 'Króm', en: 'Chrome', price: 70, cols: [0xc8d0dc], chrome: true },
+  { id: 'neon', name: 'Neon', en: 'Neon', price: 75, cols: [0xff4fd8, 0x3ff0ff, 0xb6ff3a, 0xb07aff], neon: true },
 ];
-BK.FX_DEFAULT = function () { return { v: 2, shape: 'wave', colour: 'classic', tone: 0, owned: ['wave', 'classic'] }; };
+// What happens where the shot lands (in the shot's colour).
+BK.SHOT_IMPACTS = [
+  { id: 'spark', name: 'Szikra', en: 'Spark', price: 0 },
+  { id: 'pop', name: 'Pukk', en: 'Pop', price: 25 },
+  { id: 'splat', name: 'Paca', en: 'Splat', price: 35 },
+  { id: 'pixel', name: 'Pixel', en: 'Pixel', price: 40 },
+  { id: 'stars', name: 'Csillagszóró', en: 'Starburst', price: 50 },
+  { id: 'comic', name: 'Bumm!', en: 'Pow!', price: 60 },
+];
+BK.FX_DEFAULT = function () { return { v: 2, shape: 'wave', colour: 'classic', tone: 0, impact: 'spark', owned: ['wave', 'classic', 'spark'] }; };
+
+// Boss arena (practice corner): every boss the child has beaten, again, alone, in two
+// difficulties. Hard: two more sentences, and the boss sends marks to catch like the Pumpkin King.
+BK.arenaBosses = function (p) {
+  var out = BK.REGIONS.filter(function (r) { return r.playable && r.boss; }).map(function (r) {
+    return { id: 'r' + r.id, region: r.id, name: r.bossName, where: r.name,
+      open: !!(p && p.progress && p.progress[r.id] && p.progress[r.id].stars[3]) };
+  });
+  out.push({ id: 'king', region: 0, name: BK.L('Tökkirály', 'Pumpkin King'), where: 'Halloween',
+    open: !!(p && p.halloween && p.halloween.stars && p.halloween.stars[3]) });
+  return out;
+};
 
 // Shop catalogue: outfits (recoloured hero) and pets
 BK.OUTFITS = [

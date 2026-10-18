@@ -4,6 +4,7 @@
  *   2 Gyakorlás   - three modes on any open region: short sentences, the
  *                   child's tricky letters, and the endless road
  *   3 Történetek  - the storybook: everyday stories typed sentence by sentence
+ *   4 Aréna       - every boss the child has beaten, again, on normal or hard
  * Keys: 1/2/3 switch tabs, arrows choose, Enter starts, Esc goes back.
  */
 BK.PracticeScene = class extends Phaser.Scene {
@@ -39,10 +40,14 @@ BK.PracticeScene = class extends Phaser.Scene {
     if (!(this.storySel < this.stories.length)) this.storySel = 0;
     this.storyTop = Math.min(this.storyTop || 0, Math.max(0, this.stories.length - 1));
 
-    var tabs = [['today', BK.T.pToday], ['practice', BK.T.pPractice], ['story', BK.T.pStory]];
+    this.bosses = BK.arenaBosses(P);
+    if (this.arenaSel === undefined || !this.bosses[this.arenaSel] || !this.bosses[this.arenaSel].open) {
+      this.arenaSel = Math.max(0, this.bosses.map(function (b) { return b.open; }).lastIndexOf(true));
+    }
+    var tabs = [['today', BK.T.pToday], ['practice', BK.T.pPractice], ['story', BK.T.pStory], ['arena', BK.L('4: Aréna', '4: Arena')]];
     tabs.forEach(function (t, i) {
-      var b = BK.ui.button(s, 92 + i * 100, 52, t[1], function () { s.setTab(t[0]); }, { w: 94, h: 18 });
-      if (t[0] === s.tab) s.add.rectangle(92 + i * 100, 52, 98, 22).setStrokeStyle(1, 0x9a3d1a);
+      var b = BK.ui.button(s, 63 + i * 86, 52, t[1], function () { s.setTab(t[0]); }, { w: 82, h: 18 });
+      if (t[0] === s.tab) s.add.rectangle(63 + i * 86, 52, 86, 22).setStrokeStyle(1, 0x9a3d1a);
     });
 
     this.page = [];
@@ -57,6 +62,7 @@ BK.PracticeScene = class extends Phaser.Scene {
       if (e.key === '1') s.setTab('today');
       else if (e.key === '2') s.setTab('practice');
       else if (e.key === '3') s.setTab('story');
+      else if (e.key === '4') s.setTab('arena');
       else if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') s.move(e.key === 'ArrowLeft' ? -1 : 1, 'h');
       else if (e.key === 'ArrowUp' || e.key === 'ArrowDown') s.move(e.key === 'ArrowUp' ? -1 : 1, 'v');
     });
@@ -123,6 +129,8 @@ BK.PracticeScene = class extends Phaser.Scene {
       });
     }
 
+    if (this.tab === 'arena') this.drawArena(x0, y0);
+
     if (this.tab === 'story') {
       var rows = 6, rh = 12, st = this.stories;
       if (this.storySel < this.storyTop) this.storyTop = this.storySel;
@@ -146,6 +154,43 @@ BK.PracticeScene = class extends Phaser.Scene {
     }
   }
 
+  // Arena: one row per boss (locked until beaten), stars on normal and on hard
+  drawArena(x0, y0) {
+    var s = this, P = this.P, rh = 10, res = P.arena || {};
+    y0 -= 6;
+    this.keep(BK.ui.text(this, 296, y0 - 1, BK.L('Normál', 'Normal'), { outline: false, origin: [0.5, 0], px: 8, color: 0x6b3a20 }));
+    this.keep(BK.ui.text(this, 340, y0 - 1, BK.L('Nehéz', 'Hard'), { outline: false, origin: [0.5, 0], px: 8, color: 0x8a2a2a }));
+    y0 -= 1;
+    this.bosses.forEach(function (b, i) {
+      var y = y0 + 10 + i * rh, sel = i === s.arenaSel;
+      if (sel) s.keep(s.add.rectangle(192, y + 5, 318, rh, 0xf6c88a, 0.8));
+      s.keep(BK.ui.text(s, x0 + 4, y, b.name, { outline: false, bold: sel, px: 10, color: b.open ? 0x4a2c1c : 0x9a8a80, fit: 110 }));
+      s.keep(BK.ui.text(s, x0 + 122, y + 1, b.open ? b.where : BK.L('előbb győzd le a pályán', 'beat it on the map first'), { outline: false, px: 8, color: 0x9a8a80, fit: 128 }));
+      if (b.open) {
+        var r = res[b.id] || {};
+        [['n', 296], ['h', 340]].forEach(function (d) {
+          if (sel && (d[0] === 'h') === !!s.arenaHard) s.keep(s.add.rectangle(d[1], y + 5, 42, rh - 1).setStrokeStyle(1, 0x9a3d1a));
+          s.keep(BK.ui.stars(s, d[1], y + 5, r[d[0]] || 0, 3, 9));
+          var z = s.keep(s.add.zone(d[1], y + 5, 42, rh).setInteractive({ useHandCursor: true }));
+          z.on('pointerup', function () {
+            var hard = d[0] === 'h';
+            if (s.arenaSel === i && s.arenaHard === hard) { s.go(); return; }
+            s.arenaSel = i; s.arenaHard = hard; BK.audio.sfx('ui'); s.drawTab(); s.refreshStart();
+          });
+        });
+      }
+      var zr = s.keep(s.add.zone(x0 + 120, y + 5, 240, rh).setInteractive({ useHandCursor: true }));
+      zr.on('pointerup', function () {
+        if (!b.open) { BK.audio.sfx('key_bad', { volume: 0.3 }); return; }
+        if (s.arenaSel === i) { s.go(); return; }
+        s.arenaSel = i; BK.audio.sfx('ui'); s.drawTab(); s.refreshStart();
+      });
+    });
+    var hint = this.arenaHard ? BK.L('Nehéz: két mondattal több, és jeleket is dob!', 'Hard: two more sentences, and it throws marks!')
+      : BK.L('Fel/le: boss, jobbra/balra: nehézség', 'Up/down: boss, left/right: difficulty');
+    this.keep(BK.ui.text(this, x0 + 4, y0 - 1, hint, { outline: false, origin: [0, 0], px: 8, color: this.arenaHard ? 0x8a2a2a : 0x9a8a80, fit: 230 }));
+  }
+
   // the tricky letters the drill would use for the selected region
   weakPreview() {
     var set = BK.wordbank.allowed(this.sentRegion);
@@ -162,6 +207,13 @@ BK.PracticeScene = class extends Phaser.Scene {
       var i = this.open.indexOf(this.sentRegion) + d;
       if (i < 0 || i >= this.open.length) { BK.audio.sfx('key_bad', { volume: 0.3 }); return; }
       this.sentRegion = this.open[i];
+    } else if (this.tab === 'arena' && axis === 'v') {
+      var a = this.arenaSel + d;
+      while (a >= 0 && a < this.bosses.length && !this.bosses[a].open) a += d;
+      if (a < 0 || a >= this.bosses.length) return;
+      this.arenaSel = a;
+    } else if (this.tab === 'arena' && axis === 'h') {
+      this.arenaHard = d > 0;
     } else if (this.tab === 'story' && axis === 'v') {
       var n = this.storySel + d;
       if (n < 0 || n >= this.stories.length) return;
@@ -174,7 +226,8 @@ BK.PracticeScene = class extends Phaser.Scene {
 
   refreshStart() {
     if (!this.startBtn) return;
-    var ok = this.tab !== 'story' || !!(this.stories[this.storySel] && this.storyOpen(this.stories[this.storySel]));
+    var ok = this.tab === 'arena' ? !!(this.bosses[this.arenaSel] && this.bosses[this.arenaSel].open)
+      : this.tab !== 'story' || !!(this.stories[this.storySel] && this.storyOpen(this.stories[this.storySel]));
     this.startBtn.setDisabled(!ok);
   }
 
@@ -187,6 +240,12 @@ BK.PracticeScene = class extends Phaser.Scene {
     } else if (this.tab === 'practice') {
       BK.audio.sfx('chime');
       this.scene.start('Level', { region: this.sentRegion, level: this.mode === 'sent' ? 'practice' : this.mode });
+    } else if (this.tab === 'arena') {
+      var b = this.bosses[this.arenaSel];
+      if (!b || !b.open) { BK.audio.sfx('key_bad', { volume: 0.3 }); return; }
+      BK.audio.sfx('chime');
+      var reg = b.region || Math.max(3, this.open[this.open.length - 1] || 1);
+      this.scene.start('Level', { region: reg, level: 'arena', boss: b.id, hard: !!this.arenaHard });
     } else {
       var st = this.stories[this.storySel];
       if (!st || !this.storyOpen(st)) { BK.audio.sfx('key_bad', { volume: 0.3 }); return; }

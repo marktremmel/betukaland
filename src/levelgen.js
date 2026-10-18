@@ -27,6 +27,7 @@ BK.levelgen = {
   build: function (regionId, levelIdx, profile, rng, opts) {
     if (levelIdx === 'practice' || levelIdx === 'story' || levelIdx === 'weak' || levelIdx === 'endless') return this.practice(regionId, levelIdx, profile, rng, opts || {});
     if (levelIdx === 'halloween') return this.halloween(regionId, profile, rng, opts || {});
+    if (levelIdx === 'arena') return this.arena(regionId, profile, rng, opts || {});
     var reg = (opts && opts.reg) || BK.REGIONS[regionId - 1];
     var band = (profile && profile.grade) || '3-4';
     var lang = (profile && profile.lang) || 'hu';
@@ -49,8 +50,8 @@ BK.levelgen = {
       if (rng.chance(0.12)) sky = rng.pick([4, 6, 7]);       // sometimes an evening sky
     } else if (reg.bdTint) bdTint = rng.chance(0.6) ? rng.pick(reg.bdTint) : null;
     else if (rng.chance(0.2)) bdTint = 0xffe0d0;
-    var weather = rng.pick(['clear', 'clear', 'clear', 'leaves', 'wind', 'rain']);
-    if (sky === 3 || reg.backdrop === 'moon') weather = rng.pick(['clear', 'wind']);
+    var weather = rng.pick(['clear', 'clear', 'clear', 'leaves', 'blow', 'blow', 'wind', 'rain']);
+    if (sky === 3 || reg.backdrop === 'moon') weather = rng.pick(['clear', 'wind', 'blow']);
     var look = { sky: sky, bdTint: bdTint };
 
     if (li === 3 && !daily) {
@@ -156,6 +157,32 @@ BK.levelgen = {
    * mini-boss, the mummy), stage 3 like a boss level with the Pumpkin King, all with the keys of
    * regionId and the night look from BK.halloweenRegion. No warm-up.
    */
+  /*
+   * Boss arena: one boss, alone, with the keys of its own region (the Pumpkin King: as in
+   * Halloween Night). opts.boss is 'r1'..'r7' or 'king'; opts.hard adds two sentences and
+   * marks to catch (the Pumpkin King's marks come faster).
+   */
+  arena: function (regionId, profile, rng, opts) {
+    var king = opts.boss === 'king', band = (profile && profile.grade) || '3-4';
+    var plan = king ? this.build(regionId, 3, profile, rng, { reg: BK.halloweenRegion(regionId, 3) }) : this.build(regionId, 3, profile, rng);
+    var boss = plan.encounters.filter(function (e) { return e.kind === 'boss'; })[0];
+    if (opts.hard) {
+      var picker = new BK.wordbank.Picker(regionId, (profile && profile.lang) || 'hu', band, rng, profile);
+      boss.texts.splice(boss.texts.length - 1, 0, picker.sentence(), picker.sentence());
+      var chars = (BK.HW_SPECIALS[band] || BK.HW_SPECIALS['3-4']).filter(function (c) { return BK.keyHint(c, profile) !== null; });
+      boss.specials = king ? { chars: chars, every: band === '3-4' ? 5200 : 3800, speed: band === '3-4' ? 18 : 25 }
+        : { chars: chars, every: band === '3-4' ? 6500 : 4800, speed: band === '3-4' ? 15 : 21 };
+    }
+    boss.coins = 0;                     // the arena pays at the end (more the first time)
+    plan.encounters = [boss];
+    if (king) plan.reg = BK.halloweenRegion(regionId, 3);
+    plan.practice = 'arena';
+    plan.arenaId = opts.boss;
+    plan.hard = !!opts.hard;
+    plan.boss = true;
+    return plan;
+  },
+
   halloween: function (regionId, profile, rng, opts) {
     var stage = Math.max(0, Math.min(3, opts.stage || 0));
     var reg = BK.halloweenRegion(regionId, stage);
@@ -166,7 +193,7 @@ BK.levelgen = {
     plan.practice = 'halloween';
     plan.stage = stage;
     plan.sky = reg.sky[0];         // always the stage's own night (or dusk) sky
-    if (!plan.boss) { plan.weather = rng.pick(['clear', 'leaves', 'leaves', 'wind']); plan.music = 'm_moon'; }
+    if (!plan.boss) { plan.weather = rng.pick(['clear', 'leaves', 'leaves', 'blow', 'wind']); plan.music = 'm_moon'; }
     return plan;
   },
 
@@ -263,7 +290,7 @@ BK.levelgen = {
     });
     var sky = reg.sky ? rng.pick(reg.sky) : null;
     var bdTint = !reg.sky && reg.bdTint && rng.chance(0.5) ? rng.pick(reg.bdTint) : null;
-    return { encounters: out, sky: sky, bdTint: bdTint, weather: rng.pick(['clear', 'clear', 'leaves', 'wind']),
+    return { encounters: out, sky: sky, bdTint: bdTint, weather: rng.pick(['clear', 'clear', 'leaves', 'blow', 'wind']),
       music: mode === 'story' ? 'm_chill' : (reg.music ? reg.music[0] : 'm_level1'),
       practice: mode, storyTitle: title, storyLines: mode === 'story' ? lines : null, storyId: opts.storyId || null, weakKeys: weakKeys };
   },

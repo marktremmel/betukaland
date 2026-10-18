@@ -92,6 +92,59 @@ BK.WordBubble = class {
     return false;
   }
 
+  // Light from an RTX or chrome shot. RTX: a coloured rim around the bubble, a soft wash of
+  // the colour inside it and the last letters typed glowing in it for a moment. Chrome: a
+  // white shine that slides across the bubble, and the last letter flashes silver.
+  light(c, kind) {
+    var sc = this.scene, W = this.w, H = this.h, self = this;
+    if (!this.c || !this.c.active) return;
+    if (kind === 'rtx') {
+      var g = sc.add.graphics();
+      g.fillStyle(c, 0.16).fillRoundedRect(-W / 2, -H, W, H, 3);
+      g.lineStyle(2, c, 1).strokeRoundedRect(-W / 2 - 1.5, -H - 1.5, W + 3, H + 3, 4);
+      this.c.addAt(g, 2);
+      sc.tweens.add({ targets: g, alpha: 0, duration: 320, onComplete: function () { g.destroy(); } });
+      // the glow follows the cursor: letters just typed get the colour, then go back
+      var from = Math.max(0, this.i - 3), lit = [];
+      for (var k = from; k < this.i; k++) if (this.chars[k] && this.chars[k].t) lit.push({ t: this.chars[k].t, w: (k - from + 1) / (this.i - from) });
+      var cA = Phaser.Display.Color.IntegerToColor(c), cG = Phaser.Display.Color.IntegerToColor(0x2e9e52);
+      sc.tweens.addCounter({ from: 1, to: 0, duration: 300, onUpdate: function (tw) {
+        var v = tw.getValue();
+        lit.forEach(function (o) {
+          var f = v * o.w, m = Phaser.Display.Color.Interpolate.ColorWithColor(cG, cA, 1, f);
+          if (o.t.active) o.t.setTint(Phaser.Display.Color.GetColor(m.r, m.g, m.b));
+        });
+      }, onComplete: function () { lit.forEach(function (o) { if (o.t.active) o.t.setTint(0x2e9e52); }); } });
+    } else if (kind === 'neon') {
+      // a neon sign: a bright tube around the bubble that buzzes on and slowly goes out
+      if (this.neon) this.neon.destroy();
+      var nb = this.neon = sc.add.graphics();
+      nb.lineStyle(4, c, 0.35).strokeRoundedRect(-W / 2 - 3, -H - 3, W + 6, H + 6, 5);
+      nb.lineStyle(1.5, c, 1).strokeRoundedRect(-W / 2 - 2, -H - 2, W + 4, H + 4, 5);
+      nb.lineStyle(0.6, 0xffffff, 0.9).strokeRoundedRect(-W / 2 - 2, -H - 2, W + 4, H + 4, 5);
+      this.c.addAt(nb, 0);
+      sc.tweens.add({ targets: nb, alpha: { from: 0.2, to: 1 }, duration: 35, yoyo: true, repeat: 2, onComplete: function () {
+        sc.tweens.add({ targets: nb, alpha: 0, delay: 250, duration: 500, onComplete: function () { nb.destroy(); if (self.neon === nb) self.neon = null; } });
+      } });
+      var lt = this.chars[this.i - 1];
+      if (lt && lt.t) { lt.t.setTint(c); sc.time.delayedCall(220, function () { if (lt.t.active) lt.t.setTint(0x2e9e52); }); }
+    } else {
+      var bar = sc.add.graphics(), pos = { x: -W / 2 - 8 };
+      this.c.addAt(bar, 2);
+      sc.tweens.add({ targets: pos, x: W / 2 + 8, duration: 260, ease: 'Sine.easeInOut', onUpdate: function () {
+        bar.clear();
+        // a slanted band, kept inside the bubble
+        var a = Math.max(-W / 2, pos.x - 4), b = Math.min(W / 2, pos.x + 4);
+        if (b > a) { bar.fillStyle(0xffffff, 0.75); bar.fillRect(a, -H + 1, b - a, H - 2); }
+      }, onComplete: function () { bar.destroy(); } });
+      var last = this.chars[this.i - 1];
+      if (last && last.t) {
+        last.t.setTint(0xe8eef6);
+        sc.time.delayedCall(140, function () { if (last.t.active) last.t.setTint(0x2e9e52); });
+      }
+    }
+  }
+
   // world position of the next letter (for sparks)
   nextWorldPos() {
     var c = this.chars[Math.max(0, this.i - 1)];

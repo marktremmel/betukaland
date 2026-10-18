@@ -14,21 +14,25 @@ BK.Narrator = class {
     this.pages = BK.Narrator.paginate(o.text, o.perPage || 120);
     this.page = 0; this.shown = 0; this.objs = [];
     var keep = function (x) { self.objs.push(x); return x; };
-    var bx = 74, by = 58, bw = BK.W - 86, bh = 52;
+    var bx = 74, by = 58, bw = BK.W - 86, bh = 54;
     this.box = { x: bx, y: by, w: bw, h: bh };
     keep(s.add.rectangle(BK.W / 2, BK.H / 2, BK.W, BK.H, 0x000000, 0.25).setDepth(890).setInteractive());
-    // a classic game dialogue box: dark, with a glowing orange edge
+    // drawn like the game's own speech bubbles (cream, with the dark brown edge), with a
+    // little tail pointing at the narrator
     var g = keep(s.add.graphics().setDepth(891));
-    g.fillStyle(0x1e1030, 0.94).fillRoundedRect(bx, by, bw, bh, 5);
-    g.lineStyle(2, 0xffa040, 1).strokeRoundedRect(bx, by, bw, bh, 5);
-    g.lineStyle(1, 0x7a4aaa, 1).strokeRoundedRect(bx + 3, by + 3, bw - 6, bh - 6, 3);
-    // name tag
-    var tag = keep(BK.ui.text(s, bx + 14, by - 6, o.name || '', { origin: [0, 0.5], color: 0xffe9a0, px: 10, bold: true }).setDepth(893));
-    keep(s.add.rectangle(tag.x - 3, tag.y, tag.displayWidth + 6, 12, 0x3a1850, 0.95).setOrigin(0, 0.5).setStrokeStyle(1, 0xffa040).setDepth(892));
-    this.txt = keep(BK.ui.text(s, bx + 12, by + 10, '', { outline: false, width: bw - 24, color: 0xfff2dc }).setDepth(893));
-    this.more = keep(BK.ui.text(s, bx + bw - 12, by + bh - 9, '▼', { origin: [0.5, 0.5], color: 0xffa040, px: 9 }).setDepth(893).setVisible(false));
+    g.fillStyle(0x5a3426, 1).fillRoundedRect(bx - 1, by - 1, bw + 2, bh + 2, 5);
+    g.fillStyle(0xfffaeb, 1).fillRoundedRect(bx, by, bw, bh, 4);
+    g.fillStyle(0x5a3426, 1).fillTriangle(bx - 7, by + 18, bx + 1, by + 12, bx + 1, by + 24);
+    g.fillStyle(0xfffaeb, 1).fillTriangle(bx - 4, by + 18, bx + 2, by + 14, bx + 2, by + 22);
+    // name tag on the top edge
+    var tag = keep(BK.ui.text(s, bx + 14, by - 1, o.name || '', { outline: false, origin: [0, 0.5], color: 0xfff2dc, px: 10, bold: true }).setDepth(893));
+    var tg = keep(s.add.graphics().setDepth(892));
+    tg.fillStyle(0x6a2a8a, 1).fillRoundedRect(tag.x - 5, tag.y - 7, tag.displayWidth + 10, 14, 3);
+    tg.lineStyle(1, 0x5a3426, 1).strokeRoundedRect(tag.x - 5, tag.y - 7, tag.displayWidth + 10, 14, 3);
+    this.txt = keep(BK.ui.text(s, bx + 12, by + 10, '', { outline: false, width: bw - 24, color: 0x4a2c1c }).setDepth(893));
+    this.more = keep(BK.ui.text(s, bx + bw - 12, by + bh - 9, '▼', { outline: false, origin: [0.5, 0.5], color: 0xe0742c, px: 9 }).setDepth(893).setVisible(false));
     s.tweens.add({ targets: this.more, y: this.more.y + 2, duration: 300, yoyo: true, repeat: -1 });
-    this.hint = keep(BK.ui.text(s, bx + bw - 22, by + bh - 9, 'Enter', { origin: [1, 0.5], color: 0xb8a8c8, px: 8 }).setDepth(893).setVisible(false));
+    this.hint = keep(BK.ui.text(s, bx + bw - 22, by + bh - 9, 'Enter', { outline: false, origin: [1, 0.5], color: 0x9a8a80, px: 8 }).setDepth(893).setVisible(false));
     // the narrator flies in from the left and bobs beside the box
     var key = o.sprite && BK_MANIFEST.sprites[o.sprite] ? o.sprite : 'crow_fly';
     var spr = this.spr = keep(s.add.sprite(-20, by + 22, key).setDepth(894));

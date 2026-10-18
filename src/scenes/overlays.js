@@ -74,64 +74,79 @@ BK.ShopScene = class extends BK.OverlayBase {
       var btn = s.keepD(BK.ui.button(s, x + 58, y + 42, label, function () { s.act(it, owned, wearing); }, { w: 56, h: 16, disabled: wearing && s.tab === 0 }));
     });
   }
-  // Magic: the shape and the colour of the shot at each correct key. A click shows it
-  // (a test shot); the button buys it or puts it in use. In the basic and pastel sets
-  // the child then picks one colour from the row of swatches.
+  // Magic: the shape, the colour and the impact of the shot at each correct key, on three
+  // small pages. A click shows it (a test shot); the button buys it or puts it in use. In the
+  // basic and pastel sets the child then picks one colour from the row of swatches.
   drawMagic() {
     var s = this, P = this.P, b = this.box, fx = P.fx;
-    var sel = this.fxSel || { kind: 'shape', id: fx.shape };
-    var item = (sel.kind === 'shape' ? BK.SHOT_SHAPES : BK.SHOT_COLOURS).find(function (o) { return o.id === sel.id; });
-    // one row of slots, centred in the panel; colour slots are taller (palette, name, price)
-    var row = function (list, kind, y, w, step) {
-      var h = kind === 'shape' ? 28 : 34, x0 = b.x + b.w / 2 - (list.length - 1) * step / 2;
-      list.forEach(function (o, i) {
-        var x = x0 + i * step, owned = fx.owned.indexOf(o.id) >= 0;
-        var inUse = kind === 'shape' ? fx.shape === o.id : fx.colour === o.id;
-        s.keepD(BK.ui.nine(s, x - w / 2, y - h / 2, w, h, inUse ? 'ui_slot_sel' : 'ui_slot'));
-        if (kind === 'shape') {
-          s.shotIcon(x, owned ? y - 1 : y - 5, o.id, fx.colour, fx.tone);
-          if (!owned) s.keepD(BK.ui.text(s, x, y + 7, o.price + '', { outline: false, origin: [0.5, 0.5], px: 9, bold: true, color: 0x9a3d1a }));
-        } else {
-          s.colourIcon(x, y - 9, o);
-          s.keepD(BK.ui.text(s, x, y + 1, o.name, { outline: false, origin: [0.5, 0.5], px: 8, color: 0x4a2c1c, fit: w - 6 }));
-          if (!owned) s.keepD(BK.ui.text(s, x, y + 10, o.price + '', { outline: false, origin: [0.5, 0.5], px: 8, bold: true, color: 0x9a3d1a }));
-        }
-        if (sel.kind === kind && sel.id === o.id) s.keepD(s.add.rectangle(x, y, w + 4, h + 4).setStrokeStyle(2, 0xffffff));
-        var z = s.keepD(s.add.zone(x, y, w, h).setInteractive({ useHandCursor: true }));
-        z.on('pointerup', function () {
-          s.fxSel = { kind: kind, id: o.id, tone: kind === 'colour' && fx.colour === o.id ? fx.tone : 0 };
-          BK.audio.sfx('ui');
-          s.draw();
-          s.demo();
-        });
+    var LISTS = { shape: BK.SHOT_SHAPES, colour: BK.SHOT_COLOURS, impact: BK.SHOT_IMPACTS };
+    var KEY = { shape: 'shape', colour: 'colour', impact: 'impact' };
+    var page = this.magicPage || 'shape';
+    var sel = this.fxSel && this.fxSel.kind === page ? this.fxSel : { kind: page, id: fx[KEY[page]] || LISTS[page][0].id, tone: fx.tone };
+    var item = LISTS[page].find(function (o) { return o.id === sel.id; }) || LISTS[page][0];
+    // the three pages
+    [['shape', BK.T.shape], ['colour', BK.T.colours], ['impact', BK.L('Becsapódás', 'Impact')]].forEach(function (pg, i) {
+      var x = b.x + b.w / 2 + (i - 1) * 84;
+      s.keepD(BK.ui.button(s, x, b.y + 64, pg[1], function () { s.magicPage = pg[0]; s.fxSel = null; BK.audio.sfx('ui'); s.draw(); }, { w: 78, h: 14 }));
+      if (pg[0] === page) s.keepD(s.add.rectangle(x, b.y + 64, 82, 18).setStrokeStyle(1, 0x9a3d1a));
+    });
+    var list = LISTS[page], w = page === 'colour' ? 42 : 40, step = page === 'colour' ? 45 : (page === 'shape' ? 44 : 50), h = 40, y = b.y + 98;
+    var x0 = b.x + b.w / 2 - (list.length - 1) * step / 2;
+    list.forEach(function (o, i) {
+      var x = x0 + i * step, owned = fx.owned.indexOf(o.id) >= 0, inUse = fx[KEY[page]] === o.id;
+      s.keepD(BK.ui.nine(s, x - w / 2, y - h / 2, w, h, inUse ? 'ui_slot_sel' : 'ui_slot'));
+      if (page === 'shape') s.shotIcon(x, y - 8, o.id, fx.colour, fx.tone);
+      else if (page === 'colour') s.colourIcon(x, y - 9, o);
+      else s.impactIcon(x, y - 8, o.id);
+      s.keepD(BK.ui.text(s, x, y + 3, o.name, { outline: false, origin: [0.5, 0.5], px: 8, color: 0x4a2c1c, fit: w - 4 }));
+      if (!owned) s.keepD(BK.ui.text(s, x, y + 11, o.price + '', { outline: false, origin: [0.5, 0.5], px: 8, bold: true, color: 0x9a3d1a }));
+      if (sel.id === o.id) s.keepD(s.add.rectangle(x, y, w + 4, h + 4).setStrokeStyle(2, 0xffffff));
+      var z = s.keepD(s.add.zone(x, y, w, h).setInteractive({ useHandCursor: true }));
+      z.on('pointerup', function () {
+        s.fxSel = { kind: page, id: o.id, tone: page === 'colour' && fx.colour === o.id ? fx.tone : 0 };
+        BK.audio.sfx('ui');
+        s.draw();
+        s.demo();
       });
-    };
-    this.keepD(BK.ui.text(this, b.x + 20, b.y + 57, BK.T.shape, { outline: false, px: 9, color: 0x6b3a20 }));
-    row(BK.SHOT_SHAPES, 'shape', b.y + 80, 38, 42);
-    this.keepD(BK.ui.text(this, b.x + 20, b.y + 97, BK.T.colours, { outline: false, px: 9, color: 0x6b3a20 }));
-    row(BK.SHOT_COLOURS, 'colour', b.y + 124, 48, 51);
+    });
     // the single colours of a basic or pastel set
-    if (sel.kind === 'colour' && item.pick) {
+    if (page === 'colour' && item.pick) {
       item.cols.forEach(function (c, i) {
-        var x = b.x + b.w / 2 + (i - (item.cols.length - 1) / 2) * 18, y = b.y + 146, on = (sel.tone || 0) === i;
-        s.keepD(s.add.rectangle(x, y, 12, 9, c).setStrokeStyle(on ? 2 : 1, on ? 0xffffff : 0x4a2c1c));
-        var z = s.keepD(s.add.zone(x, y, 16, 12).setInteractive({ useHandCursor: true }));
+        var x = b.x + b.w / 2 + (i - (item.cols.length - 1) / 2) * 18, yy = b.y + 129, on = (sel.tone || 0) === i;
+        s.keepD(s.add.rectangle(x, yy, 12, 9, c).setStrokeStyle(on ? 2 : 1, on ? 0xffffff : 0x4a2c1c));
+        var z = s.keepD(s.add.zone(x, yy, 16, 12).setInteractive({ useHandCursor: true }));
         z.on('pointerup', function () { s.fxSel = { kind: 'colour', id: item.id, tone: i }; BK.audio.sfx('ui'); s.draw(); s.demo(); });
       });
     }
+    // what the child uses now, all three
+    var nm = function (l, id) { var o = l.find(function (q) { return q.id === id; }); return o ? o.name : ''; };
+    this.keepD(BK.ui.text(this, b.x + b.w / 2, b.y + 143, BK.T.figureNow + ' ' + nm(BK.SHOT_SHAPES, fx.shape) + ' · ' + nm(BK.SHOT_COLOURS, fx.colour) + ' · ' + nm(BK.SHOT_IMPACTS, fx.impact || 'spark'),
+      { outline: false, origin: [0.5, 0.5], px: 9, color: 0x6b3a20, fit: 300 }));
     // what is selected, and the button for it
     var owned = fx.owned.indexOf(item.id) >= 0;
-    var inUse = sel.kind === 'shape' ? fx.shape === item.id : (fx.colour === item.id && (!item.pick || (fx.tone || 0) === (sel.tone || 0)));
+    var inUse = fx[KEY[page]] === item.id && (page !== 'colour' || !item.pick || (fx.tone || 0) === (sel.tone || 0));
     this.keepD(BK.ui.text(this, b.x + 20, b.y + 160, item.name + (owned ? '' : '  ·  ' + item.price + ' ' + BK.L('érme', 'coins')), { outline: false, origin: [0, 0.5], color: 0x4a2c1c, bold: true, fit: 150 }));
     var label = inUse ? BK.T.using : owned ? BK.T.use : BK.T.buy;
     this.keepD(BK.ui.button(this, b.x + b.w - 62, b.y + 160, label, function () { s.buyMagic(sel, item); }, { w: 84, h: 16, disabled: inUse }));
+  }
+  // a tiny picture of an impact, in the colour the child uses now
+  impactIcon(x, y, id) {
+    BK.fx.shotTextures(this);
+    var fx = this.P.fx, set = BK.fx.colourSet(fx.colour), s = this;
+    var c = function (k) { return BK.fx.shotColour(set, fx.tone, 2 + k); };
+    if (id === 'pop') { this.keepD(this.add.image(x, y, 'shot_ring').setTint(c(0))); for (var i = 0; i < 6; i++) { var a = i / 6 * Math.PI * 2; this.keepD(this.add.image(x + Math.cos(a) * 8, y + Math.sin(a) * 8, 'shot_dot').setTint(c(i)).setScale(0.6)); } }
+    else if (id === 'splat') { [[0, 0, 1.2], [6, -3, 0.5], [-6, 2, 0.4], [3, 5, 0.35], [-4, -5, 0.3]].forEach(function (d) { s.keepD(s.add.image(x + d[0], y + d[1], 'shot_ball').setTint(c(0)).setScale(d[2])); }); }
+    else if (id === 'pixel') { [[-5, -3, 2], [4, -5, 2], [6, 2, 1], [-3, 4, 1], [0, -1, 2], [-7, 1, 1]].forEach(function (d, k) { s.keepD(s.add.rectangle(x + d[0], y + d[1], d[2] * 2, d[2] * 2, c(k))); }); }
+    else if (id === 'stars') { for (var m = 0; m < 5; m++) { var a2 = -Math.PI / 2 + (m - 2) * 0.55; this.keepD(this.add.image(x + Math.cos(a2) * 7, y + 2 + Math.sin(a2) * 7, 'shot_star').setTint(c(m)).setScale(0.6)); } }
+    else if (id === 'comic') { this.keepD(BK.ui.text(this, x, y, BK.L('BUMM!', 'POW!'), { origin: [0.5, 0.5], px: 9, bold: true, color: c(0) }).setAngle(-10)); }
+    else { this.keepD(this.add.sprite(x, y, 'fx_impact', 2)); }
   }
   // a shape, drawn in the colour the child uses now
   shotIcon(x, y, shape, colour, tone) {
     BK.fx.shotTextures(this);
     var set = BK.fx.colourSet(colour), c = BK.fx.shotColour(set, tone, 2), s = this;
-    var add = function (o) { if (set.rtx) o.setBlendMode(Phaser.BlendModes.ADD); return s.keepD(o); };
-    if (set.rtx) this.keepD(this.add.image(x, y, 'shot_glow').setTint(0x8ae8ff).setBlendMode(Phaser.BlendModes.ADD).setAlpha(0.35));
+    var add = function (o) { return s.keepD(o); };
+    if (set.rtx || set.neon) this.keepD(this.add.image(x, y, 'shot_glow').setTint(c).setBlendMode(Phaser.BlendModes.ADD).setAlpha(0.6).setScale(1.4));
     if (shape === 'bolt' || shape === 'wave') {
       var g = this.add.graphics();
       g.lineStyle(shape === 'bolt' ? 2 : 1.5, c, 1).beginPath();
@@ -152,7 +167,7 @@ BK.ShopScene = class extends BK.OverlayBase {
     return add(this.add.image(x, y, key).setTint(c).setScale(1.3));
   }
   colourIcon(x, y, o) {
-    var cols = o.rainbow ? [0xff5a5a, 0xffb43c, 0xfff05a, 0x5ad17a, 0x5aa0ff, 0xb87aff] : o.rtx ? [0xfff8e8, 0x8ae8ff, 0xffc070, 0xd8a0ff] :
+    var cols = o.rainbow ? [0xff5a5a, 0xffb43c, 0xfff05a, 0x5ad17a, 0x5aa0ff, 0xb87aff] : o.rtx || o.neon ? o.cols :
       o.chrome ? [0x8a94a0, 0xe8eef4, 0xb0bac4, 0xffffff] : o.cols;
     if (o.pick) cols = cols.filter(function (c, i) { return i % 2 === 0; });
     var w = Math.min(8, 36 / cols.length);
@@ -161,10 +176,11 @@ BK.ShopScene = class extends BK.OverlayBase {
   // a test shot over the panel with the selected shape and colour
   demo() {
     var sel = this.fxSel, fx = this.P.fx, b = this.box, s = this;
+    if (!sel) return;
     var test = { shape: sel.kind === 'shape' ? sel.id : fx.shape, colour: sel.kind === 'colour' ? sel.id : fx.colour,
-      tone: sel.kind === 'colour' ? sel.tone || 0 : fx.tone };
+      tone: sel.kind === 'colour' ? sel.tone || 0 : fx.tone, impact: sel.kind === 'impact' ? sel.id : fx.impact };
     for (var i = 0; i < 3; i++) (function (i) {
-      s.time.delayedCall(i * 170, function () { BK.fx.bolt(s, b.x + 70, b.y + 99, b.x + b.w - 40, b.y + 97 + (i - 1) * 3, test); });
+      s.time.delayedCall(i * 170, function () { BK.fx.bolt(s, b.x + 40, b.y + 123, b.x + b.w - 40, b.y + 121 + (i - 1) * 3, test); });
     })(i);
   }
   buyMagic(sel, item) {
@@ -176,7 +192,10 @@ BK.ShopScene = class extends BK.OverlayBase {
       BK.audio.sfx('buy');
       BK.audio.sfx('v_great', { volume: 0.5 });
     }
-    if (sel.kind === 'shape') fx.shape = item.id; else { fx.colour = item.id; fx.tone = item.pick ? sel.tone || 0 : 0; }
+    if (sel.kind === 'shape') fx.shape = item.id;
+    else if (sel.kind === 'impact') fx.impact = item.id;
+    else { fx.colour = item.id; fx.tone = item.pick ? sel.tone || 0 : 0; }
+    this.fxSel = sel;
     BK.save.persist();
     this.draw();
     this.demo();

@@ -532,16 +532,22 @@ BK.fx = {
     BK.fx.shotTextures(scene);
     var dx = x1 - x0, dy = y1 - y0, len = Math.max(1, Math.sqrt(dx * dx + dy * dy)), nx = -dy / len, ny = dx / len;
     var hit = function () {
-      BK.fx.spark(scene, x1, y1);
-      if (set.rtx) BK.fx.flare(scene, x1, y1);
-      if (set.chrome) BK.fx.glint(scene, x1, y1);
+      BK.fx.impact(scene, x1, y1, fx.impact || 'spark', col, n);
+      if (set.rtx) { BK.fx.flare(scene, x1, y1, col(0)); BK.fx.light(scene, col(0), 'rtx'); }
+      if (set.chrome) { BK.fx.glint(scene, x1, y1); BK.fx.light(scene, 0xffffff, 'chrome'); }
+      if (set.neon) BK.fx.light(scene, col(0), 'neon');
     };
-    // a moving thing: the shape, with a soft glow behind it for RTX and a shine for chrome
+    // a moving thing: the shape, with a coloured glow around it for RTX and a shine for chrome.
+    // RTX: the shape itself stays in its neon colour (normal blend, so it shows on a bright sky),
+    // with an added glow behind and a white-hot middle
     var piece = function (key, x, y, k, scale) {
       var parts = [];
-      if (set.rtx) parts.push(scene.add.image(x, y, 'shot_glow').setTint(BK.fx.shotColour(set, tone, n + 3)).setBlendMode(Phaser.BlendModes.ADD).setAlpha(0.8).setDepth(220));
+      var lit = set.rtx || set.neon;
+      if (lit) parts.push(scene.add.image(x, y, 'shot_glow').setTint(col(k)).setBlendMode(Phaser.BlendModes.ADD).setAlpha(0.9).setDepth(220).setScale((set.neon ? 1.7 : 1.3) * (scale || 1)));
       var im = scene.add.image(x, y, key).setTint(col(k)).setDepth(221).setScale(scale || 1);
-      if (set.rtx) im.setBlendMode(Phaser.BlendModes.ADD);
+      // neon: it flickers on like a tube
+      if (set.neon) scene.tweens.add({ targets: im, alpha: { from: 0.3, to: 1 }, duration: 40, repeat: 1, yoyo: true });
+      if (lit) parts.push(scene.add.image(x, y, key).setTint(0xffffff).setBlendMode(Phaser.BlendModes.ADD).setDepth(222).setScale(0.45 * (scale || 1)));
       if (set.chrome) scene.tweens.add({ targets: { p: 0 }, p: 1, duration: 60, yoyo: true, repeat: 3, onUpdate: function (tw) {
         var v = Math.round(160 + 95 * Math.abs(Math.sin(tw.progress * Math.PI))); im.setTint(Phaser.Display.Color.GetColor(v, v, Math.min(255, v + 12)));
       } });
@@ -555,8 +561,11 @@ BK.fx = {
     // something left behind on the way, fading
     var trail = function (x, y, key, k, scale, ms) {
       var d = scene.add.image(x, y, key).setTint(col(k)).setDepth(220).setScale(scale || 1);
-      if (set.rtx) d.setBlendMode(Phaser.BlendModes.ADD);
       scene.tweens.add({ targets: d, alpha: 0, scale: (scale || 1) * 0.3, duration: ms || 160, onComplete: function () { d.destroy(); } });
+      if (set.rtx || set.neon) {
+        var gd = scene.add.image(x, y, 'shot_glow').setTint(col(k)).setBlendMode(Phaser.BlendModes.ADD).setAlpha(0.6).setDepth(219).setScale(0.6 * (scale || 1));
+        scene.tweens.add({ targets: gd, alpha: 0, duration: ms || 160, onComplete: function () { gd.destroy(); } });
+      }
     };
     if (shape === 'star' || shape === 'sparkle') {
       fly(piece('shot_' + shape, x0, y0, 0, 1), 130, { angle: shape === 'star' ? 360 : 0, scale: { from: 0.8, to: 1.25 } });
@@ -591,7 +600,7 @@ BK.fx = {
           var t = scene.add.text(x0 + nx * off, y0 + ny * off, glyphs[(n * 7 + g2 * 3) % glyphs.length],
             { fontFamily: 'monospace', fontSize: '8px', fontStyle: 'bold', color: '#' + col(g2).toString(16).padStart(6, '0') })
             .setOrigin(0.5).setDepth(221).setResolution(BK.RES || 1);
-          if (set.rtx) t.setBlendMode(Phaser.BlendModes.ADD);
+          if (set.rtx || set.neon) t.setShadow(0, 0, '#' + col(g2).toString(16).padStart(6, '0'), 4, false, true);
           scene.tweens.add({ targets: t, x: x1 + nx * off * 0.3, y: y1 + ny * off * 0.3, duration: 140, ease: 'Linear', onComplete: function () {
             t.destroy(); if (g2 === 5) hit();
           } });
@@ -615,7 +624,8 @@ BK.fx = {
         fork = [fp, { x: fp.x + dx / len * fl * 0.6 + nx * fs * fl * 0.5, y: fp.y + dy / len * fl * 0.6 + ny * fs * fl * 0.5 },
           { x: fp.x + dx / len * fl + nx * fs * fl * 0.3 + (Math.random() - 0.5) * 4, y: fp.y + dy / len * fl + ny * fs * fl * 0.3 }];
       }
-      if (set.rtx) gr.setBlendMode(Phaser.BlendModes.ADD);
+      if (set.rtx || set.neon) { var gg = scene.add.image((x0 + x1) / 2, (y0 + y1) / 2, 'shot_glow').setTint(col()).setBlendMode(Phaser.BlendModes.ADD).setDepth(220).setScale(len / 10, 1.2).setRotation(Math.atan2(dy, dx)).setAlpha(0.7);
+        scene.tweens.add({ targets: gg, alpha: 0, duration: 200, onComplete: function () { gg.destroy(); } }); }
       [[5, col(1), 0.35], [3, col(), 1], [1, 0xffffff, 0.9]].forEach(function (l) {
         gr.lineStyle(l[0], l[1], l[2]); gr.strokePoints(pts);
         if (fork) { gr.lineStyle(Math.max(1, l[0] - 1), l[1], l[2]); gr.strokePoints(fork); }
@@ -629,7 +639,6 @@ BK.fx = {
         hit();
         for (var q = 0; q < 2; q++) (function (q) {
           var w = scene.add.image(x1, y1, 'shot_ring').setTint(col(q + 1)).setDepth(221).setScale(0.6);
-          if (set.rtx) w.setBlendMode(Phaser.BlendModes.ADD);
           scene.tweens.add({ targets: w, scale: 2.6 + q, alpha: 0, delay: q * 70, duration: 280, onComplete: function () { w.destroy(); } });
         })(q);
       });
@@ -641,28 +650,119 @@ BK.fx = {
   // the colour of a shot: one picked colour, the rainbow, or the set's own
   shotColour: function (set, tone, k) {
     if (set.rainbow) return Phaser.Display.Color.HSVToRGB(((k * 0.09) % 1), 0.75, 1).color;
-    if (set.rtx) return [0xfff8e8, 0x8ae8ff, 0xffc070, 0xd8a0ff][k % 4];
     if (set.pick) return set.cols[Math.min(tone || 0, set.cols.length - 1)];
     return set.cols[k % set.cols.length];
   },
-  // RTX: a lens flare where the shot lands: a wide streak and a few ghost circles
-  flare: function (scene, x, y) {
-    var add = Phaser.BlendModes.ADD;
-    var streak = scene.add.image(x, y, 'shot_glow').setTint(0x8ad8ff).setBlendMode(add).setDepth(222).setScale(4, 0.35).setAlpha(0.9);
-    var core = scene.add.image(x, y, 'shot_glow').setTint(0xffffff).setBlendMode(add).setDepth(222).setScale(1.4);
-    scene.tweens.add({ targets: [streak, core], alpha: 0, duration: 260, onComplete: function () { streak.destroy(); core.destroy(); } });
+  // RTX: a lens flare where the shot lands: a wide streak and a few ghost circles. The added
+  // light alone would vanish on a bright sky, so each part also has a thin coloured copy.
+  flare: function (scene, x, y, c) {
+    var add = Phaser.BlendModes.ADD, parts = [];
+    parts.push(scene.add.image(x, y, 'shot_glow').setTint(c || 0x5ae8ff).setDepth(222).setScale(4.2, 0.22).setAlpha(0.55));
+    parts.push(scene.add.image(x, y, 'shot_glow').setTint(0x8ad8ff).setBlendMode(add).setDepth(222).setScale(4, 0.35).setAlpha(0.9));
+    parts.push(scene.add.image(x, y, 'shot_glow').setTint(0xffffff).setBlendMode(add).setDepth(222).setScale(1.4));
+    scene.tweens.add({ targets: parts, alpha: 0, duration: 280, onComplete: function () { parts.forEach(function (o) { o.destroy(); }); } });
     // ghosts along the line through the screen centre, like a camera lens
     var cx = BK.W / 2, cy = BK.KB_TOP / 2;
     [0.5, 1.1, 1.6].forEach(function (f, i) {
-      var gx = x + (cx - x) * f * 1.2, gy = y + (cy - y) * f * 1.2;
-      var gh = scene.add.image(gx, gy, 'shot_ring').setTint([0xffb060, 0x80ffd0, 0xc090ff][i]).setBlendMode(add).setDepth(222).setScale(0.6 + i * 0.5).setAlpha(0.5);
-      scene.tweens.add({ targets: gh, alpha: 0, duration: 300, onComplete: function () { gh.destroy(); } });
+      var gx = x + (cx - x) * f * 1.2, gy = y + (cy - y) * f * 1.2, tint = [0xffa040, 0x40e0b0, 0xa070ff][i];
+      var gh = scene.add.image(gx, gy, 'shot_ring').setTint(tint).setDepth(222).setScale(0.6 + i * 0.5).setAlpha(0.55);
+      var gl = scene.add.image(gx, gy, 'shot_glow').setTint(tint).setBlendMode(add).setDepth(222).setScale(0.5 + i * 0.4).setAlpha(0.5);
+      scene.tweens.add({ targets: [gh, gl], alpha: 0, duration: 320, onComplete: function () { gh.destroy(); gl.destroy(); } });
     });
+  },
+  // Light on what the child is typing: RTX throws coloured light on the word bubble (a rim
+  // and a soft wash) and makes the letters just typed glow; chrome sends a shine across it.
+  // The mark bubbles of the Pumpkin King light up too.
+  light: function (scene, c, kind) {
+    var enc = scene.enc;
+    if (!enc) return;
+    if (enc.bubble && enc.bubble.light) enc.bubble.light(c, kind);
+    var p = enc.proj;
+    if (p && p.c && kind === 'rtx') {
+      var g = scene.add.image(p.x, p.y, 'shot_glow').setTint(c).setBlendMode(Phaser.BlendModes.ADD).setDepth(224).setScale(2.4).setAlpha(0.8);
+      scene.tweens.add({ targets: g, alpha: 0, duration: 300, onComplete: function () { g.destroy(); } });
+    }
+  },
+  // Where the shot lands (shop: Becsapódás). col(k) gives the shot's colours.
+  impact: function (scene, x, y, id, col, n) {
+    var tw = function (o, props, ms) { scene.tweens.add(Object.assign({ targets: o, duration: ms, onComplete: function () { o.destroy(); } }, props)); };
+    if (id === 'pop') {
+      var r = scene.add.image(x, y, 'shot_ring').setTint(col(0)).setDepth(222).setScale(0.3);
+      tw(r, { scale: 1.6, alpha: 0, ease: 'Quad.easeOut' }, 220);
+      for (var i = 0; i < 6; i++) {
+        var a = i / 6 * Math.PI * 2 + n, d = scene.add.image(x, y, 'shot_dot').setTint(col(i)).setDepth(222).setScale(0.8);
+        tw(d, { x: x + Math.cos(a) * 11, y: y + Math.sin(a) * 11, alpha: 0, scale: 0.3, ease: 'Quad.easeOut' }, 240);
+      }
+    } else if (id === 'splat') {
+      // a blob of paint with a few drops around it, that slides down a little and fades
+      var bl = [];
+      for (var j = 0; j < 6; j++) {
+        var ang = Math.random() * Math.PI * 2, dist = j ? 3 + Math.random() * 7 : 0;
+        bl.push(scene.add.image(x + Math.cos(ang) * dist, y + Math.sin(ang) * dist, 'shot_ball').setTint(col(0))
+          .setDepth(221).setScale(j ? 0.3 + Math.random() * 0.4 : 0.9 + Math.random() * 0.3));
+      }
+      bl.forEach(function (o, k) { o.setScale(o.scale * 0.4); scene.tweens.add({ targets: o, scale: o.scale * 2.5, duration: 70, ease: 'Back.easeOut' });
+        tw(o, { y: o.y + 2 + (k % 3), alpha: 0, delay: 260 }, 420); });
+    } else if (id === 'pixel') {
+      // chunky 8-bit pieces that jump out and fall
+      for (var q = 0; q < 7; q++) (function (q) {
+        var sz = 1 + (q % 2), px = scene.add.rectangle(x, y, sz * 2, sz * 2, col(q)).setDepth(222);
+        var vx = (Math.random() - 0.5) * 34, vy = -14 - Math.random() * 14, t0 = 0;
+        scene.tweens.add({ targets: { t: 0 }, t: 1, duration: 420, onUpdate: function (twn) {
+          t0 = twn.progress * 0.42; px.x = x + vx * t0 * 2; px.y = y + vy * t0 * 2 + 90 * t0 * t0 * 2; px.alpha = 1 - twn.progress * 0.8;
+        }, onComplete: function () { px.destroy(); } });
+      })(q);
+    } else if (id === 'stars') {
+      for (var m = 0; m < 5; m++) {
+        var a2 = -Math.PI / 2 + (m - 2) * 0.55, st = scene.add.image(x, y, 'shot_star').setTint(col(m)).setDepth(222).setScale(0.4);
+        tw(st, { x: x + Math.cos(a2) * 14, y: y + Math.sin(a2) * 14, angle: 180, scale: 0.8, alpha: { from: 1, to: 0 }, ease: 'Cubic.easeOut' }, 380);
+      }
+    } else if (id === 'comic') {
+      // a comic-book word now and then (not on every key, it would be too much), small sparks otherwise
+      if (n % 3 === 0) {
+        var words = BK.L('BUMM! PUFF! CSATT! PÁ! ZSUPSZ! HOPP!', 'POW! BAM! ZAP! BOOM! WHAM! POP!').split(' ');
+        var w = BK.ui.text(scene, x, y - 8, words[Math.floor(n / 3) % words.length], { origin: [0.5, 0.5], px: 11, bold: true, color: col(0) }).setDepth(223);
+        w.setAngle((n % 2 ? 1 : -1) * 10).setScale(0.3);
+        scene.tweens.add({ targets: w, scale: 1, duration: 90, ease: 'Back.easeOut' });
+        tw(w, { y: w.y - 6, alpha: 0, delay: 260 }, 260);
+      }
+      var bt = scene.add.image(x, y, 'shot_sparkle').setTint(col(1)).setDepth(222).setScale(0.4);
+      tw(bt, { scale: 1.3, alpha: 0, angle: 45 }, 200);
+    } else BK.fx.spark(scene, x, y);
   },
   // chrome: a quick white star glint where the shot lands
   glint: function (scene, x, y) {
     var g = scene.add.image(x - 2, y - 3, 'shot_sparkle').setTint(0xffffff).setDepth(222).setScale(0.3);
     scene.tweens.add({ targets: g, scale: 1.4, angle: 45, alpha: { from: 1, to: 0 }, duration: 240, onComplete: function () { g.destroy(); } });
+  },
+  // small pictures for the wind (BK.LevelScene.blowFx) and the things that fly past, drawn in code once
+  windTextures: function (scene) {
+    if (scene.textures.exists('wind_seed')) return;
+    BK.fx.shotTextures(scene);
+    var g = scene.make.graphics({ x: 0, y: 0, add: false });
+    var px = function (rows, pal, key) {
+      g.clear();
+      rows.forEach(function (r, y) { for (var x = 0; x < r.length; x++) if (pal[r[x]] !== undefined) { g.fillStyle(pal[r[x]], 1); g.fillRect(x, y, 1, 1); } });
+      g.generateTexture(key, rows[0].length, rows.length);
+    };
+    var W = { w: 0xffffff, g: 0xd8d8e0, b: 0x8a6a4a, d: 0x5a3426, y: 0xffd23c, r: 0xe8483c, o: 0xff9a3a, k: 0x3a3048, p: 0x5aa0ff, s: 0xc0e8ff, t: 0xc89a5a, m: 0x8a5a30 };
+    px(['.w.w.', 'w.w.w', '.www.', '..g..', '..g..'], W, 'wind_seed');                // a dandelion seed
+    px(['.ww.', 'wwww', '.ww.'], W, 'wind_petal');
+    px(['w'], W, 'wind_dot');
+    px(['.w.', 'www', '.w.'], W, 'wind_snow');
+    px(['...ww', '..wgw', '.wgw.', 'wgw..', 'g....'], W, 'wind_feather');
+    px(['.ss.', 's..s', 's..w', '.ss.'], W, 'wind_bubble');
+    px(['..tmt..', '.m.t.m.', 't.mtm.t', 'mtm.mtm', 't.mtm.t', '.m.t.m.', '..tmt..'], W, 'wind_tumble');
+    px(['..wwww..', '.wwwwwww', 'wwwwww..'], W, 'wind_wisp');
+    px(['..kkk..', '..kkk..', '..rrr..', 'kkkkkkk'], W, 'wind_hat');               // a top hat
+    px(['.rr', '.ww', '.rr', '.ww', 'rrr', 'rr.'], W, 'wind_sock');                  // a striped sock
+    px(['..ppp..', '.ppppp.', 'ppppppp', '...d...', '...d...', '..dd...'], W, 'wind_umbrella');
+    px(['w......', 'wgw....', 'wwgww..', 'wwwwwww', '.gg....'], W, 'wind_plane');    // a paper plane
+    px(['..y..', '.yoy.', 'yooo r', '.yoy.', '..y..', '..d..', '...d.', '..d..'].map(function (r) { return (r + '      ').slice(0, 6); }), W, 'wind_kite');
+    g.clear();
+    for (var r = 3; r > 0; r--) { g.fillStyle(0xffffff, 0.25 + (3 - r) * 0.3); g.fillCircle(3, 3, r); }
+    g.generateTexture('shot_glow_small', 6, 6);
+    g.destroy();
   },
   // small white shapes for the shots, drawn once and tinted per shot
   shotTextures: function (scene) {

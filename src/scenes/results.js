@@ -12,7 +12,7 @@ BK.ResultsScene = class extends Phaser.Scene {
     BK.menuBackground(this, 2, { groundY: 200 });
     BK.audio.music(BK.MUSIC.map);
     BK.ui.nine(this, 16, 4, 352, 182, 'ui_panel2');
-    var modeName = { practice: BK.T.practice, weak: BK.T.weak, endless: BK.T.endless, halloween: 'Halloween' }[r.practice];
+    var modeName = { practice: BK.T.practice, weak: BK.T.weak, endless: BK.T.endless, halloween: 'Halloween', arena: BK.L('Aréna', 'Arena') }[r.practice];
     var head = r.daily ? BK.T.daily + BK.L(': kész!', ': done!') : modeName ? modeName + BK.L(': kész!', ': done!') : BK.T.results;
     BK.ui.text(this, 192, 35, head, { outline: false, size: 2, origin: [0.5, 0.5] });
 
@@ -107,9 +107,9 @@ BK.ResultsScene = class extends Phaser.Scene {
   // Daily, sentence practice and stories go back to the practice corner
   practiceButtons(r) {
     var s = this;
-    var again = { region: r.r, level: r.daily ? 'daily' : r.practice, storyId: r.storyId,
+    var again = { region: r.r, level: r.daily ? 'daily' : r.practice, storyId: r.storyId, boss: r.arenaId, hard: r.hard,
       seed: r.daily ? BK.util.hash('daily:' + BK.util.today()) : undefined };
-    var tab = r.daily ? 'today' : r.practice === 'story' ? 'story' : 'practice';
+    var tab = r.daily ? 'today' : r.practice === 'story' ? 'story' : r.practice === 'arena' ? 'arena' : 'practice';
     var mode = r.practice === 'practice' ? 'sent' : r.practice;
     BK.ui.button(this, 78, 196, BK.T.retry, function () { s.scene.start('Level', again); }, { w: 66, h: 18 });
     BK.ui.button(this, 192, 196, BK.T.map, function () { s.scene.start('Map'); }, { w: 66, h: 18, key: 'ESC' });

@@ -2,10 +2,10 @@
 
 Everything for the page is in this folder:
 
-- `betukaland-itch-0.7.1.zip`: the game (upload this)
+- `betukaland-itch-0.10.0.zip`: the game (upload this)
 - `cover_hu_630x500.png` / `cover_en_630x500.png`: cover image (pick one)
 - `screenshots/`: 11 screenshots at 1152×648
-- `DEVLOG_0.7.md`: the devlog post for this update
+- `DEVLOG_0.10.md`: the devlog post for this update
 
 ## 1. Create the project
 
@@ -20,7 +20,7 @@ itch.io → Dashboard → Create new project, then fill in:
 | Kind of project | HTML |
 | Release status | Released (or In development, if you still want to change things) |
 | Pricing | No payments |
-| Uploads | `betukaland-itch-0.7.1.zip`, tick "This file will be played in the browser" |
+| Uploads | `betukaland-itch-0.10.0.zip`, tick "This file will be played in the browser" |
 
 ## 2. Embed options
 
@@ -67,6 +67,10 @@ Gépelős kaland 3–6. osztályosoknak. A nyúl (vagy a tigris, a csikóhal, va
 - Az ujjak színesek a képernyő-billentyűzeten, így látszik, melyik ujj mit üt
 - Bemelegítő teszt az elején, ami megmondja, honnan érdemes kezdeni
 - 13 figura, köztük a 4.B osztály hét állata, és a boltban bármikor lehet figurát váltani
+- Halloween éjszaka: barátságosan kísérteties kaland a Tökkirállyal (a címképernyőn kapcsolható)
+- Bossaréna: a legyőzött főellenfelek újra kihívhatók, Normál vagy Nehéz fokozaton
+- Varázslövések a boltban: forma, szín (RTX, króm, neon is) és becsapódás
+- A pálya hossza a gyerek tempójához igazodik
 - Főellenfelek, csillagok, korona, bolt ruhákkal és kisállatokkal
 - Gyakorlósarok: napi kihívás, mondatok, rövid történetek, a nehéz betűk gyakorlása és a végtelen út
 - Napi célok és sorozat, hogy legyen mit csinálni a pályák után is
@@ -86,6 +90,10 @@ A typing adventure for ages 8–12. A bunny (or a tiger, a seahorse, or any of 1
 - Finger colours on the on-screen keyboard show which finger presses which key
 - A short warm-up at the start finds the right place to begin
 - 13 figures, seven of them suggested by class 4.B, and you can switch figures in the shop any time
+- Halloween Night: a friendly spooky adventure with the Pumpkin King (switch on the title screen)
+- Boss arena: fight the bosses you have beaten again, on Normal or Hard
+- Magic shots in the shop: shape, colour (RTX, chrome and neon too) and impact
+- Level length follows the child's pace
 - Bosses, stars, crowns and a shop with outfits and pets
 - Practice corner: daily challenge, sentences, short stories, tricky-letter drills and an endless road
 - Daily goals and a streak, so there is something to do after the last level
@@ -110,7 +118,7 @@ The full list is on the Credits screen in the game.
 
 ## 6. Screenshots
 
-Upload in this order: 01_title, 10_new_figures, 02_map, 11_seahorse, 04_story, 05_boss, 06_practice, 12_shop_figures, 07_shop, 08_title_en, 09_warmup_en. itch shows the first few most, so the new figures go near the front.
+Upload in this order: 01_title, 15_pumpkin_king_marks, 02_map, 13_halloween_night, 14_bat_narrator, 18_boss_arena, 17_magic_impacts, 19_rtx_wind, 10_new_figures, 16_halloween_figures, 04_story, 05_boss, 06_practice, 20_settings, 08_title_en, 09_warmup_en. Delete 07_shop, 11_seahorse and 12_shop_figures from the page if you want it shorter; the new shop pictures replace them.
 
 ## 7. Notes for running it from itch
 

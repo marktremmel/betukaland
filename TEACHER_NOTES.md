@@ -81,11 +81,23 @@ Coins from every creature, chest and boss; treasures (fruit and sweets icons) in
 
 ## Magic shots (shop, Varázs tab)
 
-At every correct key a little magic flies from the hero to the creature. In the shop's Varázs (Magic) tab a child chooses its shape and its colour separately; the shape pictures always show the colour in use.
+At every correct key a little magic flies from the hero to the creature. In the shop's Varázs (Magic) tab a child chooses its shape, its colour and its impact (Becsapódás) on three small pages; the pictures always show the colour in use, and a line shows all three in use.
 
 Shapes: Hullám (wave, free, the standard), Csillag (spinning star) 30, Kód (bits of code streaming to the target, like in the films) 40, Szikra (sparkle with a trail) 40, Üstökös (comet with a tail of embers) 50, Villám (lightning) 60, Gravihullám (rings that roll out where they land) 80.
 
-Colours: Klasszikus (yellow, free); Alapszínek 25 and Pasztell 35, where the child then picks one of eight colours; Szivárvány (a new colour every shot) 60; RTX 80 (glowing light and a lens flare where it lands, like a game camera); Króm 70 (shiny metal with a glint). A click shows a test shot; the button buys it or puts it in use. Everything bought is in the save code (version 5 since v0.9.1; older codes still load).
+Colours: Klasszikus (yellow, free); Alapszínek 25 and Pasztell 35, where the child then picks one of eight colours; Szivárvány (a new colour every shot) 60; RTX 80 (neon-coloured shots with a glow, a lens flare where they land, and coloured light on the word bubble: a lit rim and the letters just typed glowing); Króm 70 (shiny metal with a glint, and a shine that slides across the bubble); Neon 75 (shots that flicker on like a tube, and the bubble lights up like a neon sign).
+
+Impacts (what happens where the shot lands, in the shot's colour): Szikra (the classic, free), Pukk (a ring and dots) 25, Paca (a paint splat) 35, Pixel (8-bit pieces that fall) 40, Csillagszóró (little stars) 50, Bumm! (a comic-book word every third key: BUMM!, PUFF!, CSATT!...) 60.
+
+A click shows a test shot; the button buys it or puts it in use. Everything bought is in the save code (version 7 since v0.10; older codes still load).
+
+## Boss arena (Gyakorlósarok, 4: Aréna)
+
+Every boss the child has beaten on the map (and the Pumpkin King after Halloween Night) can be fought again here, alone, without the road before it. Normál is the boss as on the map. Nehéz adds two sentences and the boss throws marks to catch (! ? : - ( ) , @ in grade 3-4, # $ € & ; / < > = % in grade 5-6), like the Pumpkin King; the King throws them faster. The keyboard hints follow Settings: Jelek súgója. Stars are kept per boss and difficulty. The first win on each difficulty pays 12 or 25 coins, later wins only a few, so it is not a coin farm. Good for children who finished the map, and for the ones who liked the boss fights best.
+
+## Wind and little surprises
+
+Some levels have wind that carries something of the region: dandelion seeds and petals on the meadow, sand and feathers on the beach, foam bubbles in the bay, snow on the mountain, red dust and a rolling tumbleweed in the canyon, fireflies in the twilight wood, cloud wisps at the castle, autumn leaves at Halloween. Now and then a lost hat, a sock, an umbrella, a paper plane or a kite blows across the sky. They are only for fun.
 
 ## Settings (per child)
 
