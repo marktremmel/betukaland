@@ -37,6 +37,26 @@ BK.audio = (function () {
       if (wantMusic) tryPlay();
     },
 
+    // A tiny synthesised "voice" blip (Web Audio, no file): the narrator's talking
+    // sound, one blip per letter, pitched by the vowel, like in old video games.
+    blip: function (freq, opts) {
+      if (!wantSfx || !game || !game.sound || !game.sound.context) return;
+      opts = opts || {};
+      try {
+        var ctx = game.sound.context, t = ctx.currentTime, len = opts.len || 0.045;
+        var o1 = ctx.createOscillator(), o2 = ctx.createOscillator(), g = ctx.createGain(), f = ctx.createBiquadFilter();
+        o1.type = 'square'; o2.type = 'triangle';
+        o1.frequency.setValueAtTime(freq, t); o2.frequency.setValueAtTime(freq * 1.5, t);
+        o1.frequency.exponentialRampToValueAtTime(freq * (opts.slide || 0.92), t + len);
+        f.type = 'lowpass'; f.frequency.value = opts.cutoff || 2400;
+        g.gain.setValueAtTime(0.0001, t);
+        g.gain.exponentialRampToValueAtTime(opts.volume || 0.07, t + 0.005);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + len);
+        o1.connect(f); o2.connect(f); f.connect(g); g.connect(game.sound.masterVolumeNode || ctx.destination);
+        o1.start(t); o2.start(t); o1.stop(t + len + 0.02); o2.stop(t + len + 0.02);
+      } catch (e) { /* no Web Audio: silent */ }
+    },
+
     sfx: function (key, opts) {
       if (!wantSfx || !game || !game.cache.audio.exists(key)) return;
       opts = opts || {};

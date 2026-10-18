@@ -13,6 +13,20 @@ van vans bike bikes cake cakes milk moon moons bank bench cheese chicken monkey 
 camera cookie cookies candy blue black brown big small funny happy busy sunny windy rainy snowy
 can make bake take jump jumps run runs swim climb climbs read reads write draw draws sing sings
 banana bananas pizza puppy puppies kitten kittens bunny bunnies rabbit rabbits button mitten
+lasses fad fads ads plum grape grapes peach orange cherry berry kiwi bread toast butter honey pasta soup rice
+carrot potato tomato onion pepper corn bean peas juice mouse hamster parrot turtle lizard snake snail bee ant
+spider beetle butterfly ladybird worm hedgehog squirrel wolf bear deer owl crow robin pigeon goose hen rooster
+horse pony donkey calf lamb sheep piglet lion elephant giraffe hippo gorilla crocodile camel kangaroo koala
+panda penguin whale dolphin shark octopus crab jellyfish hand head ear eye nose mouth hair neck knee finger
+toe back arm leg mother father mum grandma grandpa sister brother baby family aunt uncle cousin friend teacher
+house home room kitchen window door gate garden fence roof stairs bed pillow chair table shelf lamp clock
+phone book pencil pen paper ruler eraser glue scissors bag school class train tram scooter boat plane
+helicopter rocket tractor truck forest field meadow hill mountain valley river sea island beach sand stone
+rock cave sun star cloud rain snow wind storm rainbow fog ice spring summer autumn winter morning noon evening
+night today tomorrow yesterday white grey purple pink tall short long fast slow brave kind clever strong weak
+warm cold soft hard new old clean loud walk fly dance laugh cry sleep wake eat drink paint build play learn
+count help look find give bring cook wash scarf glove coat shoe boot sock trousers skirt dress shirt jumper
+umbrella flower tulip bush grass branch root mushroom acorn ball doll robot puzzle game swing slide team goal
 `;
 
 window.BK_SENTENCES_EN = [

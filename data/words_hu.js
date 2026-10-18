@@ -33,6 +33,20 @@ méh méz mókus nyár olló ország oroszlán pálma pék pillangó pók póni 
 sün sütemény tál tánc táska teknős tó tojás tök tulipán tükör vár vasút vidám virág víz zászló zöld cipő erdő
 felhő eső kesztyű szőlő szőnyeg szúnyog szürke banán zsiráf papagáj madár bogár bárány mézes kút sétál táncol
 repül talál lát segít nyávog lassú jön kabát nadrág radír papír osztály bolygó szivárvány
+asztal fazék szék kép képek kalitka szarka kefir joghurt gida kos farkas szikla kerget szalad pattog kopog
+zakatol szuszog horkol suttog dalol friss piszkos rizs kekszek tollak eperfa pizzás tortás tolltartó ragasztó
+vonalzó szivacs tábla iskolatáska tanító tanár barát barátnő játszótér hinta csúszda homokozó mászóka foci
+kapus gól csapat nyúl hörcsög tengerimalac kanári aranyhal béka gyík katica darázs szöcske hangya giliszta
+szarvas vaddisznó borz vidra varjú veréb galamb kacsa liba tyúk csirke pulyka csikó szamár tehén borjú disznó
+elefánt víziló orrszarvú gorilla fóka bálna cápa polip rák medúza tengeri cseresznye dinnye mandarin ananász
+kivi mogyoró krumpli hagyma fokhagyma saláta káposzta karfiol borsó kukorica cukkini spenót pogácsa rétes
+lekvár főzelék szendvics száj váll könyök térd hát anya apa nagymama nagypapa testvér báty öcs nővér húg
+család unokatestvér nagynéni nagybácsi ház lakás konyha fürdőszoba ajtó kerítés tető kémény lépcső pince
+padlás erkély párna takaró függöny tévé rádió számítógép autó roller csónak repülő helikopter traktor
+teherautó mentő tűzoltóautó mező völgy strand kavics barlang hó villám köd harmat délben ma holnap hétfő kedd
+szerda csütörtök péntek szombat vasárnap barna narancssárga rózsaszín hosszú rövid magas alacsony széles
+keskeny szomorú bátor erős gyenge könnyű nehéz új régi mászik sír ébred számol ad főz süt mos takarít csizma
+póló pulóver pizsama esernyő napraforgó fa ág gyökér makk toboz
 `;
 
 // Sentences. Lowercase ones are used before capitals are taught.

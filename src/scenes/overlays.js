@@ -30,14 +30,17 @@ BK.ShopScene = class extends BK.OverlayBase {
   constructor() { super('Shop'); }
   create() {
     this.tab = 0;
-    this.frame(BK.T.shop, 300, 196);
+    this.frame(BK.T.shop, 340, 196);
     var s = this, b = this.box;
     this.karou = this.add.sprite(b.x + 34, b.y + b.h - 6, 'karou_sit').setOrigin(0.5, 1).play('karou_sit');
-    BK.ui.button(this, b.x + 46, b.y + 46, BK.T.outfits, function () { s.tab = 0; s.draw(); }, { w: 64, h: 16 });
-    BK.ui.button(this, b.x + 116, b.y + 46, BK.T.pets, function () { s.tab = 1; s.draw(); }, { w: 64, h: 16 });
-    BK.ui.button(this, b.x + 256, b.y + 46, BK.T.magic, function () { s.tab = 3; s.fxSel = null; s.draw(); }, { w: 64, h: 16 });
-    // switching figures only from the map: in a level the hero is already on the road
-    if (this.data0.from !== 'Level') BK.ui.button(this, b.x + 186, b.y + 46, BK.T.figures, function () { s.tab = 2; s.draw(); }, { w: 64, h: 16 });
+    // tabs, evenly spread; switching figures only from the map (in a level the hero is already on the road)
+    var tabs = [[0, BK.T.outfits], [1, BK.T.pets], [2, BK.T.figures], [3, BK.T.magic]].filter(function (t) { return t[0] !== 2 || s.data0.from !== 'Level'; });
+    this.tabX = {};
+    tabs.forEach(function (t, i) {
+      var x = b.x + b.w / 2 + (i - (tabs.length - 1) / 2) * 76;
+      s.tabX[t[0]] = x;
+      BK.ui.button(s, x, b.y + 46, t[1], function () { s.tab = t[0]; s.fxSel = null; s.draw(); }, { w: 70, h: 16 });
+    });
     this.coinIcon = this.add.sprite(b.x + b.w - 44, b.y + 30, 'coin').play('coin');
     this.coinText = BK.ui.text(this, b.x + b.w - 34, b.y + 24, '', { outline: false, color: 0x9a3d1a });
     BK.audio.sfx('v_hiya', { volume: 0.5 });
@@ -48,7 +51,7 @@ BK.ShopScene = class extends BK.OverlayBase {
     this.clearD();
     this.coinText.setText(String(P.coins));
     // which tab is open
-    this.keepD(this.add.rectangle(b.x + 46 + this.tab * 70, b.y + 46, 68, 20).setStrokeStyle(1, 0x9a3d1a));
+    this.keepD(this.add.rectangle(this.tabX[this.tab], b.y + 46, 74, 20).setStrokeStyle(1, 0x9a3d1a));
     this.karou.setVisible(this.tab < 2);
     if (this.tab === 2) { this.drawFigures(); return; }
     if (this.tab === 3) { this.drawMagic(); return; }
@@ -56,7 +59,7 @@ BK.ShopScene = class extends BK.OverlayBase {
     var list = this.tab === 0 ? BK.OUTFITS : BK.PETS.filter(function (p) { return !p.reward || P.pets.indexOf(p.id) >= 0; });
     list.forEach(function (it, i) {
       var col = i % 3, row = Math.floor(i / 3);
-      var x = b.x + 16 + col * 92, y = b.y + 58 + row * 56;
+      var x = b.x + (b.w - 270) / 2 + col * 92, y = b.y + 58 + row * 56;
       s.keepD(BK.ui.nine(s, x, y, 86, 54, 'ui_slot'));
       var hero = BK.heroOf(P);
       var key = s.tab === 0 ? (it.id === 'base' ? hero.idle : hero.idle + '_' + it.id) : it.sprite;
@@ -78,17 +81,23 @@ BK.ShopScene = class extends BK.OverlayBase {
     var s = this, P = this.P, b = this.box, fx = P.fx;
     var sel = this.fxSel || { kind: 'shape', id: fx.shape };
     var item = (sel.kind === 'shape' ? BK.SHOT_SHAPES : BK.SHOT_COLOURS).find(function (o) { return o.id === sel.id; });
-    var row = function (list, kind, y, w, step, x0) {
+    // one row of slots, centred in the panel; colour slots are taller (palette, name, price)
+    var row = function (list, kind, y, w, step) {
+      var h = kind === 'shape' ? 28 : 34, x0 = b.x + b.w / 2 - (list.length - 1) * step / 2;
       list.forEach(function (o, i) {
-        var x = b.x + x0 + i * step, owned = fx.owned.indexOf(o.id) >= 0;
+        var x = x0 + i * step, owned = fx.owned.indexOf(o.id) >= 0;
         var inUse = kind === 'shape' ? fx.shape === o.id : fx.colour === o.id;
-        s.keepD(BK.ui.nine(s, x - w / 2, y - 14, w, 28, inUse ? 'ui_slot_sel' : 'ui_slot'));
-        if (kind === 'shape') s.shotIcon(x, owned ? y - 1 : y - 5, o.id, fx.colour, fx.tone);
-        else s.colourIcon(x, y - 6, o);
-        var tag = kind === 'shape' ? (owned ? '' : o.price + '') : (owned ? o.name : o.name + ' ' + o.price);
-        if (tag) s.keepD(BK.ui.text(s, x, y + 6, tag, { outline: false, origin: [0.5, 0.5], px: 9, bold: !owned, color: owned ? 0x4a2c1c : 0x9a3d1a, fit: w - 6 }));
-        if (sel.kind === kind && sel.id === o.id) s.keepD(s.add.rectangle(x, y, w + 4, 32).setStrokeStyle(2, 0xffffff));
-        var z = s.keepD(s.add.zone(x, y, w, 28).setInteractive({ useHandCursor: true }));
+        s.keepD(BK.ui.nine(s, x - w / 2, y - h / 2, w, h, inUse ? 'ui_slot_sel' : 'ui_slot'));
+        if (kind === 'shape') {
+          s.shotIcon(x, owned ? y - 1 : y - 5, o.id, fx.colour, fx.tone);
+          if (!owned) s.keepD(BK.ui.text(s, x, y + 7, o.price + '', { outline: false, origin: [0.5, 0.5], px: 9, bold: true, color: 0x9a3d1a }));
+        } else {
+          s.colourIcon(x, y - 9, o);
+          s.keepD(BK.ui.text(s, x, y + 1, o.name, { outline: false, origin: [0.5, 0.5], px: 8, color: 0x4a2c1c, fit: w - 6 }));
+          if (!owned) s.keepD(BK.ui.text(s, x, y + 10, o.price + '', { outline: false, origin: [0.5, 0.5], px: 8, bold: true, color: 0x9a3d1a }));
+        }
+        if (sel.kind === kind && sel.id === o.id) s.keepD(s.add.rectangle(x, y, w + 4, h + 4).setStrokeStyle(2, 0xffffff));
+        var z = s.keepD(s.add.zone(x, y, w, h).setInteractive({ useHandCursor: true }));
         z.on('pointerup', function () {
           s.fxSel = { kind: kind, id: o.id, tone: kind === 'colour' && fx.colour === o.id ? fx.tone : 0 };
           BK.audio.sfx('ui');
@@ -97,14 +106,14 @@ BK.ShopScene = class extends BK.OverlayBase {
         });
       });
     };
-    this.keepD(BK.ui.text(this, b.x + 14, b.y + 57, BK.T.shape, { outline: false, px: 9, color: 0x6b3a20 }));
-    row(BK.SHOT_SHAPES, 'shape', b.y + 81, 36, 40, 30);
-    this.keepD(BK.ui.text(this, b.x + 14, b.y + 97, BK.T.colours, { outline: false, px: 9, color: 0x6b3a20 }));
-    row(BK.SHOT_COLOURS, 'colour', b.y + 121, 44, 46, 35);
+    this.keepD(BK.ui.text(this, b.x + 20, b.y + 57, BK.T.shape, { outline: false, px: 9, color: 0x6b3a20 }));
+    row(BK.SHOT_SHAPES, 'shape', b.y + 80, 38, 42);
+    this.keepD(BK.ui.text(this, b.x + 20, b.y + 97, BK.T.colours, { outline: false, px: 9, color: 0x6b3a20 }));
+    row(BK.SHOT_COLOURS, 'colour', b.y + 124, 48, 51);
     // the single colours of a basic or pastel set
     if (sel.kind === 'colour' && item.pick) {
       item.cols.forEach(function (c, i) {
-        var x = b.x + 60 + i * 18, y = b.y + 144, on = (sel.tone || 0) === i;
+        var x = b.x + b.w / 2 + (i - (item.cols.length - 1) / 2) * 18, y = b.y + 146, on = (sel.tone || 0) === i;
         s.keepD(s.add.rectangle(x, y, 12, 9, c).setStrokeStyle(on ? 2 : 1, on ? 0xffffff : 0x4a2c1c));
         var z = s.keepD(s.add.zone(x, y, 16, 12).setInteractive({ useHandCursor: true }));
         z.on('pointerup', function () { s.fxSel = { kind: 'colour', id: item.id, tone: i }; BK.audio.sfx('ui'); s.draw(); s.demo(); });
@@ -113,9 +122,9 @@ BK.ShopScene = class extends BK.OverlayBase {
     // what is selected, and the button for it
     var owned = fx.owned.indexOf(item.id) >= 0;
     var inUse = sel.kind === 'shape' ? fx.shape === item.id : (fx.colour === item.id && (!item.pick || (fx.tone || 0) === (sel.tone || 0)));
-    this.keepD(BK.ui.text(this, b.x + 14, b.y + 163, item.name + (owned ? '' : '  ·  ' + item.price + ' ' + BK.L('érme', 'coins')), { outline: false, origin: [0, 0.5], color: 0x4a2c1c, bold: true, fit: 150 }));
+    this.keepD(BK.ui.text(this, b.x + 20, b.y + 160, item.name + (owned ? '' : '  ·  ' + item.price + ' ' + BK.L('érme', 'coins')), { outline: false, origin: [0, 0.5], color: 0x4a2c1c, bold: true, fit: 150 }));
     var label = inUse ? BK.T.using : owned ? BK.T.use : BK.T.buy;
-    this.keepD(BK.ui.button(this, b.x + b.w - 56, b.y + 163, label, function () { s.buyMagic(sel, item); }, { w: 84, h: 16, disabled: inUse }));
+    this.keepD(BK.ui.button(this, b.x + b.w - 62, b.y + 160, label, function () { s.buyMagic(sel, item); }, { w: 84, h: 16, disabled: inUse }));
   }
   // a shape, drawn in the colour the child uses now
   shotIcon(x, y, shape, colour, tone) {
@@ -155,7 +164,7 @@ BK.ShopScene = class extends BK.OverlayBase {
     var test = { shape: sel.kind === 'shape' ? sel.id : fx.shape, colour: sel.kind === 'colour' ? sel.id : fx.colour,
       tone: sel.kind === 'colour' ? sel.tone || 0 : fx.tone };
     for (var i = 0; i < 3; i++) (function (i) {
-      s.time.delayedCall(i * 170, function () { BK.fx.bolt(s, b.x + 40, b.y + 100, b.x + b.w - 40, b.y + 98 + (i - 1) * 3, test); });
+      s.time.delayedCall(i * 170, function () { BK.fx.bolt(s, b.x + 70, b.y + 99, b.x + b.w - 40, b.y + 97 + (i - 1) * 3, test); });
     })(i);
   }
   buyMagic(sel, item) {
@@ -177,7 +186,7 @@ BK.ShopScene = class extends BK.OverlayBase {
   drawFigures() {
     var s = this, P = this.P, b = this.box;
     BK.HEROES.forEach(function (h, i) {
-      var x = b.x + 38 + (i % 5) * 56, y = b.y + 76 + Math.floor(i / 5) * 38;
+      var x = b.x + (b.w - 280) / 2 + 28 + (i % 5) * 56, y = b.y + 76 + Math.floor(i / 5) * 38;
       var sel = i === (P.avatar || 0);
       s.keepD(BK.ui.nine(s, x - 26, y - 18, 52, 36, sel ? 'ui_slot_sel' : 'ui_slot'));
       var spr = s.keepD(BK.avatarSprite(s, x, y + 16, i, P));

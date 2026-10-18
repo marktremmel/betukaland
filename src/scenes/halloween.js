@@ -17,8 +17,8 @@ BK.HalloweenScene = class extends Phaser.Scene {
     BK.menuBackground(this, 3, { groundY: 200 });
     BK.audio.music('m_moon');
     BK.ui.nine(this, 16, 4, 352, 182, 'ui_panel2');
-    BK.ui.text(this, 192, 30, story.title, { outline: false, size: 2, origin: [0.5, 0.5], color: 0x6a2a8a });
-    BK.ui.text(this, 34, 41, story.intro, { outline: false, width: 316, px: 9, color: 0x4a2c1c });
+    BK.ui.text(this, 192, 33, story.title, { outline: false, size: 2, origin: [0.5, 0.5], color: 0x6a2a8a });
+    BK.ui.text(this, 34, 44, story.intro, { outline: false, width: 316, px: 9, color: 0x4a2c1c });
     var hw = P.halloween || { stars: [0, 0, 0, 0] };
     this.stars = hw.stars;
     var open = BK.REGIONS.filter(function (r) { return r.playable && BK.save.regionOpen(P, r.id); });

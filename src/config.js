@@ -6,7 +6,7 @@
  */
 window.BK = window.BK || {};
 
-BK.VERSION = '0.9.2';
+BK.VERSION = '0.9.4';
 
 // Test mode for the teacher: open the game with ?debug at the end of the address.
 // Every region and level is open; in a level Tab finishes the current word and
