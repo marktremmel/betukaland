@@ -6,7 +6,7 @@
  */
 window.BK = window.BK || {};
 
-BK.VERSION = '0.9.4';
+BK.VERSION = '0.9.5';
 
 // Test mode for the teacher: open the game with ?debug at the end of the address.
 // Every region and level is open; in a level Tab finishes the current word and
@@ -80,14 +80,42 @@ BK.setLayout = function (id) {
 BK.setLayout('hu');
 
 // How to type a mark that is not on a plain key (shown under the Pumpkin King's
-// bubbles). Shift marks come from the layout; AltGr marks are for the Hungarian
-// PC layout (on a Mac: Option, and some keys differ).
-BK.ALTGR_HU = { '@': 'V', '#': 'X', '&': 'C', '$': 'É', '€': 'U', '<': 'Í', '>': 'Y', ';': ',', '*': '-', '[': 'F', ']': 'G', '{': 'B', '}': 'N' };
-BK.keyHint = function (ch) {
-  var base = BK.SHIFT_MAP[ch];
-  if (base) return 'Shift + ' + base.toUpperCase();
-  if (BK.layout.id === 'hu' && BK.ALTGR_HU[ch]) return 'AltGr + ' + BK.ALTGR_HU[ch];
-  return '';
+// bubbles). The child's computer is chosen in Settings ("Jelek súgója"):
+// Mac or PC, Hungarian or English keyboard; Mac Hungarian is the default.
+// An empty string means a plain key; a mark missing from a list is not sent.
+BK.KEY_HINT_SETS = [
+  { id: 'mac-hu', name: 'Mac magyar', en: 'Mac Hungarian' },
+  { id: 'pc-hu', name: 'PC magyar', en: 'PC Hungarian' },
+  { id: 'pc-us', name: 'PC angol', en: 'PC English' },
+  { id: 'mac-us', name: 'Mac angol', en: 'Mac English' },
+];
+(function () {
+  var huShift = { '!': 'Shift + 4', '%': 'Shift + 5', '/': 'Shift + 6', '=': 'Shift + 7', '(': 'Shift + 8', ')': 'Shift + 9',
+    '?': 'Shift + ,', ':': 'Shift + .', '-': '', ',': '' };
+  var usAll = { '!': 'Shift + 1', '@': 'Shift + 2', '#': 'Shift + 3', '$': 'Shift + 4', '%': 'Shift + 5', '&': 'Shift + 7',
+    '(': 'Shift + 9', ')': 'Shift + 0', '?': 'Shift + /', ':': 'Shift + ;', '<': 'Shift + ,', '>': 'Shift + .',
+    '=': '', ';': '', '/': '', '-': '', ',': '' };
+  BK.KEY_HINTS = {
+    'mac-hu': Object.assign({}, huShift, { '@': 'Option + Q', '#': 'Option + Shift + 3', '$': 'Option + 4', '€': 'Option + E',
+      '&': 'Option + 1', '<': 'Option + Shift + Y', '>': 'Option + Shift + X', ';': 'Option + .' }),
+    'pc-hu': Object.assign({}, huShift, { '@': 'AltGr + V', '#': 'AltGr + X', '$': 'AltGr + É', '€': 'AltGr + U',
+      '&': 'AltGr + C', '<': 'AltGr + Í', '>': 'AltGr + Y', ';': 'AltGr + ,' }),
+    'pc-us': usAll,
+    'mac-us': Object.assign({}, usAll, { '€': 'Option + Shift + 2' }),
+  };
+})();
+BK.hintSet = function (p) { p = p || BK.state.profile; return (p && p.settings && p.settings.kbHint) || 'mac-hu'; };
+// '' = plain key, null = this computer cannot make it
+BK.keyHint = function (ch, p) {
+  var h = BK.KEY_HINTS[BK.hintSet(p)] || BK.KEY_HINTS['mac-hu'];
+  return h[ch] === undefined ? null : h[ch];
+};
+// the key to light up on the screen keyboard for a hinted mark ("Option + Shift + 3" -> "3")
+BK.hintKey = function (ch) {
+  var h = BK.keyHint(ch);
+  if (!h) return null;
+  var k = h.split('+').pop().trim().toLowerCase();
+  return k;
 };
 // The marks the Pumpkin King sends, by grade band (the US keyboard has no €)
 BK.HW_SPECIALS = { '3-4': ['!', '?', ':', '-', '(', ')', ',', '@'], '5-6': ['#', '$', '€', '&', ';', '/', '<', '>', '=', '%'] };
@@ -328,10 +356,25 @@ BK.HEROES = [
   { id: 'tiger', name: 'Tigris', idle: 'tiger_idle', run: 'tiger_run' },
   { id: 'seahorse', name: 'Csikóhal', idle: 'seahorse_idle', run: 'seahorse_run', flies: true },
   { id: 'polar', name: 'Jegesmedve', idle: 'polar_idle', run: 'polar_run' },
+  // Halloween figures: in the shop once the Pumpkin King smiles (lock); the ghost is the gift
+  { id: 'hwghost', name: 'Szellemke', idle: 'hw_ghost_float', run: 'hw_ghost_float', flies: true, creature: 'hw_ghost', lock: 'halloween', price: 0 },
+  { id: 'hwpumpkin', name: 'Tökfej', idle: 'hw_pumpkin_walk', run: 'hw_pumpkin_walk', creature: 'hw_pumpkin', lock: 'halloween', price: 60 },
+  { id: 'hwcat', name: 'Boszicica', idle: 'hw_cat_walk', run: 'hw_cat_walk', creature: 'hw_cat', lock: 'halloween', price: 60 },
+  { id: 'hwmummy', name: 'Múmia', idle: 'hw_mummy_walk', run: 'hw_mummy_walk', creature: 'hw_mummy', lock: 'halloween', price: 80 },
+  { id: 'hwbat', name: 'Denevérke', idle: 'hw_bat_fly', run: 'hw_bat_fly', flies: true, creature: 'hw_bat', lock: 'halloween', price: 80 },
 ];
-BK.heroOf = function (p) { return BK.HEROES[(p && p.avatar) || 0] || BK.HEROES[0]; };
+// Can this child play this figure? Locked ones must be owned (bought or given).
+BK.heroOwned = function (p, h) { return !h.lock || ((p && p.figures) || []).indexOf(h.id) >= 0; };
+BK.heroUnlocked = function (p, h) { return !h.lock || !!(p && p.halloween && p.halloween.stars && p.halloween.stars[3]); };
+BK.HW_GIFT = 'hwghost';
+// a new profile chooses from the figures everyone has (the locked ones come last in the list)
+BK.N_FREE_HEROES = BK.HEROES.filter(function (h) { return !h.lock; }).length;
+BK.heroOf = function (p) { var h = BK.HEROES[(p && p.avatar) || 0] || BK.HEROES[0]; return BK.heroOwned(p, h) ? h : BK.HEROES[0]; };
 // key of an animation in the profile's outfit colour
-BK.outfitKey = function (key, p) { return (p && p.outfit && p.outfit !== 'base') ? key + '_' + p.outfit : key; };
+BK.outfitKey = function (key, p) {
+  var k = (p && p.outfit && p.outfit !== 'base') ? key + '_' + p.outfit : key;
+  return window.BK_MANIFEST && !BK_MANIFEST.sprites[k] ? key : k;   // figures without outfit colours (Halloween ones) stay as they are
+};
 
 // Which way the creatures look in the source art. Enemies must face left
 // (towards the hero), pets must face right. true = faces left already.

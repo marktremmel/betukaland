@@ -182,26 +182,44 @@ BK.ShopScene = class extends BK.OverlayBase {
     this.demo();
   }
 
-  // Figures: free to switch, 5 x 3 small slots, the current one framed in white
+  // Figures: switching is free. 6 x 3 small slots, the current one framed in white.
+  // The Halloween figures open after Halloween Night: one is a gift, the others cost coins.
   drawFigures() {
     var s = this, P = this.P, b = this.box;
     BK.HEROES.forEach(function (h, i) {
-      var x = b.x + (b.w - 280) / 2 + 28 + (i % 5) * 56, y = b.y + 76 + Math.floor(i / 5) * 38;
-      var sel = i === (P.avatar || 0);
-      s.keepD(BK.ui.nine(s, x - 26, y - 18, 52, 36, sel ? 'ui_slot_sel' : 'ui_slot'));
-      var spr = s.keepD(BK.avatarSprite(s, x, y + 16, i, P));
-      spr.setScale(h.id === 'crab' ? 1.4 : Math.min(1, 30 / spr.height));
-      if (sel) s.keepD(s.add.rectangle(x, y, 56, 40).setStrokeStyle(2, 0xffffff));
-      var z = s.keepD(s.add.zone(x, y, 52, 36).setInteractive({ useHandCursor: true }));
+      var x = b.x + (b.w - 324) / 2 + 27 + (i % 6) * 54, y = b.y + 74 + Math.floor(i / 6) * 36;
+      var sel = i === (P.avatar || 0), owned = BK.heroOwned(P, h), open = BK.heroUnlocked(P, h);
+      s.keepD(BK.ui.nine(s, x - 25, y - 17, 50, 34, sel ? 'ui_slot_sel' : open ? 'ui_slot' : 'ui_slot_off'));
+      var spr = s.keepD(BK.avatarSprite(s, x, y + (owned ? 15 : 6), i, P));
+      spr.setScale(h.id === 'crab' ? 1.4 : Math.min(1, (owned ? 28 : 21) / spr.height));
+      if (!open) spr.setTint(0x302838).setAlpha(0.7);
+      if (!owned) {
+        s.keepD(BK.ui.text(s, x, y + 5, open ? h.price + ' ' + BK.L('érme', 'coins') : 'Halloween',
+          { outline: false, origin: [0.5, 0], px: 9, color: open ? 0x9a3d1a : 0x6a2a8a }));
+      }
+      if (sel) s.keepD(s.add.rectangle(x, y, 54, 38).setStrokeStyle(2, 0xffffff));
+      var z = s.keepD(s.add.zone(x, y, 50, 34).setInteractive({ useHandCursor: true }));
       z.on('pointerup', function () {
         if (P.avatar === i) return;
+        if (!open) {
+          BK.ui.toast(s, BK.W / 2, b.y + b.h - 34, BK.L('Teljesítsd a Halloween éjszakát!', 'Finish Halloween Night first!'), 0xd8a0ff);
+          BK.audio.sfx('key_bad', { volume: 0.3 });
+          return;
+        }
+        if (!owned) {
+          if (P.coins < h.price) { BK.ui.toast(s, BK.W / 2, b.y + b.h - 34, BK.T.notEnough, 0xff9a7a); BK.audio.sfx('key_bad', { volume: 0.3 }); return; }
+          P.coins -= h.price;
+          P.figures = P.figures || [];
+          P.figures.push(h.id);
+          BK.audio.sfx('buy');
+          BK.audio.sfx('v_great', { volume: 0.5 });
+        } else BK.audio.sfx('ui');
         P.avatar = i;
-        BK.audio.sfx('ui');
         BK.save.persist();
         s.draw();
       });
     });
-    this.keepD(BK.ui.text(this, b.x + 14, b.y + b.h - 16, BK.T.figureNow + ' ' + BK.heroOf(P).name,
+    this.keepD(BK.ui.text(this, b.x + 14, b.y + 30, BK.T.figureNow + ' ' + BK.heroOf(P).name,
       { outline: false, origin: [0, 0.5], color: 0x9a3d1a, fit: 96 }));
   }
   act(it, owned, wearing) {
@@ -258,14 +276,14 @@ BK.SettingsScene = class extends BK.OverlayBase {
     this.clearD();
     var toggles = [
       ['keyboard', BK.T.keyboardHints], ['fingers', BK.T.fingerColours], ['music', BK.T.music],
-      ['sfx', BK.T.sound], ['speedRun', BK.T.speedRun],
+      ['sfx', BK.T.sound], ['speedRun', BK.T.speedRun], ['rest', BK.L('Pihenő', 'Rest stop')],
     ];
     toggles.forEach(function (r, i) {
       var y = b.y + 56 + i * 20;
       s.keepD(BK.ui.text(s, b.x + 20, y, r[1], { outline: false, origin: [0, 0.5], fit: 118 }));
-      var on = !!P.settings[r[0]];
+      var on = r[0] === 'rest' ? P.settings.rest !== false : !!P.settings[r[0]];
       s.keepD(BK.ui.button(s, b.x + 158, y, on ? BK.T.on : BK.T.off, function () {
-        P.settings[r[0]] = !P.settings[r[0]];
+        P.settings[r[0]] = P.settings[r[0]] === false ? true : !P.settings[r[0]];
         BK.save.persist();
         BK.audio.apply(P.settings);
         s.draw();
@@ -273,6 +291,7 @@ BK.SettingsScene = class extends BK.OverlayBase {
     });
     var font = BK.FONTS.filter(function (f) { return f.id === BK.fontId; })[0] || BK.FONTS[0];
     var lay = BK.layoutOf(P);
+    var hid = BK.hintSet(P), hset = BK.KEY_HINT_SETS.filter(function (h) { return h.id === hid; })[0] || BK.KEY_HINT_SETS[0];
     var choices = [
       // word language: what the child types
       [BK.T.wordLang, P.lang === 'en' ? BK.T.langEn : BK.T.langHu, function () { P.lang = P.lang === 'en' ? 'hu' : 'en'; BK.save.persist(); s.draw(); }],
@@ -285,6 +304,12 @@ BK.SettingsScene = class extends BK.OverlayBase {
       [BK.T.kbLayout, lay.name, function () {
         var ids = Object.keys(BK.LAYOUTS);
         P.settings.layout = ids[(ids.indexOf(lay.id) + 1) % ids.length]; BK.setLayout(P.settings.layout); BK.save.persist(); s.draw();
+        if (P.settings.layout !== 'hu') BK.ui.toast(s, BK.W / 2, b.y + b.h - 34, BK.T.kbLayoutNote, 0xffe0a0, 1, 2600);
+      }],
+      // which keys the Pumpkin King's marks need (Option on a Mac, AltGr on a PC)
+      [BK.L('Jelek súgója', 'Mark hints'), hset.name, function () {
+        var sets = BK.KEY_HINT_SETS, k = sets.indexOf(hset);
+        P.settings.kbHint = sets[(k + 1) % sets.length].id; BK.save.persist(); s.draw();
       }],
     ];
     choices.forEach(function (c, i) {
@@ -294,16 +319,13 @@ BK.SettingsScene = class extends BK.OverlayBase {
     });
     // the warm-up test once more (for a child who skipped it, or has improved a lot)
     if (this.data0.from === 'Map') {
-      var wy = b.y + 56 + 4 * 20;
+      var wy = b.y + 56 + 5 * 20;
       s.keepD(BK.ui.text(s, b.x + 186, wy, BK.L('Bemelegítés', 'Warm-up'), { outline: false, origin: [0, 0.5], fit: 82 }));
       s.keepD(BK.ui.button(s, b.x + b.w - 50, wy, BK.L('Újra', 'Again'), function () {
         BK.save.persist();
         s.scene.stop('Map');
         s.scene.start('Placement');
       }, { w: 70, h: 18 }));
-    }
-    if (lay.id !== 'hu') {
-      s.keepD(BK.ui.text(s, b.x + 186, b.y + 56 + 5 * 20 - 6, BK.T.kbLayoutNote, { outline: false, width: 140, px: 9, color: 0x6b3a20 }));
     }
   }
 };

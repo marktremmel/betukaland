@@ -43,7 +43,7 @@ BK.save = (function () {
       nick: nick, avatar: avatar, grade: grade, lang: lang,
       created: BK.util.today(), lastPlayed: null,
       placed: null,                       // region suggested by the placement test
-      settings: { keyboard: true, fingers: true, music: true, sfx: true, speedRun: false },
+      settings: { keyboard: true, fingers: true, music: true, sfx: true, speedRun: false, rest: true, kbHint: 'mac-hu' },
       progress: {},                       // regionId -> { stars: [l1, l2, l3, boss] }
       coins: 0,
       items: {},                          // item id -> count
@@ -62,7 +62,8 @@ BK.save = (function () {
 
   // Fill in fields added in later versions so old saves keep working
   function upgrade(p) {
-    p.settings = Object.assign({ keyboard: true, fingers: true, music: true, sfx: true, speedRun: false }, p.settings || {});
+    p.settings = Object.assign({ keyboard: true, fingers: true, music: true, sfx: true, speedRun: false, rest: true, kbHint: 'mac-hu' }, p.settings || {});
+    p.figures = p.figures || [];          // figures that must be owned (Halloween ones)
     p.progress = p.progress || {};
     BK.REGIONS.forEach(function (r) {
       if (!p.progress[r.id]) p.progress[r.id] = { stars: [0, 0, 0, 0] };
@@ -121,6 +122,9 @@ BK.save = (function () {
     local.best.endless = Math.max(local.best.endless || 0, inc.best.endless || 0);
     local.placed = Math.max(local.placed || 0, inc.placed || 0) || null;
     local.avatar = inc.avatar;
+    (inc.figures || []).forEach(function (f) { if (local.figures.indexOf(f) < 0) local.figures.push(f); });
+    if (inc.halloween && (!local.halloween || !local.halloween.stars[3])) local.halloween = inc.halloween;
+    ['rest', 'kbHint'].forEach(function (k) { if (inc.settings[k] !== undefined) local.settings[k] = inc.settings[k]; });
     if (inc.fx) { (inc.fx.owned || []).forEach(function (o) { if (local.fx.owned.indexOf(o) < 0) local.fx.owned.push(o); }); local.fx.shape = inc.fx.shape; local.fx.colour = inc.fx.colour; local.fx.tone = inc.fx.tone || 0; }              // the figure can change, the code carries the latest choice
     ['layout', 'ui', 'font'].forEach(function (k) { if (inc.settings[k]) local.settings[k] = inc.settings[k]; });
     return local;
@@ -167,6 +171,9 @@ BK.save = (function () {
       hw.stars[res.stage] = Math.max(hw.stars[res.stage] || 0, res.stars);
       var pet = BK.HALLOWEEN.pet;
       if (res.stage === 3 && p.pets.indexOf(pet) < 0) { p.pets.push(pet); res.newPet = pet; }
+      // ...and a Halloween figure as a gift; the others can be bought in the shop from now on
+      p.figures = p.figures || [];
+      if (res.stage === 3 && res.stars > 0 && p.figures.indexOf(BK.HW_GIFT) < 0) { p.figures.push(BK.HW_GIFT); res.newFigure = BK.HW_GIFT; }
     }
     if (res.practice === 'endless') { res.prevEndless = p.best.endless; p.best.endless = Math.max(p.best.endless, res.words || 0); }
     p.coins = Math.min(16000, p.coins + (res.coins || 0));
@@ -201,10 +208,10 @@ BK.save = (function () {
   }
 
   function encode(p) {
-    // version 5 (v0.9.1): magic shots with single colours, RTX and chrome. Version 4 (v0.9): the shop's magic shots. Version 3 (v0.7): two more figure bits. Version 2 (v0.6.2) made codes shorter: the per-key skill levels are left out (the game relearns
+    // version 6 (v0.9.5): plus Halloween figures. Version 5 (v0.9.1): magic shots with single colours, RTX and chrome. Version 4 (v0.9): the shop's magic shots. Version 3 (v0.7): two more figure bits. Version 2 (v0.6.2) made codes shorter: the per-key skill levels are left out (the game relearns
     // them in a few rounds) and trailing zeros are dropped. Version 1 codes still load.
     var b = new Bits();
-    b.put(5, 3);
+    b.put(6, 3);
     b.put(p.avatar & 7, 3);
     b.put(p.grade === '5-6' ? 1 : 0, 1);
     b.put(p.lang === 'en' ? 1 : 0, 1);
@@ -237,6 +244,9 @@ BK.save = (function () {
     b.put(Math.max(0, BK.SHOT_SHAPES.findIndex(function (o) { return o.id === fx.shape; })), 3);
     b.put(Math.max(0, BK.SHOT_COLOURS.findIndex(function (o) { return o.id === fx.colour; })), 3);
     b.put((fx.tone || 0) & 7, 3);
+    // v6 (v0.9.5): Halloween figures owned, and whether the Pumpkin King was beaten (opens them in the shop)
+    BK.HEROES.filter(function (h) { return h.lock; }).forEach(function (h) { b.put((p.figures || []).indexOf(h.id) >= 0 ? 1 : 0, 1); });
+    b.put(p.halloween && p.halloween.stars && p.halloween.stars[3] ? 1 : 0, 1);
     storyOrder().forEach(function (k) { b.put(Math.min(3, (p.stories || {})[k] || 0), 2); });
     while (b.a.length > 5 && b.a.lastIndexOf(1) < b.a.length - 5) b.a.length -= 5;   // drop trailing zero groups
     while (b.a.length % 5) b.a.push(0);
@@ -261,7 +271,7 @@ BK.save = (function () {
     if (sum !== check) throw new Error('checksum');
     var rd = new Reader(body);
     var ver = rd.get(3);
-    if (ver < 1 || ver > 5) throw new Error('version');
+    if (ver < 1 || ver > 6) throw new Error('version');
     var avatar = rd.get(3), grade = rd.get(1) ? '5-6' : '3-4', lang = rd.get(1) ? 'en' : 'hu', placed = rd.get(3) || null;
     var nl = rd.get(4), nick = '';
     for (i = 0; i < nl; i++) nick += NICK[rd.get(7)] || '';
@@ -300,6 +310,11 @@ BK.save = (function () {
       var tone = ver >= 5 ? rd.get(3) : 0;
       p.fx = { v: 2, owned: own, shape: own.indexOf(si.id) >= 0 ? si.id : 'wave', colour: own.indexOf(ci.id) >= 0 ? ci.id : 'classic',
         tone: ci.cols && tone < ci.cols.length ? tone : 0 };
+    }
+    if (ver >= 6) {
+      p.figures = [];
+      BK.HEROES.filter(function (h) { return h.lock; }).forEach(function (h) { if (rd.get(1)) p.figures.push(h.id); });
+      if (rd.get(1)) p.halloween = { stars: [1, 1, 1, 1] };
     }
     storyOrder().forEach(function (k) { var v = rd.get(2); if (v) p.stories[k] = v; });
     return p;

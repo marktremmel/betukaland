@@ -8,6 +8,22 @@
  * encounter object in the Level scene (see encounters.js).
  */
 BK.levelgen = {
+  /*
+   * Pace: how long a level is depends on the child. From the WPM of the last
+   * few rounds the level gets about two minutes of typing (a little more for
+   * grade 5-6), so a slower typist does not sit three times as long on the same
+   * level, and a fast one gets more. Between 55 % and 140 % of the normal
+   * amount; until there are three rounds to go on, the normal amount.
+   */
+  pace: function (profile) {
+    var band = (profile && profile.grade) || '3-4';
+    var h = ((profile && profile.history) || []).filter(function (x) { return x.practice !== 'endless' && x.wpm > 0; }).slice(-8);
+    if (h.length < 3) return 1;
+    var w = h.map(function (x) { return x.wpm; }).sort(function (a, b) { return a - b; })[Math.floor(h.length / 2)];
+    var minutes = band === '3-4' ? 2 : 2.2;
+    return BK.util.clamp(w * 5 * minutes / (BK.LEVEL_CHARS[band] || 100), 0.55, 1.4);
+  },
+
   build: function (regionId, levelIdx, profile, rng, opts) {
     if (levelIdx === 'practice' || levelIdx === 'story' || levelIdx === 'weak' || levelIdx === 'endless') return this.practice(regionId, levelIdx, profile, rng, opts || {});
     if (levelIdx === 'halloween') return this.halloween(regionId, profile, rng, opts || {});
@@ -40,6 +56,7 @@ BK.levelgen = {
     if (li === 3 && !daily) {
       // Boss: sentences only
       var n = (band === '3-4' ? 5 : 7) + (reg.theme ? 2 : 0);   // the Pumpkin King is a longer fight
+      n = Math.max(3, Math.round(n * BK.util.clamp(this.pace(profile), 0.6, 1.3)));     // fewer sentences for a slower typist
       var texts = [];
       if (reg.theme === 'halloween') {
         // the Pumpkin King says his own lines, in story order (those that fit the keys)
@@ -59,8 +76,8 @@ BK.levelgen = {
       var specials = null;
       if (reg.theme === 'halloween') {
         // the King sends marks to catch: slower and fewer for 3-4, faster for 5-6
-        var chars = BK.HW_SPECIALS[band] || BK.HW_SPECIALS['3-4'];
-        if (!BK.layout.accents) chars = chars.filter(function (c) { return c !== '€'; });   // no € on a US keyboard
+        // only marks this child's computer can make (Settings: Jelek súgója)
+        var chars = (BK.HW_SPECIALS[band] || BK.HW_SPECIALS['3-4']).filter(function (c) { return BK.keyHint(c, profile) !== null; });
         specials = band === '3-4' ? { chars: chars, every: 7000, speed: 15 } : { chars: chars, every: 5000, speed: 21 };
       }
       out.push({ kind: 'boss', creature: reg.boss, tint: reg.bossTint, texts: texts, coins: 12 + regionId * 2, maxWidth: 170,
@@ -69,7 +86,7 @@ BK.levelgen = {
       return { encounters: out, sky: sky, bdTint: bdTint, weather: 'clear', music: reg.bossMusic || 'm_boss', boss: true };
     }
 
-    var budget = Math.round((BK.LEVEL_CHARS[band] || 100) * (daily ? 1.25 : 1));
+    var budget = Math.round((BK.LEVEL_CHARS[band] || 100) * (daily ? 1.25 : 1) * this.pace(profile));
     var used = 0, count = 0;
     var phaseOf = function () {
       // first part of the level uses the easier phase
@@ -83,7 +100,7 @@ BK.levelgen = {
     specials.push({ at: 0.25 + rng() * 0.1, kind: 'chest' });
     if (li >= 0) specials.push({ at: 0.4 + rng() * 0.1, kind: 'gate' });
     if (li >= 1 || daily) specials.push({ at: 0.6 + rng() * 0.1, kind: 'bridge' });
-    if (li >= 1 && !daily) specials.push({ at: 0.52, kind: 'rest' });
+    if (li >= 1 && !daily && !(profile && profile.settings && profile.settings.rest === false)) specials.push({ at: 0.52, kind: 'rest' });
     if (rng.chance(li === 2 ? 1 : 0.5)) specials.push({ at: 0.78, kind: 'shop' });
     if (rng.chance(0.4)) specials.push({ at: 0.85, kind: 'chest' });
     specials.sort(function (a, b) { return a.at - b.at; });
@@ -233,7 +250,7 @@ BK.levelgen = {
       var st = lib.find(function (x) { return x.id === opts.storyId; }) || lib[0];
       if (!st) { mode = 'practice'; } else { lines = st.lines.slice(); title = st.title; opts.storyId = st.id; }
     } else {
-      var n = band === '3-4' ? 8 : 10;
+      var n = Math.max(4, Math.round((band === '3-4' ? 8 : 10) * BK.util.clamp(this.pace(profile), 0.6, 1.3)));
       for (var i = 0; i < n; i++) lines.push(picker.sentence());
     }
     if (!lines.length) for (var i2 = 0; i2 < (band === '3-4' ? 8 : 10); i2++) lines.push(picker.sentence());

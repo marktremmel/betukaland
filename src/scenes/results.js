@@ -125,6 +125,14 @@ BK.ResultsScene = class extends Phaser.Scene {
         var pd = BK.PETS.find(function (p) { return p.id === r.newPet; });
         this.time.delayedCall(1600, function () { BK.ui.toast(s, 192, 160, BK.L('Új kedvenc: ', 'New pet: ') + pd.name + '!', 0xffd23c, 1, 2400); BK.audio.sfx('level_up', { volume: 0.5 }); });
       }
+      if (r.newFigure) {
+        var fh = BK.HEROES.find(function (h) { return h.id === r.newFigure; });
+        this.time.delayedCall(r.newPet ? 4200 : 1600, function () {
+          BK.ui.toast(s, 192, 160, BK.L('Ajándék figura: ', 'Gift figure: ') + fh.name + '!\n' +
+            BK.L('A boltban a többi is megvehető.', 'The others are in the shop.'), 0xd8a0ff, 1, 3200);
+          BK.audio.sfx('level_up', { volume: 0.5 });
+        });
+      }
     }
     BK.ui.button(this, 78, 196, BK.T.retry, function () { s.scene.start('Level', { region: r.r, level: 'halloween', stage: r.stage }); }, { w: 66, h: 18 });
     BK.ui.button(this, 192, 196, BK.T.map, function () { s.scene.start('Map'); }, { w: 66, h: 18, key: 'ESC' });

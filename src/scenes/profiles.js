@@ -96,9 +96,9 @@ BK.NewProfileScene = class extends Phaser.Scene {
     } else if (this.step === 1) {
       this.keep(BK.ui.text(this, 192, 41, BK.T.chooseAvatar, { outline: false, size: 2, origin: [0.5, 0.5] }));
       // 8 figures a page (4 x 2); the page follows the chosen figure
-      var PER = 8, page = Math.floor(this.avatar / PER), pages = Math.ceil(BK.HEROES.length / PER);
+      var PER = 8, page = Math.floor(this.avatar / PER), pages = Math.ceil(BK.N_FREE_HEROES / PER);
       BK.HEROES.forEach(function (h, i) {
-        if (Math.floor(i / PER) !== page) return;
+        if (h.lock || Math.floor(i / PER) !== page) return;
         // figure above, name below, the chosen one framed in white
         var j = i % PER, x = 93 + (j % 4) * 66, y = 83 + Math.floor(j / 4) * 50;
         var sel = i === s.avatar;
@@ -118,7 +118,7 @@ BK.NewProfileScene = class extends Phaser.Scene {
       if (pages > 1) {
         var turn = function (d) {
           var np = (page + d + pages) % pages;
-          s.avatar = Math.min(BK.HEROES.length - 1, np * PER + (s.avatar % PER)); s.draw();
+          s.avatar = Math.min(BK.N_FREE_HEROES - 1, np * PER + (s.avatar % PER)); s.draw();
         };
         this.keep(BK.ui.button(this, 50, 108, '<', function () { turn(-1); }, { w: 14, h: 22 }));
         this.keep(BK.ui.button(this, 334, 108, '>', function () { turn(1); }, { w: 14, h: 22 }));
@@ -154,10 +154,10 @@ BK.NewProfileScene = class extends Phaser.Scene {
       BK.audio.sfx('key_ok', { volume: 0.3 });
       this.nickText.setText(this.nick + '_');
     } else if (this.step === 1) {
-      if (k === 'ArrowRight') { this.avatar = (this.avatar + 1) % BK.HEROES.length; this.draw(); }
-      if (k === 'ArrowLeft') { this.avatar = (this.avatar + BK.HEROES.length - 1) % BK.HEROES.length; this.draw(); }
-      if (k === 'ArrowDown') { this.avatar = (this.avatar + 4) % BK.HEROES.length; this.draw(); }
-      if (k === 'ArrowUp') { this.avatar = (this.avatar + BK.HEROES.length - 4) % BK.HEROES.length; this.draw(); }
+      if (k === 'ArrowRight') { this.avatar = (this.avatar + 1) % BK.N_FREE_HEROES; this.draw(); }
+      if (k === 'ArrowLeft') { this.avatar = (this.avatar + BK.N_FREE_HEROES - 1) % BK.N_FREE_HEROES; this.draw(); }
+      if (k === 'ArrowDown') { this.avatar = (this.avatar + 4) % BK.N_FREE_HEROES; this.draw(); }
+      if (k === 'ArrowUp') { this.avatar = (this.avatar + BK.N_FREE_HEROES - 4) % BK.N_FREE_HEROES; this.draw(); }
       if (k === 'Enter') this.nextStep();
     } else if (this.step === 2) {
       if (k === '1') { this.grade = '3-4'; this.nextStep(); }
