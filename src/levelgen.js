@@ -151,8 +151,8 @@ BK.levelgen = {
     var sents = (BK.HALLOWEEN_SENTENCES[lang] || []).filter(fits);
     var get = picker.get.bind(picker), sentence = picker.sentence.bind(picker);
     picker.get = function (phase) {
-      if (words.length && (phase === 'words' || phase === 'syllables') && rng.chance(0.5)) return rng.pick(words);
-      if (words.length > 1 && phase === 'pairs' && rng.chance(0.5)) {
+      if (words.length && (phase === 'words' || phase === 'syllables') && rng.chance(0.7)) return rng.pick(words);
+      if (words.length > 1 && phase === 'pairs' && rng.chance(0.7)) {
         var a = rng.pick(words), b = rng.pick(words), p2 = a + ' ' + b;
         if (a !== b && fits(p2)) return p2;
       }

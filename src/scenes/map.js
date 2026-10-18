@@ -40,7 +40,7 @@ BK.MapScene = class extends Phaser.Scene {
   drawTop() {
     var P = this.P;
     this.add.rectangle(0, 0, BK.W, 18, 0x2b1a14, 0.55).setOrigin(0, 0);
-    var av = BK.avatarSprite(this, 12, 17, P.avatar, P); av.setScale(0.5);
+    var av = BK.avatarSprite(this, 12, 17, P.avatar, P); av.setScale(Math.min(0.5, 16 / av.height));   // taller figures stay inside the bar
     BK.ui.text(this, 24, 3, P.nick, { color: 0xfff2dc });
     this.add.sprite(150, 9, 'coin').play('coin');
     this.coinText = BK.ui.text(this, 160, 3, String(P.coins), { color: 0xffe9a0 });
