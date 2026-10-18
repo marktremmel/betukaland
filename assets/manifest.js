@@ -724,42 +724,42 @@ window.BK_MANIFEST = {
   },
   "panda_run": {
    "url": "assets/sprites/panda_run.png",
-   "fw": 32,
+   "fw": 30,
    "fh": 39,
    "frames": 6,
    "fps": 12
   },
   "panda_run_blue": {
    "url": "assets/sprites/panda_run_blue.png",
-   "fw": 32,
+   "fw": 30,
    "fh": 39,
    "frames": 6,
    "fps": 12
   },
   "panda_run_mint": {
    "url": "assets/sprites/panda_run_mint.png",
-   "fw": 32,
+   "fw": 30,
    "fh": 39,
    "frames": 6,
    "fps": 12
   },
   "panda_run_pink": {
    "url": "assets/sprites/panda_run_pink.png",
-   "fw": 32,
+   "fw": 30,
    "fh": 39,
    "frames": 6,
    "fps": 12
   },
   "panda_run_gold": {
    "url": "assets/sprites/panda_run_gold.png",
-   "fw": 32,
+   "fw": 30,
    "fh": 39,
    "frames": 6,
    "fps": 12
   },
   "panda_run_night": {
    "url": "assets/sprites/panda_run_night.png",
-   "fw": 32,
+   "fw": 30,
    "fh": 39,
    "frames": 6,
    "fps": 12
@@ -892,42 +892,42 @@ window.BK_MANIFEST = {
   },
   "roach_run": {
    "url": "assets/sprites/roach_run.png",
-   "fw": 40,
+   "fw": 38,
    "fh": 47,
    "frames": 6,
    "fps": 12
   },
   "roach_run_blue": {
    "url": "assets/sprites/roach_run_blue.png",
-   "fw": 40,
+   "fw": 38,
    "fh": 47,
    "frames": 6,
    "fps": 12
   },
   "roach_run_mint": {
    "url": "assets/sprites/roach_run_mint.png",
-   "fw": 40,
+   "fw": 38,
    "fh": 47,
    "frames": 6,
    "fps": 12
   },
   "roach_run_pink": {
    "url": "assets/sprites/roach_run_pink.png",
-   "fw": 40,
+   "fw": 38,
    "fh": 47,
    "frames": 6,
    "fps": 12
   },
   "roach_run_gold": {
    "url": "assets/sprites/roach_run_gold.png",
-   "fw": 40,
+   "fw": 38,
    "fh": 47,
    "frames": 6,
    "fps": 12
   },
   "roach_run_night": {
    "url": "assets/sprites/roach_run_night.png",
-   "fw": 40,
+   "fw": 38,
    "fh": 47,
    "frames": 6,
    "fps": 12
@@ -976,42 +976,42 @@ window.BK_MANIFEST = {
   },
   "tiger_run": {
    "url": "assets/sprites/tiger_run.png",
-   "fw": 52,
+   "fw": 50,
    "fh": 41,
    "frames": 6,
    "fps": 12
   },
   "tiger_run_blue": {
    "url": "assets/sprites/tiger_run_blue.png",
-   "fw": 52,
+   "fw": 50,
    "fh": 41,
    "frames": 6,
    "fps": 12
   },
   "tiger_run_mint": {
    "url": "assets/sprites/tiger_run_mint.png",
-   "fw": 52,
+   "fw": 50,
    "fh": 41,
    "frames": 6,
    "fps": 12
   },
   "tiger_run_pink": {
    "url": "assets/sprites/tiger_run_pink.png",
-   "fw": 52,
+   "fw": 50,
    "fh": 41,
    "frames": 6,
    "fps": 12
   },
   "tiger_run_gold": {
    "url": "assets/sprites/tiger_run_gold.png",
-   "fw": 52,
+   "fw": 50,
    "fh": 41,
    "frames": 6,
    "fps": 12
   },
   "tiger_run_night": {
    "url": "assets/sprites/tiger_run_night.png",
-   "fw": 52,
+   "fw": 50,
    "fh": 41,
    "frames": 6,
    "fps": 12
@@ -1060,42 +1060,42 @@ window.BK_MANIFEST = {
   },
   "seahorse_run": {
    "url": "assets/sprites/seahorse_run.png",
-   "fw": 34,
+   "fw": 32,
    "fh": 42,
    "frames": 6,
    "fps": 12
   },
   "seahorse_run_blue": {
    "url": "assets/sprites/seahorse_run_blue.png",
-   "fw": 34,
+   "fw": 32,
    "fh": 42,
    "frames": 6,
    "fps": 12
   },
   "seahorse_run_mint": {
    "url": "assets/sprites/seahorse_run_mint.png",
-   "fw": 34,
+   "fw": 32,
    "fh": 42,
    "frames": 6,
    "fps": 12
   },
   "seahorse_run_pink": {
    "url": "assets/sprites/seahorse_run_pink.png",
-   "fw": 34,
+   "fw": 32,
    "fh": 42,
    "frames": 6,
    "fps": 12
   },
   "seahorse_run_gold": {
    "url": "assets/sprites/seahorse_run_gold.png",
-   "fw": 34,
+   "fw": 32,
    "fh": 42,
    "frames": 6,
    "fps": 12
   },
   "seahorse_run_night": {
    "url": "assets/sprites/seahorse_run_night.png",
-   "fw": 34,
+   "fw": 32,
    "fh": 42,
    "frames": 6,
    "fps": 12
@@ -1190,6 +1190,55 @@ window.BK_MANIFEST = {
    "fh": 48,
    "frames": 2,
    "fps": 6
+  },
+  "hw_ghost_float": {
+   "url": "assets/sprites/hw_ghost_float.png",
+   "fw": 40,
+   "fh": 36,
+   "frames": 6,
+   "fps": 8
+  },
+  "hw_bat_fly": {
+   "url": "assets/sprites/hw_bat_fly.png",
+   "fw": 36,
+   "fh": 32,
+   "frames": 4,
+   "fps": 10
+  },
+  "hw_cat_walk": {
+   "url": "assets/sprites/hw_cat_walk.png",
+   "fw": 36,
+   "fh": 40,
+   "frames": 6,
+   "fps": 10
+  },
+  "hw_pumpkin_walk": {
+   "url": "assets/sprites/hw_pumpkin_walk.png",
+   "fw": 28,
+   "fh": 36,
+   "frames": 6,
+   "fps": 10
+  },
+  "hw_mummy_walk": {
+   "url": "assets/sprites/hw_mummy_walk.png",
+   "fw": 62,
+   "fh": 48,
+   "frames": 6,
+   "fps": 8
+  },
+  "hw_king_idle": {
+   "url": "assets/sprites/hw_king_idle.png",
+   "fw": 84,
+   "fh": 80,
+   "frames": 6,
+   "fps": 6
+  },
+  "hw_decor": {
+   "url": "assets/sprites/hw_decor.png",
+   "fw": 59,
+   "fh": 56,
+   "frames": 25,
+   "fps": 1
   }
  },
  "images": {

@@ -120,7 +120,7 @@ BK.LevelScene = class extends Phaser.Scene {
     if (list) {
       // region decor (palms on the beach); an empty list means the backdrop is enough
       var d = { x: x, speed: 1, destroy: function () {} };
-      if (list.length && this.rng.chance(0.6)) {
+      if (list.length && this.rng.chance(this.reg.decorChance || 0.6)) {
         var key0 = this.rng.pick(list);
         var frames = this.textures.get(key0).frameTotal - 1;
         d = this.add.image(x, BK.GROUND_Y + 2, key0, frames > 1 ? this.rng.int(frames) : undefined).setOrigin(0.5, 1).setDepth(15);

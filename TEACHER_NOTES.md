@@ -1,6 +1,6 @@
 # Betűkaland (Typing Adventure): teacher notes
 
-Version 0.8.0: all seven regions are playable, each with three levels and a boss, plus a practice corner (daily goals with a streak, sentence practice, a tricky-letter drill, the endless road, and a storybook) and crowns to win on every level of a finished region. The menus can be Hungarian or English, the text uses a font made for young readers (three to choose from), and the keyboard can be Hungarian or US English. Title screen, player profiles with a choice of thirteen figures, placement test, world map, shop, rest spots, results with stars and a chart, saving with a code and a file, the teacher screen with CSV export, and credits.
+Version 0.8.1: all seven regions are playable, each with three levels and a boss, plus a practice corner (daily goals with a streak, sentence practice, a tricky-letter drill, the endless road, and a storybook) and crowns to win on every level of a finished region. The menus can be Hungarian or English, the text uses a font made for young readers (three to choose from), and the keyboard can be Hungarian or US English. Title screen, player profiles with a choice of thirteen figures, placement test, world map, shop, rest spots, results with stars and a chart, saving with a code and a file, the teacher screen with CSV export, and credits.
 
 ## Running it
 
@@ -122,7 +122,7 @@ Class 4.B suggested seven new animals. They were drawn with ChatGPT image genera
 
 The typing uses only the keys of the child's newest region, with Halloween words and sentences mixed in where they fit those keys (`data/halloween.js`), so a child in region 1 and one in region 6 both get the right material. Normal progress, stars and crowns are not touched. The Halloween stars stay on this computer and are not in the save code; the pet is. Switch it off again after Halloween; the pet stays.
 
-Until the drawn characters exist (prompts in `halloween/HALLOWEEN_PROMPTS.md`), the stages use tinted stand-ins from the library (mushrooms, frogs, a crow, the toad, the baby dragon) on the night sky. When the pictures are saved in `halloween/` with the names from the prompts: `python3 tools/clean_ai_sprites.py`, then `python3 tools/build_assets.py --local` and `python3 tools/build_pack.py`. The game picks each drawn character up by itself.
+The characters (ghost, pumpkin head, witch cat, bat, mummy, Pumpkin King) and 25 roadside decorations (pumpkins, lanterns, the BÚ tombstone, a scarecrow, a well, crooked trees...) were drawn with ChatGPT (prompts in `halloween/HALLOWEEN_PROMPTS.md`) and cut out by `tools/clean_ai_sprites.py` into `art/halloween/`; the file names it reads are at the top of the tool, and `HW_DECOR` picks the props (characters, the skull and the coffin are left out). After changing a picture: `python3 tools/clean_ai_sprites.py`, then `python3 tools/build_assets.py --local` and `python3 tools/build_pack.py`. With Halloween on, the title screen shows the pumpkin head and the bat. The pet for the Pumpkin King is the bat.
 
 ## Teacher screen
 

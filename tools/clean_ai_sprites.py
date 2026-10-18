@@ -48,11 +48,12 @@ CFG = {
 # (the game uses them as soon as tools/build_assets.py --local has packed them)
 HW_SRC = os.path.join(ROOT, "halloween"); HW_DST = os.path.join(ROOT, "art", "halloween")
 HW_FILES = {
-    "hw_ghost": {"float": "ghost_float.png"}, "hw_bat": {"fly": "bat_fly.png"}, "hw_cat": {"walk": "cat_walk.png"},
-    "hw_pumpkin": {"walk": "pumpkin_walk.png"}, "hw_mummy": {"walk": "mummy_walk.png"}, "hw_king": {"idle": "king_idle.png"},
+    "hw_ghost": {"float": "Cute Floating Ghost Sprite Sheet.png"}, "hw_bat": {"fly": "Four-Frame Pixel Bat Flight Sprite Sheet.png"},
+    "hw_cat": {"walk": "Pixel Cat Witch Walk Cycle.png"}, "hw_pumpkin": {"walk": "Six-Frame Pumpkin Creature Walk Cycle.png"},
+    "hw_mummy": {"walk": "Six-Frame Pixel Mummy Walk Cycle.png"}, "hw_king": {"idle": "Pixel Pumpkin King Animation Sheet.png"},
 }
 HW_CFG = {
-    "hw_ghost": [("float", 6, 34)], "hw_bat": [("fly", 4, 22)], "hw_cat": [("walk", 6, 38)],
+    "hw_ghost": [("float", 6, 34)], "hw_bat": [("fly", 4, 30)], "hw_cat": [("walk", 6, 38)],
     "hw_pumpkin": [("walk", 6, 34)], "hw_mummy": [("walk", 6, 46)], "hw_king": [("idle", 6, 78)],
 }
 import numpy as np
@@ -127,7 +128,9 @@ def process(name, specs, K=18):
         src, files = (HW_SRC, HW_FILES) if name in HW_FILES else (SRC, FILES)
         fr = frames(os.path.join(src, files[name][kind]), n)
         # colours never come from the magenta-blended fringe (the outline is drawn again below)
-        small.append([downs(a, m, H + 2, ndimage.binary_erosion(m, iterations=3)) for a, m in fr])
+        # one scale for the whole sheet (the tallest frame gets H), so a wings-up frame is not shrunk
+        hmax = max(m.shape[0] for a, m in fr)
+        small.append([downs(a, m, max(4, round((H + 2) * m.shape[0] / hmax)), ndimage.binary_erosion(m, iterations=3)) for a, m in fr])
     # shared palette per animal
     pts = np.concatenate([r[al > .5] for st in small for r, al in st])
     km = KMeans(K, n_init=4, random_state=0).fit(pts)
@@ -191,8 +194,61 @@ def pack(fs):
     return strip, fw, fh
 
 
+# Halloween decorations: props cut from one sheet, each scaled to its own height
+# (box index after sorting by row and x -> height in game pixels). Characters
+# (cat, ghost, bat, spider, crow) and the skull and coffin are left out on purpose.
+HW_DECOR_FILE = "Pixel Halloween Sprite Sheet.png"
+HW_DECOR = {0: 14, 1: 22, 2: 24, 3: 20, 5: 20, 6: 44, 7: 26, 8: 32, 11: 16, 13: 20, 14: 16, 16: 22, 17: 18, 18: 24,
+            19: 52, 21: 22, 22: 18, 23: 40, 24: 34, 26: 34, 28: 22, 29: 46, 31: 26, 32: 54, 33: 18}
+
+
+def decor():
+    path = os.path.join(HW_SRC, HW_DECOR_FILE)
+    if not os.path.exists(path):
+        return
+    a, m = load(path)
+    lab, n = ndimage.label(ndimage.binary_dilation(m, iterations=6))
+    boxes = [(sl[0].start, sl[1].start, sl[0].stop, sl[1].stop) for sl in ndimage.find_objects(lab)
+             if (sl[0].stop - sl[0].start) * (sl[1].stop - sl[1].start) > 1500]
+    boxes.sort(key=lambda b: (round(b[2] / 120), b[1]))
+    # small loose bits (a cauldron bubble) join the prop they overlap; indices stay those of the sorted list
+    big = list(boxes)
+    for j, b in enumerate(boxes):
+        if (b[2] - b[0]) > 60: continue
+        for i, c in enumerate(boxes):
+            if i != j and (c[2] - c[0]) > 60 and b[1] < c[3] and b[3] > c[1] and abs(b[2] - c[0]) < 60:
+                big[i] = (min(b[0], c[0]), min(b[1], c[1]), max(b[2], c[2]), max(b[3], c[3]))
+    items = []
+    for i, b in enumerate(big):
+        if i not in HW_DECOR: continue
+        aa = a[b[0]:b[2], b[1]:b[3]]; mm = m[b[0]:b[2], b[1]:b[3]]
+        ys, xs = np.where(mm)
+        aa, mm = aa[ys.min():ys.max() + 1, xs.min():xs.max() + 1], mm[ys.min():ys.max() + 1, xs.min():xs.max() + 1]
+        items.append(downs(aa, mm, HW_DECOR[i] + 2, ndimage.binary_erosion(mm, iterations=3)))
+    pts = np.concatenate([r[al > .5] for r, al in items])
+    km = KMeans(28, n_init=4, random_state=0).fit(pts)
+    pal = km.cluster_centers_
+    dark = pal[int(np.argmin(pal @ [0.3, 0.59, 0.11]))]
+    frames_ = []
+    for rgb, al in items:
+        op = al > .45
+        idx = km.predict(rgb.reshape(-1, 3)).reshape(op.shape)
+        img = np.zeros(op.shape + (4,), np.uint8)
+        img[..., :3] = pal[idx].round().clip(0, 255); img[..., 3] = op * 255
+        edge = op & ~ndimage.binary_erosion(np.pad(op, 1), CROSS)[1:-1, 1:-1]
+        img[edge] = list(dark.round().astype(int)) + [255]
+        frames_.append(Image.fromarray(img))
+    fw = max(f.width for f in frames_); fh = max(f.height for f in frames_)
+    strip = Image.new("RGBA", (fw * len(frames_), fh))
+    for i, f in enumerate(frames_):
+        strip.alpha_composite(f, (i * fw + (fw - f.width) // 2, fh - f.height))
+    os.makedirs(HW_DST, exist_ok=True)
+    strip.save(os.path.join(HW_DST, "hw_decor.png"))
+    print("hw_decor   %d props %dx%d" % (len(frames_), fw, fh))
+
+
 def main():
-    names = sys.argv[1:] or list(CFG) + [n for n in HW_CFG if all(os.path.exists(os.path.join(HW_SRC, f)) for f in HW_FILES[n].values())]
+    names = [n for n in sys.argv[1:] if n != 'hw_decor'] if sys.argv[1:] else list(CFG) + [n for n in HW_CFG if all(os.path.exists(os.path.join(HW_SRC, f)) for f in HW_FILES[n].values())]
     for n in names:
         cfg, dst = (HW_CFG[n], HW_DST) if n in HW_CFG else (CFG[n], DST)
         os.makedirs(dst, exist_ok=True)
@@ -200,6 +256,8 @@ def main():
             st, fw, fh = pack(fs)
             st.save(os.path.join(dst, "%s_%s.png" % (n, kind)))
             print("%-10s %-5s %d frames %dx%d" % (n, kind, len(fs), fw, fh))
+    if not sys.argv[1:] or "hw_decor" in sys.argv[1:]:
+        decor()
 
 
 if __name__ == "__main__":

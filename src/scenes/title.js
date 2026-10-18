@@ -8,8 +8,11 @@ BK.TitleScene = class extends Phaser.Scene {
     var s = this;
     BK.menuBackground(this, 1, { scroll: true, groundY: 176 });
     var hero = this.add.sprite(96, 177, 'bunny_run').setOrigin(0.5, 1); hero.play('bunny_run');
-    var frog = this.add.sprite(300, 177, 'frog_taunt').setOrigin(0.5, 1).setFlipX(true); frog.play('frog_taunt');
-    var gull = this.add.sprite(318, 104, 'gull_fly'); gull.play('gull_fly');
+    // Halloween Night: a pumpkin head and a bat instead of the frog and the gull (once they are drawn)
+    var S = BK_MANIFEST.sprites, hw = BK.save.halloween();
+    var fk = hw && S.hw_pumpkin_walk ? 'hw_pumpkin_walk' : 'frog_taunt', gk = hw && S.hw_bat_fly ? 'hw_bat_fly' : 'gull_fly';
+    var frog = this.add.sprite(300, 177, fk).setOrigin(0.5, 1).setFlipX(true); frog.play(fk);
+    var gull = this.add.sprite(318, 104, gk).setFlipX(gk !== 'gull_fly'); gull.play(gk);
     this.tweens.add({ targets: gull, y: 110, duration: 900, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
 
     var title = BK.ui.text(this, BK.W / 2, 44, BK.T.title, { size: 4, origin: [0.5, 0.5], color: 0xffd23c });

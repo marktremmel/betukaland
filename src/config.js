@@ -6,7 +6,7 @@
  */
 window.BK = window.BK || {};
 
-BK.VERSION = '0.8.0';
+BK.VERSION = '0.8.1';
 
 // Test mode for the teacher: open the game with ?debug at the end of the address.
 // Every region and level is open; in a level Tab finishes the current word and
@@ -154,6 +154,8 @@ BK.halloweenRegion = function (regionId, stage) {
     if (drawn) BK.CREATURES[key] = c.art;
     return { key: key, tint: drawn ? undefined : c.tint };
   };
+  r.decor = window.BK_MANIFEST && BK_MANIFEST.sprites.hw_decor ? ['hw_decor'] : null;
+  r.decorChance = 0.9;   // pumpkins, lanterns... or the usual trees
   r.tints = {};
   var list = function (ids) { return ids.map(function (id) { var c = pick(id); if (c.tint) r.tints[c.key] = c.tint; return c.key; }); };
   r.walkers = list(st.walkers);

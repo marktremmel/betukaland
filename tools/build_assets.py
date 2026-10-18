@@ -247,7 +247,8 @@ for _n in NEW_FIGURES:
 SPRITES["crow_fly"] = dict(strip=(GOTH + "crow/Spritesheets/crow-fly.png", 2), fps=6)
 # Drawn Halloween characters (ChatGPT, cleaned by tools/clean_ai_sprites.py): used when the file exists
 HALLOWEEN_SPRITES = {"hw_ghost_float": (6, 8), "hw_bat_fly": (4, 10), "hw_cat_walk": (6, 10),
-                     "hw_pumpkin_walk": (6, 10), "hw_mummy_walk": (6, 8), "hw_king_idle": (6, 6)}
+                     "hw_pumpkin_walk": (6, 10), "hw_mummy_walk": (6, 8), "hw_king_idle": (6, 6),
+                     "hw_decor": (25, 1)}
 for _k, (_n, _fps) in HALLOWEEN_SPRITES.items():
     if os.path.exists(os.path.join(ROOT, "art", "halloween", _k + ".png")):
         SPRITES[_k] = dict(local=("art/halloween/%s.png" % _k, _n), fps=_fps)
