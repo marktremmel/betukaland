@@ -92,6 +92,12 @@ BK.save = (function () {
     p.fx.impact = p.fx.impact || 'spark';          // v0.10: impacts
     p.fx.glow = p.fx.glow || 'g_none';             // v0.10.1: light on the word bubble
     ['spark', 'g_none'].forEach(function (k) { if (p.fx.owned.indexOf(k) < 0) p.fx.owned.push(k); });
+    p.dishes = p.dishes || {};                     // kitchen: dish id -> how many
+    p.rares = p.rares || {};                       // rare treasures: id -> how many
+    p.castle = Object.assign({ props: [], floor: [], frames: 0, framed: [] }, p.castle || {});   // the castle room
+    p.emblem = p.emblem || null;                   // the child's own sign (profile page)
+    p.menuBg = p.menuBg || 0;                      // menu background (profile page)
+    p.tales = p.tales || {};                       // Mesék: id -> { at: next line, done: stars }
     p.arena = p.arena || {};                       // boss arena: id -> { n: stars, h: stars }
     if (!(p.avatar >= 0 && p.avatar < BK.HEROES.length)) p.avatar = 0;   // figure list changed in v0.2
     return p;
@@ -131,6 +137,19 @@ BK.save = (function () {
     if (inc.halloween && (!local.halloween || !local.halloween.stars[3])) local.halloween = inc.halloween;
     ['rest', 'kbHint'].forEach(function (k) { if (inc.settings[k] !== undefined) local.settings[k] = inc.settings[k]; });
     if (inc.fx) { (inc.fx.owned || []).forEach(function (o) { if (local.fx.owned.indexOf(o) < 0) local.fx.owned.push(o); }); local.fx.shape = inc.fx.shape; local.fx.colour = inc.fx.colour; local.fx.tone = inc.fx.tone || 0; local.fx.impact = inc.fx.impact || local.fx.impact; local.fx.glow = inc.fx.glow || local.fx.glow; }
+    ['dishes', 'rares'].forEach(function (k) {
+      local[k] = local[k] || {};
+      Object.keys(inc[k] || {}).forEach(function (id) { local[k][id] = Math.max(local[k][id] || 0, inc[k][id] || 0); });
+    });
+    if (inc.castle) {
+      local.castle = local.castle || { props: [], floor: [], frames: 0, framed: [] };
+      (inc.castle.props || []).forEach(function (id) { if (local.castle.props.indexOf(id) < 0) local.castle.props.push(id); });
+      local.castle.frames = Math.max(local.castle.frames || 0, inc.castle.frames || 0);
+      if ((inc.castle.floor || []).some(Boolean)) local.castle.floor = inc.castle.floor.slice();
+      if ((inc.castle.framed || []).some(Boolean)) local.castle.framed = inc.castle.framed.slice();
+    }
+    if (inc.emblem) local.emblem = inc.emblem;
+    if (inc.menuBg) local.menuBg = inc.menuBg;
     local.arena = local.arena || {};
     Object.keys(inc.arena || {}).forEach(function (k) {
       var a = local.arena[k] || (local.arena[k] = { n: 0, h: 0 }), b = inc.arena[k];
@@ -168,6 +187,23 @@ BK.save = (function () {
     // res: { r, l, wpm, acc, stars, ms, coins, daily }
     var pr = p.progress[res.r];
     if (res.l >= 0 && res.l <= 3 && !res.daily) pr.stars[res.l] = Math.max(pr.stars[res.l] || 0, res.stars);
+    if (res.practice === 'cook' && res.recipeId) {
+      // the dish is ready: the treasures it needed are used up
+      var rc = BK.RECIPES.find(function (x) { return x.id === res.recipeId; });
+      if (rc && rc.needs.every(function (id) { return (p.items[id] || 0) > 0; })) {
+        rc.needs.forEach(function (id) { p.items[id]--; if (!p.items[id]) delete p.items[id]; });
+        p.dishes = p.dishes || {};
+        p.dishes[rc.id] = (p.dishes[rc.id] || 0) + 1;
+        res.newDish = rc.id;
+      }
+    }
+    if (res.practice === 'tale' && res.tale) {
+      // the place in the tale; a finished tale keeps its stars and can be read again from the start
+      p.tales = p.tales || {};
+      var tl = p.tales[res.tale.id] || (p.tales[res.tale.id] = { at: 0, done: 0 });
+      tl.at = res.tale.to;
+      if (res.tale.to >= res.tale.total) { res.taleFinished = !tl.done; tl.done = Math.max(tl.done || 0, res.stars); }
+    }
     if (res.practice === 'story' && res.storyId) { var sk = storyKey(p, res.storyId); p.stories[sk] = Math.max(p.stories[sk] || 0, res.stars); }
     // crowns: a mastery goal on every level of a region whose boss is beaten
     res.crownNew = false;
@@ -225,11 +261,11 @@ BK.save = (function () {
   }
 
   function encode(p) {
-    // version 8 (v0.10.1): plus bubble lights; written as 0 then the version in 5 bits. Version 7 (v0.10): plus impacts and the boss arena. Version 6 (v0.9.5): plus Halloween figures. Version 5 (v0.9.1): magic shots with single colours, RTX and chrome. Version 4 (v0.9): the shop's magic shots. Version 3 (v0.7): two more figure bits. Version 2 (v0.6.2) made codes shorter: the per-key skill levels are left out (the game relearns
+    // version 9 (v0.11): plus kitchen, rare treasures, castle, sign, menu background and finished tales. Version 8 (v0.10.1): plus bubble lights; written as 0 then the version in 5 bits. Version 7 (v0.10): plus impacts and the boss arena. Version 6 (v0.9.5): plus Halloween figures. Version 5 (v0.9.1): magic shots with single colours, RTX and chrome. Version 4 (v0.9): the shop's magic shots. Version 3 (v0.7): two more figure bits. Version 2 (v0.6.2) made codes shorter: the per-key skill levels are left out (the game relearns
     // them in a few rounds) and trailing zeros are dropped. Version 1 codes still load.
     var b = new Bits();
     b.put(0, 3);                            // 0 = look at the next 5 bits (versions 8 and up)
-    b.put(8, 5);
+    b.put(9, 5);
     b.put(p.avatar & 7, 3);
     b.put(p.grade === '5-6' ? 1 : 0, 1);
     b.put(p.lang === 'en' ? 1 : 0, 1);
@@ -272,6 +308,18 @@ BK.save = (function () {
     // v8 (v0.10.1): bubble lights owned and the one in use
     BK.SHOT_GLOWS.forEach(function (o) { b.put(own.indexOf(o.id) >= 0 ? 1 : 0, 1); });
     b.put(Math.max(0, BK.SHOT_GLOWS.findIndex(function (o) { return o.id === fx.glow; })), 3);
+    // v9 (v0.11): kitchen, rare treasures, castle, sign, menu background, finished tales
+    BK.RECIPES.forEach(function (r) { b.put(Math.min(3, (p.dishes || {})[r.id] || 0), 2); });
+    BK.RARES.forEach(function (r) { b.put(Math.min(7, (p.rares || {})[r.id] || 0), 3); });
+    var cs = p.castle || { props: [], floor: [] };
+    BK.CASTLE_PROPS.forEach(function (o) { b.put((cs.props || []).indexOf(o.id) >= 0 ? 1 : 0, 1); });
+    for (var fi = 0; fi < 7; fi++) b.put((cs.floor || [])[fi] ? BK.CASTLE_PROPS.findIndex(function (o) { return o.id === cs.floor[fi]; }) + 1 : 0, 6);
+    b.put(Math.min(4, cs.frames || 0), 3);
+    var em = p.emblem;
+    b.put(em ? 1 : 0, 1);
+    if (em) { b.put(em.field, 3); b.put(em.fc, 4); b.put(em.pattern, 3); b.put(em.pc, 4); b.put(em.symbol, 4); b.put(em.sc, 4); }
+    b.put(p.menuBg || 0, 4);
+    BK.TALES.forEach(function (t) { b.put(((p.tales || {})[t.id] || {}).done ? 1 : 0, 1); });
     storyOrder().forEach(function (k) { b.put(Math.min(3, (p.stories || {})[k] || 0), 2); });
     while (b.a.length > 5 && b.a.lastIndexOf(1) < b.a.length - 5) b.a.length -= 5;   // drop trailing zero groups
     while (b.a.length % 5) b.a.push(0);
@@ -297,7 +345,7 @@ BK.save = (function () {
     var rd = new Reader(body);
     var ver = rd.get(3);
     if (ver === 0) ver = rd.get(5);          // version 8 and up
-    if (ver < 1 || ver > 8) throw new Error('version');
+    if (ver < 1 || ver > 9) throw new Error('version');
     var avatar = rd.get(3), grade = rd.get(1) ? '5-6' : '3-4', lang = rd.get(1) ? 'en' : 'hu', placed = rd.get(3) || null;
     var nl = rd.get(4), nick = '';
     for (i = 0; i < nl; i++) nick += NICK[rd.get(7)] || '';
@@ -355,6 +403,17 @@ BK.save = (function () {
       BK.SHOT_GLOWS.forEach(function (o) { if (rd.get(1) && p.fx.owned.indexOf(o.id) < 0) p.fx.owned.push(o.id); });
       var gi = BK.SHOT_GLOWS[rd.get(3)] || BK.SHOT_GLOWS[0];
       p.fx.glow = p.fx.owned.indexOf(gi.id) >= 0 ? gi.id : 'g_none';
+    }
+    if (ver >= 9) {
+      p.dishes = {}; BK.RECIPES.forEach(function (r) { var v = rd.get(2); if (v) p.dishes[r.id] = v; });
+      p.rares = {}; BK.RARES.forEach(function (r) { var v = rd.get(3); if (v) p.rares[r.id] = v; });
+      p.castle = { props: [], floor: [], frames: 0, framed: [] };
+      BK.CASTLE_PROPS.forEach(function (o) { if (rd.get(1)) p.castle.props.push(o.id); });
+      for (var fi = 0; fi < 7; fi++) { var ix = rd.get(6); p.castle.floor[fi] = ix && BK.CASTLE_PROPS[ix - 1] ? BK.CASTLE_PROPS[ix - 1].id : null; }
+      p.castle.frames = rd.get(3);
+      if (rd.get(1)) p.emblem = { field: rd.get(3), fc: rd.get(4), pattern: rd.get(3), pc: rd.get(4), symbol: rd.get(4), sc: rd.get(4), letter: (p.nick || 'A').charAt(0).toUpperCase() };
+      p.menuBg = rd.get(4);
+      p.tales = {}; BK.TALES.forEach(function (t) { if (rd.get(1)) p.tales[t.id] = { at: 0, done: 1 }; });
     }
     storyOrder().forEach(function (k) { var v = rd.get(2); if (v) p.stories[k] = v; });
     return p;

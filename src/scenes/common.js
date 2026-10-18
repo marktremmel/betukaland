@@ -38,6 +38,9 @@ BK.applyUiLang = function (lang, p) {
 BK.menuBackground = function (scene, sky, opts) {
   opts = opts || {};
   sky = sky || 1;
+  // the child's own choice from the profile page (not on the Halloween page, which has its night)
+  var mb = BK.state.profile && BK.state.profile.menuBg;
+  if (mb && !opts.fixed && BK_MANIFEST.skies[mb]) sky = mb;
   var layers = BK_MANIFEST.skies[sky].length, out = { layers: [] };
   for (var i = 1; i <= layers; i++) {
     var t = scene.add.tileSprite(0, 0, BK.W, BK.H, 'sky' + sky + '_' + i).setOrigin(0, 0);

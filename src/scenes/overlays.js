@@ -101,7 +101,7 @@ BK.ShopScene = class extends BK.OverlayBase {
       else if (page === 'impact') s.impactIcon(x, y - 8, o.id);
       else s.glowIcon(x, y - 8, o.id);
       s.keepD(BK.ui.text(s, x, y + 3, o.name, { outline: false, origin: [0.5, 0.5], px: 8, color: 0x4a2c1c, fit: w - 4 }));
-      if (!owned) s.keepD(BK.ui.text(s, x, y + 11, o.price + '', { outline: false, origin: [0.5, 0.5], px: 8, bold: true, color: 0x9a3d1a }));
+      if (!owned) s.keepD(BK.ui.text(s, x, y + 11, o.price + (o.rare ? ' +' + o.rare + '◆' : ''), { outline: false, origin: [0.5, 0.5], px: 8, bold: true, color: 0x9a3d1a }));
       if (sel.id === o.id) s.keepD(s.add.rectangle(x, y, w + 4, h + 4).setStrokeStyle(2, 0xffffff));
       var z = s.keepD(s.add.zone(x, y, w, h).setInteractive({ useHandCursor: true }));
       z.on('pointerup', function () {
@@ -135,7 +135,8 @@ BK.ShopScene = class extends BK.OverlayBase {
     // what is selected, and the button for it
     var owned = fx.owned.indexOf(item.id) >= 0;
     var inUse = fx[KEY[page]] === item.id && (page !== 'colour' || !item.pick || (fx.tone || 0) === (sel.tone || 0));
-    this.keepD(BK.ui.text(this, b.x + 20, b.y + 160, item.name + (owned ? '' : '  ·  ' + item.price + ' ' + BK.L('érme', 'coins')), { outline: false, origin: [0, 0.5], color: 0x4a2c1c, bold: true, fit: 150 }));
+    this.keepD(BK.ui.text(this, b.x + 20, b.y + 160, item.name + (owned ? '' : '  ·  ' + item.price + ' ' + BK.L('érme', 'coins') +
+      (item.rare ? ' + ' + item.rare + ' ' + BK.L('ritka kincs', 'rare treasure') : '')), { outline: false, origin: [0, 0.5], color: 0x4a2c1c, bold: true, fit: 190 }));
     var label = inUse ? BK.T.using : owned ? BK.T.use : BK.T.buy;
     this.keepD(BK.ui.button(this, b.x + b.w - 62, b.y + 160, label, function () { s.buyMagic(sel, item); }, { w: 84, h: 16, disabled: inUse }));
   }
@@ -213,6 +214,12 @@ BK.ShopScene = class extends BK.OverlayBase {
     var P = this.P, fx = P.fx;
     if (fx.owned.indexOf(item.id) < 0) {
       if (P.coins < item.price) { BK.ui.toast(this, BK.W / 2, this.box.y + this.box.h - 34, BK.T.notEnough, 0xff9a7a); BK.audio.sfx('key_bad', { volume: 0.3 }); return; }
+      // the best magic also costs rare treasures (from the kitchen: three dishes for one)
+      if (item.rare && BK.rareCount(P) < item.rare) {
+        BK.ui.toast(this, BK.W / 2, this.box.y + this.box.h - 34, BK.L('Ehhez ritka kincs is kell: főzz a Konyhában!', 'This needs rare treasures too: cook in the Kitchen!'), 0xd8a0ff);
+        BK.audio.sfx('key_bad', { volume: 0.3 }); return;
+      }
+      if (item.rare) BK.payRares(P, item.rare);
       P.coins -= item.price;
       fx.owned.push(item.id);
       BK.audio.sfx('buy');
@@ -308,22 +315,128 @@ BK.BagScene = class extends BK.OverlayBase {
   constructor() { super('Bag'); }
   create() {
     var s = this, P = this.P;
-    this.frame(BK.T.bag, 300, 196);
+    P.dishes = P.dishes || {}; P.rares = P.rares || {};
+    this.tab = (this.data0 && this.data0.tab) || 0;
+    this.frame(BK.T.bag, 320, 196);
     var b = this.box;
+    var tabs = [[0, BK.L('Kincsek', 'Treasures')], [1, BK.L('Konyha', 'Kitchen')], [2, BK.L('Polc', 'Shelf')]];
+    this.tabX = {};
+    tabs.forEach(function (t, i) {
+      var x = b.x + b.w / 2 + (i - 1) * 84;
+      s.tabX[t[0]] = x;
+      BK.ui.button(s, x, b.y + 46, t[1], function () { s.tab = t[0]; s.draw(); }, { w: 78, h: 16 });
+    });
+    this.draw();
+  }
+  icon(x, y, frame, sheet, have) {
+    var im = this.keepD(this.add.image(x, y, sheet || 'icons_food', frame));
+    if (!have) im.setTint(0x302828).setAlpha(0.55);
+    return im;
+  }
+  draw() {
+    var s = this, P = this.P, b = this.box;
+    this.clearD();
+    this.keepD(this.add.rectangle(this.tabX[this.tab], b.y + 46, 82, 20).setStrokeStyle(1, 0x9a3d1a));
+    if (this.tab === 0) this.drawItems();
+    else if (this.tab === 1) this.drawKitchen();
+    else this.drawShelf();
+  }
+  drawItems() {
+    var s = this, P = this.P, b = this.box;
     var have = BK.ITEMS.filter(function (it) { return P.items[it.id]; });
-    if (!have.length) {
-      BK.ui.text(this, BK.W / 2, BK.H / 2, BK.T.empty + ' ' + BK.L('Nyiss ki kincsesládákat!', 'Open treasure chests!'), { outline: false, origin: [0.5, 0.5] });
-    }
     BK.ITEMS.forEach(function (it, i) {
       var col = i % 8, row = Math.floor(i / 8);
-      var x = b.x + 28 + col * 34, y = b.y + 56 + row * 34;
+      var x = b.x + (b.w - 272) / 2 + 17 + col * 34, y = b.y + 76 + row * 32;
       var n = P.items[it.id] || 0;
-      BK.ui.nine(s, x - 14, y - 14, 28, 28, n ? 'ui_slot_sel' : 'ui_slot_off');
-      var icon = s.add.image(x, y, 'icons_food', it.frame);
-      if (!n) icon.setTint(0x302828).setAlpha(0.6);
-      else BK.ui.text(s, x + 12, y + 4, 'x' + n, { origin: [1, 0], color: 0xffffff });
+      s.keepD(BK.ui.nine(s, x - 14, y - 14, 28, 28, n ? 'ui_slot_sel' : 'ui_slot_off'));
+      s.icon(x, y, it.frame, 'icons_food', n);
+      if (n) s.keepD(BK.ui.text(s, x + 12, y + 4, 'x' + n, { origin: [1, 0], color: 0xffffff }));
     });
-    BK.ui.text(this, BK.W / 2, b.y + b.h - 36, have.length + ' / ' + BK.ITEMS.length + ' ' + BK.L('kincs', 'treasures'), { outline: false, origin: [0.5, 0.5], color: 0x6b3a20 });
+    this.keepD(BK.ui.text(this, BK.W / 2, b.y + 164, have.length + ' / ' + BK.ITEMS.length + ' ' + BK.L('kincs  ·  a Konyhában ételt főzhetsz belőlük', 'treasures  ·  cook with them in the Kitchen'),
+      { outline: false, origin: [0.5, 0.5], px: 9, color: 0x6b3a20 }));
+  }
+  canCook(r) { var P = this.P; return r.needs.every(function (id) { return (P.items[id] || 0) > 0; }); }
+  // Kitchen: the recipes, what each needs, and the cook button
+  drawKitchen() {
+    var s = this, P = this.P, b = this.box;
+    if (this.recSel === undefined) { this.recSel = Math.max(0, BK.RECIPES.findIndex(function (r) { return s.canCook(r); })); }
+    BK.RECIPES.forEach(function (r, i) {
+      var y = b.y + 63 + i * 10, ok = s.canCook(r), sel = i === s.recSel;
+      if (sel) s.keepD(s.add.rectangle(b.x + 104, y + 5, 184, 10, 0xf6c88a, 0.8));
+      s.keepD(BK.ui.text(s, b.x + 16, y, r.name, { outline: false, bold: sel, px: 9, color: ok ? 0x4a2c1c : 0x9a8a80, fit: 96 }));
+      r.needs.forEach(function (id, k) {
+        var it = BK.ITEMS.find(function (q) { return q.id === id; });
+        s.icon(b.x + 128 + k * 13, y + 5, it.frame, 'icons_food', (P.items[id] || 0) > 0).setScale(0.6);
+      });
+      if (P.dishes[r.id]) s.keepD(BK.ui.text(s, b.x + 192, y, 'x' + P.dishes[r.id], { outline: false, origin: [1, 0], px: 8, color: 0x6b8a50 }));
+      var z = s.keepD(s.add.zone(b.x + 104, y + 5, 184, 11).setInteractive({ useHandCursor: true }));
+      z.on('pointerup', function () { if (s.recSel === i) s.cook(); else { s.recSel = i; BK.audio.sfx('ui'); s.draw(); } });
+    });
+    // the chosen recipe
+    var r = BK.RECIPES[this.recSel], cx = b.x + 252;
+    this.keepD(BK.ui.nine(this, cx - 44, b.y + 60, 88, 96, 'ui_slot'));
+    this.icon(cx, b.y + 84, r.frame, 'icons_food', true).setScale(2);
+    this.keepD(BK.ui.text(this, cx, b.y + 104, r.name, { outline: false, origin: [0.5, 0], px: 10, bold: true, color: 0x4a2c1c, fit: 82 }));
+    this.keepD(BK.ui.text(this, cx, b.y + 117, BK.L('Eladva: ', 'Sells for: ') + r.sell + BK.L(' érme', ' coins'), { outline: false, origin: [0.5, 0], px: 8, color: 0x9a3d1a }));
+    var ok = this.canCook(r), inLevel = this.data0.from !== 'Map';
+    this.keepD(BK.ui.button(this, cx, b.y + 140, BK.L('Főzés!', 'Cook!'), function () { s.cook(); }, { w: 70, h: 16, disabled: !ok || inLevel }));
+    var note = inLevel ? BK.L('Főzni a térképről lehet.', 'You can cook from the map.') : ok ? BK.L('Gépeld be a receptet, és kész az étel!', 'Type the recipe and the dish is ready!') :
+      BK.L('Hiányzik még: ', 'Still missing: ') + r.needs.filter(function (id) { return !(P.items[id] > 0); }).map(function (id) { return BK.ITEMS.find(function (q) { return q.id === id; }).name; }).join(', ');
+    this.keepD(BK.ui.text(this, b.x + 16, b.y + 166, note, { outline: false, origin: [0, 0.5], px: 9, color: 0x6b3a20, fit: 290 }));
+  }
+  cook() {
+    var r = BK.RECIPES[this.recSel];
+    if (!this.canCook(r) || this.data0.from !== 'Map') { BK.audio.sfx('key_bad', { volume: 0.3 }); return; }
+    var P = this.P, open = BK.REGIONS.filter(function (g) { return g.playable && BK.save.regionOpen(P, g.id); });
+    BK.audio.sfx('chime');
+    this.scene.stop('Map');
+    this.scene.start('Level', { region: Math.max(3, open.length ? open[open.length - 1].id : 3), level: 'cook', recipeId: r.id });
+  }
+  // Shelf: the dishes (sell one to Karou, or trade three different ones for a rare treasure) and the rare treasures
+  drawShelf() {
+    var s = this, P = this.P, b = this.box;
+    this.keepD(BK.ui.text(this, b.x + 16, b.y + 58, BK.L('Ételek', 'Dishes'), { outline: false, px: 9, color: 0x6b3a20 }));
+    if (this.dishSel === undefined) this.dishSel = Math.max(0, BK.RECIPES.findIndex(function (r) { return P.dishes[r.id]; }));
+    BK.RECIPES.forEach(function (r, i) {
+      var x = b.x + 30 + i * 30, y = b.y + 84, n = P.dishes[r.id] || 0;
+      s.keepD(BK.ui.nine(s, x - 13, y - 13, 26, 26, i === s.dishSel ? 'ui_slot_sel' : n ? 'ui_slot' : 'ui_slot_off'));
+      s.icon(x, y, r.frame, 'icons_food', n);
+      if (n) s.keepD(BK.ui.text(s, x + 11, y + 3, 'x' + n, { origin: [1, 0], px: 8, color: 0xffffff }));
+      var z = s.keepD(s.add.zone(x, y, 26, 26).setInteractive({ useHandCursor: true }));
+      z.on('pointerup', function () { s.dishSel = i; BK.audio.sfx('ui'); s.draw(); });
+    });
+    var d = BK.RECIPES[this.dishSel], have = P.dishes[d.id] || 0;
+    this.keepD(BK.ui.text(this, b.x + 16, b.y + 110, d.name + (have ? '' : BK.L('  (még nincs ilyen)', '  (none yet)')), { outline: false, origin: [0, 0.5], px: 10, bold: true, color: 0x4a2c1c, fit: 130 }));
+    this.keepD(BK.ui.button(this, b.x + 180, b.y + 110, BK.L('Eladom: ', 'Sell: ') + d.sell, function () {
+      if (!(P.dishes[d.id] > 0)) return;
+      P.dishes[d.id]--; P.coins += d.sell;
+      BK.audio.sfx('coin'); BK.save.persist(); s.draw();
+    }, { w: 72, h: 16, disabled: !have }));
+    var kinds = BK.RECIPES.filter(function (r) { return P.dishes[r.id] > 0; });
+    this.keepD(BK.ui.button(this, b.x + 262, b.y + 110, BK.L('3 étel = 1 ◆', '3 dishes = 1 ◆'), function () { s.trade(); }, { w: 76, h: 16, disabled: kinds.length < 3 }));
+    this.keepD(BK.ui.text(this, b.x + 16, b.y + 126, BK.L('Ritka kincsek (3 különböző étel = 1 ritka kincs)', 'Rare treasures (3 different dishes = 1 rare treasure)'), { outline: false, px: 9, color: 0x6b3a20, fit: 290 }));
+    BK.RARES.forEach(function (r, i) {
+      var x = b.x + 34 + i * 46, y = b.y + 150, n = P.rares[r.id] || 0;
+      s.keepD(BK.ui.nine(s, x - 13, y - 13, 26, 26, n ? 'ui_slot_sel' : 'ui_slot_off'));
+      s.icon(x, y, r.frame, 'icons_gear', n);
+      if (n) s.keepD(BK.ui.text(s, x + 11, y + 3, 'x' + n, { origin: [1, 0], px: 8, color: 0xffffff }));
+    });
+  }
+  // three different dishes (the ones the child has most of) become one rare treasure
+  trade() {
+    var P = this.P, kinds = BK.RECIPES.filter(function (r) { return P.dishes[r.id] > 0; })
+      .sort(function (a, c) { return P.dishes[c.id] - P.dishes[a.id]; }).slice(0, 3);
+    if (kinds.length < 3) return;
+    kinds.forEach(function (r) { P.dishes[r.id]--; });
+    // a rare treasure the child has fewest of
+    var low = Math.min.apply(null, BK.RARES.map(function (r) { return P.rares[r.id] || 0; }));
+    var pool = BK.RARES.filter(function (r) { return (P.rares[r.id] || 0) === low; });
+    var got = pool[Math.floor(Math.random() * pool.length)];
+    P.rares[got.id] = (P.rares[got.id] || 0) + 1;
+    BK.audio.sfx('level_up', { volume: 0.5 });
+    BK.ui.toast(this, BK.W / 2, this.box.y + 40, BK.L('Ritka kincs: ', 'Rare treasure: ') + got.name + '!', 0xd8a0ff, 1, 1400);
+    BK.save.persist();
+    this.draw();
   }
 };
 
@@ -341,8 +454,9 @@ BK.SettingsScene = class extends BK.OverlayBase {
       ['keyboard', BK.T.keyboardHints], ['fingers', BK.T.fingerColours], ['music', BK.T.music],
       ['sfx', BK.T.sound], ['speedRun', BK.T.speedRun], ['rest', BK.L('Pihenő', 'Rest stop')],
     ];
+    var STEP = 18;
     toggles.forEach(function (r, i) {
-      var y = b.y + 56 + i * 20;
+      var y = b.y + 56 + i * STEP;
       s.keepD(BK.ui.text(s, b.x + 20, y, r[1], { outline: false, origin: [0, 0.5], fit: 118 }));
       var on = r[0] === 'rest' ? P.settings.rest !== false : !!P.settings[r[0]];
       s.keepD(BK.ui.button(s, b.x + 158, y, on ? BK.T.on : BK.T.off, function () {
@@ -350,7 +464,7 @@ BK.SettingsScene = class extends BK.OverlayBase {
         BK.save.persist();
         BK.audio.apply(P.settings);
         s.draw();
-      }, { w: 34, h: 18, color: on ? 0x2e7d3e : 0x8a3a2a }));
+      }, { w: 34, h: 16, color: on ? 0x2e7d3e : 0x8a3a2a }));
     });
     var font = BK.FONTS.filter(function (f) { return f.id === BK.fontId; })[0] || BK.FONTS[0];
     var lay = BK.layoutOf(P);
@@ -370,25 +484,29 @@ BK.SettingsScene = class extends BK.OverlayBase {
         if (P.settings.layout !== 'hu') BK.ui.toast(s, BK.W / 2, b.y + b.h - 34, BK.T.kbLayoutNote, 0xffe0a0, 1, 2600);
       }],
       // which keys the Pumpkin King's marks need (Option on a Mac, AltGr on a PC)
+      // the level chosen for a new player, Kezdő or Haladó, can be changed here later
+      [BK.L('Szint', 'Level'), P.grade === '5-6' ? BK.T.grade56 : BK.T.grade34, function () {
+        P.grade = P.grade === '5-6' ? '3-4' : '5-6'; BK.save.persist(); s.draw();
+      }],
       [BK.L('Jelek súgója', 'Mark hints'), hset.name, function () {
         var sets = BK.KEY_HINT_SETS, k = sets.indexOf(hset);
         P.settings.kbHint = sets[(k + 1) % sets.length].id; BK.save.persist(); s.draw();
       }],
     ];
     choices.forEach(function (c, i) {
-      var y = b.y + 56 + i * 20;
+      var y = b.y + 56 + i * STEP;
       s.keepD(BK.ui.text(s, b.x + 186, y, c[0], { outline: false, origin: [0, 0.5], fit: 82 }));
-      s.keepD(BK.ui.button(s, b.x + b.w - 50, y, c[1], c[2], { w: 70, h: 18 }));
+      s.keepD(BK.ui.button(s, b.x + b.w - 50, y, c[1], c[2], { w: 70, h: 16 }));
     });
     // the warm-up test once more (for a child who skipped it, or has improved a lot)
     if (this.data0.from === 'Map') {
-      var wy = b.y + 56 + 5 * 20;
+      var wy = b.y + 56 + choices.length * STEP;
       s.keepD(BK.ui.text(s, b.x + 186, wy, BK.L('Bemelegítés', 'Warm-up'), { outline: false, origin: [0, 0.5], fit: 82 }));
       s.keepD(BK.ui.button(s, b.x + b.w - 50, wy, BK.L('Újra', 'Again'), function () {
         BK.save.persist();
         s.scene.stop('Map');
         s.scene.start('Placement');
-      }, { w: 70, h: 18 }));
+      }, { w: 70, h: 16 }));
     }
   }
 };

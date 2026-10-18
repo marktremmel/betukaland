@@ -6,7 +6,7 @@
  */
 window.BK = window.BK || {};
 
-BK.VERSION = '0.10.1';
+BK.VERSION = '0.11.0';
 
 // Test mode for the teacher: open the game with ?debug at the end of the address.
 // Every region and level is open; in a level Tab finishes the current word and
@@ -288,9 +288,9 @@ BK.SHOT_COLOURS = [
   { id: 'pastel', name: 'Pasztell', en: 'Pastel', price: 35, pick: true,
     cols: [0xffb8b8, 0xffd2a8, 0xfff0a8, 0xc8f2b4, 0xb4ecf0, 0xb8d4ff, 0xdcc6ff, 0xffc4e4] },
   { id: 'rainbow', name: 'Szivárvány', en: 'Rainbow', price: 60, rainbow: true },
-  { id: 'rtx', name: 'RTX', en: 'RTX', price: 80, cols: [0x5ae8ff, 0xff6ad8, 0xffb040, 0xa98aff], rtx: true },
-  { id: 'chrome', name: 'Króm', en: 'Chrome', price: 70, cols: [0xc8d0dc], chrome: true },
-  { id: 'neon', name: 'Neon', en: 'Neon', price: 75, cols: [0xff4fd8, 0x3ff0ff, 0xb6ff3a, 0xb07aff], neon: true },
+  { id: 'rtx', name: 'RTX', en: 'RTX', price: 80, rare: 2, cols: [0x5ae8ff, 0xff6ad8, 0xffb040, 0xa98aff], rtx: true },
+  { id: 'chrome', name: 'Króm', en: 'Chrome', price: 70, rare: 1, cols: [0xc8d0dc], chrome: true },
+  { id: 'neon', name: 'Neon', en: 'Neon', price: 75, rare: 2, cols: [0xff4fd8, 0x3ff0ff, 0xb6ff3a, 0xb07aff], neon: true },
 ];
 // What happens where the shot lands (in the shot's colour).
 BK.SHOT_IMPACTS = [
@@ -307,13 +307,23 @@ BK.SHOT_GLOWS = [
   { id: 'g_rim', name: 'Fénykeret', en: 'Light rim', price: 40 },
   { id: 'g_shine', name: 'Csillanás', en: 'Shine', price: 40 },
   { id: 'g_pulse', name: 'Lüktetés', en: 'Pulse', price: 30 },
-  { id: 'g_rainbow', name: 'Szivárvány', en: 'Rainbow', price: 55 },
-  { id: 'g_neon', name: 'Neontábla', en: 'Neon sign', price: 65 },
+  { id: 'g_rainbow', name: 'Szivárvány', en: 'Rainbow', price: 55, rare: 1 },
+  { id: 'g_neon', name: 'Neontábla', en: 'Neon sign', price: 65, rare: 1 },
 ];
 BK.FX_DEFAULT = function () { return { v: 2, shape: 'wave', colour: 'classic', tone: 0, impact: 'spark', glow: 'g_none', owned: ['wave', 'classic', 'spark', 'g_none'] }; };
 
 // Boss arena (practice corner): every boss the child has beaten, again, alone, in two
 // difficulties. Hard: two more sentences, and the boss sends marks to catch like the Pumpkin King.
+// Tales (Mesék tab): Benedek Elek's texts, typed a part at a time; the place is kept
+// (read when used: data/tales_hu.js loads after this file)
+Object.defineProperty(BK, 'TALES', { get: function () { return window.BK_TALES_HU || []; } });
+BK.talePart = function (p, tale) {
+  var band = (p && p.grade) || '3-4', at = (((p && p.tales) || {})[tale.id] || {}).at || 0;
+  if (at >= tale.lines.length) at = 0;                                   // read again from the start
+  var n = Math.max(4, Math.round((band === '3-4' ? 8 : 10) * BK.util.clamp(BK.levelgen.pace(p), 0.6, 1.3)));
+  if (tale.lines.length - (at + n) < 3) n = tale.lines.length - at;      // no tiny last part
+  return { from: at, to: at + n };
+};
 BK.arenaBosses = function (p) {
   var out = BK.REGIONS.filter(function (r) { return r.playable && r.boss; }).map(function (r) {
     return { id: 'r' + r.id, region: r.id, name: r.bossName, where: r.name,
@@ -368,6 +378,79 @@ BK.ITEMS = [
   { id: 'candycane', name: 'cukorpálca', frame: 202 },
   { id: 'pizza', name: 'pizza', frame: 102 },
 ];
+
+// Kitchen (Hátizsák → Konyha): treasures + typing the recipe = a dish. Dishes can be sold to
+// Karou, or three different ones traded for a rare treasure. Rare treasures are what the
+// best magic (RTX, neon, chrome) and the finest castle things cost, on top of coins.
+BK.RECIPES = [
+  { id: 'palacsinta', name: 'Palacsinta', en: 'Pancakes', frame: 114, needs: ['egg', 'cheese', 'strawberry'], sell: 18,
+    hu: ['Feltöröm a tojást egy tálba.', 'Liszt és tej megy hozzá.', 'Kikeverem a tésztát.', 'Kisütöm a serpenyőben.', 'Eperrel és túróval töltöm meg.'],
+    en: ['I crack the egg into a bowl.', 'Flour and milk go in too.', 'I mix the batter.', 'I fry it in the pan.', 'I fill it with strawberries.'] },
+  { id: 'gyumolcssali', name: 'Gyümölcssaláta', en: 'Fruit salad', frame: 106, needs: ['apple', 'banana', 'grapes'], sell: 15,
+    hu: ['Megmosom a gyümölcsöt.', 'Felszeletelem az almát és a banánt.', 'A szőlőt félbevágom.', 'Mindent egy tálba teszek.', 'Egy kis mézzel keverem össze.'],
+    en: ['I wash the fruit.', 'I slice the apple and the banana.', 'I cut the grapes in half.', 'Everything goes into a bowl.', 'I stir it with a little honey.'] },
+  { id: 'leves', name: 'Zöldségleves', en: 'Vegetable soup', frame: 107, needs: ['carrot', 'mushroom'], sell: 14,
+    hu: ['Megpucolom a répát.', 'A gombát kis darabokra vágom.', 'Vizet forralok a fazékban.', 'Beleteszem a zöldséget.', 'Lassan főzöm, és sózom.'],
+    en: ['I peel the carrot.', 'I cut the mushrooms into small pieces.', 'I boil water in the pot.', 'In go the vegetables.', 'I cook it slowly and add salt.'] },
+  { id: 'pite', name: 'Almás pite', en: 'Apple pie', frame: 116, needs: ['apple', 'pear', 'egg'], sell: 18,
+    hu: ['Lisztből és vajból tésztát gyúrok.', 'Felszeletelem az almát és a körtét.', 'Fahéjat szórok rá.', 'Tésztát teszek a tetejére.', 'Megsütöm, amíg aranybarna lesz.'],
+    en: ['I make dough from flour and butter.', 'I slice the apple and the pear.', 'I sprinkle cinnamon on top.', 'I put dough over it.', 'I bake it until it is golden.'] },
+  { id: 'repatorta', name: 'Répatorta', en: 'Carrot cake', frame: 168, needs: ['carrot', 'egg', 'cupcake'], sell: 20,
+    hu: ['Lereszelem a répát.', 'Tojást és cukrot keverek hozzá.', 'A tésztát formába öntöm.', 'Megsütöm a sütőben.', 'Krémet kenek a tetejére.'],
+    en: ['I grate the carrot.', 'I mix in eggs and sugar.', 'I pour the batter into a tin.', 'I bake it in the oven.', 'I spread cream on top.'] },
+  { id: 'kehely', name: 'Fagyikehely', en: 'Ice cream sundae', frame: 181, needs: ['icecream', 'cherry', 'strawberry'], sell: 16,
+    hu: ['Két gombóc fagyit teszek a pohárba.', 'Epret rakok mellé.', 'Tejszínhabot nyomok rá.', 'A tetejére cseresznye kerül.', 'Gyorsan kell enni!'],
+    en: ['I put two scoops in a glass.', 'I add strawberries.', 'I add whipped cream.', 'A cherry goes on top.', 'Eat it quickly!'] },
+  { id: 'turmix', name: 'Gyümölcsturmix', en: 'Smoothie', frame: 213, needs: ['banana', 'orange', 'strawberry'], sell: 14,
+    hu: ['Meghámozom a banánt és a narancsot.', 'A gyümölcs a turmixgépbe kerül.', 'Egy pohár tejet öntök rá.', 'Összeturmixolom.', 'Szívószállal iszom.'],
+    en: ['I peel the banana and the orange.', 'The fruit goes into the blender.', 'I pour in a glass of milk.', 'I blend it.', 'I drink it with a straw.'] },
+  { id: 'pogacsa', name: 'Sajtos pogácsa', en: 'Cheese scones', frame: 123, needs: ['cheese', 'egg', 'croissant'], sell: 16,
+    hu: ['Lisztet, vajat és sajtot gyúrok össze.', 'Kinyújtom a tésztát.', 'Kis köröket szaggatok.', 'Tojással kenem meg őket.', 'Sajtot szórok rájuk, és megsütöm.'],
+    en: ['I knead flour, butter and cheese.', 'I roll out the dough.', 'I cut out small circles.', 'I brush them with egg.', 'I add cheese on top and bake them.'] },
+  { id: 'unnepi', name: 'Ünnepi torta', en: 'Party cake', frame: 175, needs: ['cake', 'macaron', 'candycane'], sell: 28,
+    hu: ['Három piskótát teszek egymásra.', 'Közéjük csokikrém kerül.', 'Körbekenem habbal.', 'Macaronokkal díszítem.', 'Gyertyát szúrok bele, és jöhet a buli!'],
+    en: ['I stack three sponge cakes.', 'Chocolate cream goes between them.', 'I cover it with cream.', 'I decorate it with macarons.', 'I add a candle, party time!'] },
+];
+BK.RARES = [
+  { id: 'gem', name: 'Gyémánt', en: 'Diamond', frame: 80 },
+  { id: 'crystal', name: 'Kristály', en: 'Crystal', frame: 81 },
+  { id: 'goldbar', name: 'Aranyrúd', en: 'Gold bar', frame: 64 },
+  { id: 'nugget', name: 'Aranyrög', en: 'Gold nugget', frame: 66 },
+  { id: 'orb', name: 'Tűzgömb', en: 'Fire orb', frame: 156 },
+  { id: 'map', name: 'Kincses térkép', en: 'Treasure map', frame: 106 },
+];
+BK.rareCount = function (p) { var r = (p && p.rares) || {}; return BK.RARES.reduce(function (a, x) { return a + (r[x.id] || 0); }, 0); };
+// pay n rare treasures (the ones the child has most of first); false if there are not enough
+BK.payRares = function (p, n) {
+  if (BK.rareCount(p) < n) return false;
+  for (var k = 0; k < n; k++) {
+    var best = BK.RARES.slice().sort(function (a, b) { return (p.rares[b.id] || 0) - (p.rares[a.id] || 0); })[0];
+    p.rares[best.id]--;
+  }
+  return true;
+};
+
+// The castle room (Váram): things to buy and place. kind floor / wall; rare: rare treasures needed too
+BK.CASTLE_PROPS = [
+  { id: 'crate', name: 'Láda', en: 'Crate', price: 15 }, { id: 'barrel', name: 'Hordó', en: 'Barrel', price: 15 },
+  { id: 'stool', name: 'Zsámoly', en: 'Stool', price: 12 }, { id: 'chair', name: 'Szék', en: 'Chair', price: 18 },
+  { id: 'table', name: 'Asztalka', en: 'Small table', price: 20 }, { id: 'basket', name: 'Kosár', en: 'Basket', price: 15 },
+  { id: 'pot', name: 'Üst', en: 'Pot', price: 15 }, { id: 'apples', name: 'Almakupac', en: 'Apple pile', price: 20 },
+  { id: 'flowers', name: 'Virágcserép', en: 'Flower pot', price: 20 }, { id: 'plant', name: 'Szobanövény', en: 'House plant', price: 20 },
+  { id: 'fern', name: 'Páfrány', en: 'Fern', price: 25 }, { id: 'vase', name: 'Váza', en: 'Vase', price: 15 },
+  { id: 'pumpkin', name: 'Tök', en: 'Pumpkin', price: 15 }, { id: 'lantern', name: 'Töklámpás', en: 'Jack-o\'-lantern', price: 25 },
+  { id: 'barrels', name: 'Két hordó', en: 'Two barrels', price: 28 }, { id: 'crates', name: 'Ládatorony', en: 'Crate stack', price: 28 },
+  { id: 'logs', name: 'Farakás', en: 'Log pile', price: 25 }, { id: 'tub', name: 'Dézsa', en: 'Tub', price: 20 },
+  { id: 'bottles', name: 'Üvegek', en: 'Bottles', price: 15 }, { id: 'longtable', name: 'Hosszú asztal', en: 'Long table', price: 35 },
+  { id: 'feast', name: 'Lakomaasztal', en: 'Feast table', price: 45 }, { id: 'potion', name: 'Varázsasztalka', en: 'Potion desk', price: 40 },
+  { id: 'sunflowers', name: 'Napraforgók', en: 'Sunflowers', price: 30 }, { id: 'bushpot', name: 'Bokor cserépben', en: 'Potted bush', price: 30 },
+  { id: 'urn', name: 'Kőváza', en: 'Stone urn', price: 40 }, { id: 'bust', name: 'Mellszobor', en: 'Bust', price: 50, rare: 1 },
+  { id: 'urnrose', name: 'Rózsás kőváza', en: 'Rose urn', price: 50, rare: 1 }, { id: 'alchemy', name: 'Alkimista asztal', en: 'Alchemy table', price: 60, rare: 1 },
+  { id: 'scarecrow', name: 'Madárijesztő', en: 'Scarecrow', price: 50, rare: 1 }, { id: 'statue', name: 'Szobor', en: 'Statue', price: 70, rare: 2 },
+  { id: 'cypress', name: 'Ciprus', en: 'Cypress', price: 60, rare: 1 }, { id: 'tree', name: 'Fa a teremben', en: 'Indoor tree', price: 90, rare: 2 },
+  { id: 'cook', name: 'Tűzhely (lobog!)', en: 'Hearth (it burns!)', price: 80, rare: 2, sprite: 'castle_cook' },
+];
+BK.CASTLE_FRAME_PRICE = 20;        // each picture frame on the wall
 
 // Playable heroes. The figure a child picks is the one that walks through the
 // levels (and the profile picture). idle/run are animation keys; outfits add

@@ -6,6 +6,8 @@
 BK.MapScene = class extends Phaser.Scene {
   constructor() { super('Map'); }
 
+  init(data) { this.openAfter = data && data.open ? data : null; }
+
   create() {
     var s = this, P = this.P = BK.state.profile;
     if (!P) { this.scene.start('Profiles'); return; }
@@ -41,7 +43,12 @@ BK.MapScene = class extends Phaser.Scene {
     var P = this.P;
     this.add.rectangle(0, 0, BK.W, 18, 0x2b1a14, 0.55).setOrigin(0, 0);
     var av = BK.avatarSprite(this, 12, 17, P.avatar, P); av.setScale(Math.min(0.5, 16 / av.height));   // taller figures stay inside the bar
-    BK.ui.text(this, 24, 3, P.nick, { color: 0xfff2dc });
+    var nm = BK.ui.text(this, 24, 3, P.nick, { color: 0xfff2dc });
+    // the name (and the little figure) open the profile page
+    if (P.emblem) BK.emblem.draw(this, 30 + nm.displayWidth + 6, 9, P.emblem, 12);
+    var pz = this.add.zone(0, 0, 36 + nm.displayWidth + 14, 18).setOrigin(0, 0).setInteractive({ useHandCursor: true });
+    var s0 = this;
+    pz.on('pointerup', function () { BK.audio.sfx('chime'); s0.scene.start('Profile'); });
     this.add.sprite(150, 9, 'coin').play('coin');
     this.coinText = BK.ui.text(this, 160, 3, String(P.coins), { color: 0xffe9a0 });
     this.add.image(206, 9, 'star_on');
@@ -141,21 +148,27 @@ BK.MapScene = class extends Phaser.Scene {
       [BK.T.bag, function () { s.openOverlay('Bag'); }],
       [BK.T.settings, function () { s.openOverlay('Settings'); }],
       [BK.T.saveCode, function () { BK.SaveCodeUI.open(P, function () { s.scene.restart(); }); }],
+      [BK.L('Váram', 'My castle'), function () { BK.audio.sfx('chime'); s.scene.start('Castle'); }],
+      [BK.L('Profilom', 'Profile'), function () { BK.audio.sfx('chime'); s.scene.start('Profile'); }],
       [BK.T.switchPlayer, function () { s.scene.start('Profiles'); }],
     ];
     items.forEach(function (it, i) {
-      var x = 286 + (i % 2) * 64, y = 140 + Math.floor(i / 2) * 24;
-      var b = BK.ui.button(s, x, y, it[0], it[1], { w: 62, h: 20 });
+      var x = 286 + (i % 2) * 64, y = 134 + Math.floor(i / 2) * 20;
+      var b = BK.ui.button(s, x, y, it[0], it[1], { w: 62, h: 18 });
     });
     // Halloween Night, while the teacher has it switched on
+    if (this.openAfter) {
+      var oa = this.openAfter; this.openAfter = null;
+      this.time.delayedCall(50, function () { s.openOverlay(oa.open, { tab: oa.tab }); });
+    }
     if (BK.save.halloween()) {
       BK.ui.button(s, 318, 114, 'Halloween', function () { BK.audio.sfx('chime'); s.scene.start('Halloween'); }, { w: 126, h: 18, color: 0xb8480c });
     }
   }
 
-  openOverlay(name) {
+  openOverlay(name, extra) {
     var s = this;
-    this.scene.launch(name, { from: 'Map', onClose: function () { s.scene.restart(); } });
+    this.scene.launch(name, Object.assign({ from: 'Map', onClose: function () { s.scene.restart(); } }, extra || {}));
     this.scene.pause();
   }
 

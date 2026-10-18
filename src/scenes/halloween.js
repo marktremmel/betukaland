@@ -14,7 +14,7 @@ BK.HalloweenScene = class extends Phaser.Scene {
   create() {
     var s = this, P = this.P = BK.state.profile;
     var story = this.story = BK.HALLOWEEN_STORY[BK.uiLang === 'en' ? 'en' : 'hu'];
-    BK.menuBackground(this, 3, { groundY: 200 });
+    BK.menuBackground(this, 3, { groundY: 200, fixed: true });
     BK.audio.music('m_moon');
     BK.ui.nine(this, 16, 4, 352, 182, 'ui_panel2');
     BK.ui.text(this, 192, 33, story.title, { outline: false, size: 2, origin: [0.5, 0.5], color: 0x6a2a8a });

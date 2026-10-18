@@ -1529,6 +1529,20 @@ window.BK_MANIFEST = {
    "frames": 6,
    "fps": 8,
    "hd": 3
+  },
+  "castle_cook": {
+   "url": "assets/sprites/castle_cook.png",
+   "fw": 64,
+   "fh": 64,
+   "frames": 12,
+   "fps": 8
+  },
+  "castle_torch": {
+   "url": "assets/sprites/castle_torch.png",
+   "fw": 32,
+   "fh": 32,
+   "frames": 6,
+   "fps": 10
   }
  },
  "images": {
@@ -1696,6 +1710,186 @@ window.BK_MANIFEST = {
    "url": "assets/img/flat_frame.png",
    "w": 96,
    "h": 64
+  },
+  "castle_crate": {
+   "url": "assets/img/castle/crate.png",
+   "w": 27,
+   "h": 16
+  },
+  "castle_crates": {
+   "url": "assets/img/castle/crates.png",
+   "w": 27,
+   "h": 32
+  },
+  "castle_barrel": {
+   "url": "assets/img/castle/barrel.png",
+   "w": 15,
+   "h": 18
+  },
+  "castle_barrels": {
+   "url": "assets/img/castle/barrels.png",
+   "w": 29,
+   "h": 18
+  },
+  "castle_stool": {
+   "url": "assets/img/castle/stool.png",
+   "w": 14,
+   "h": 13
+  },
+  "castle_pot": {
+   "url": "assets/img/castle/pot.png",
+   "w": 18,
+   "h": 15
+  },
+  "castle_table": {
+   "url": "assets/img/castle/table.png",
+   "w": 18,
+   "h": 14
+  },
+  "castle_chair": {
+   "url": "assets/img/castle/chair.png",
+   "w": 20,
+   "h": 29
+  },
+  "castle_feast": {
+   "url": "assets/img/castle/feast.png",
+   "w": 39,
+   "h": 29
+  },
+  "castle_apples": {
+   "url": "assets/img/castle/apples.png",
+   "w": 28,
+   "h": 18
+  },
+  "castle_bottles": {
+   "url": "assets/img/castle/bottles.png",
+   "w": 25,
+   "h": 12
+  },
+  "castle_basket": {
+   "url": "assets/img/castle/basket.png",
+   "w": 17,
+   "h": 15
+  },
+  "castle_longtable": {
+   "url": "assets/img/castle/longtable.png",
+   "w": 39,
+   "h": 19
+  },
+  "castle_logs": {
+   "url": "assets/img/castle/logs.png",
+   "w": 47,
+   "h": 21
+  },
+  "castle_tub": {
+   "url": "assets/img/castle/tub.png",
+   "w": 23,
+   "h": 18
+  },
+  "castle_pumpkin": {
+   "url": "assets/img/castle/pumpkin.png",
+   "w": 19,
+   "h": 15
+  },
+  "castle_lantern": {
+   "url": "assets/img/castle/lantern.png",
+   "w": 19,
+   "h": 15
+  },
+  "castle_scarecrow": {
+   "url": "assets/img/castle/scarecrow.png",
+   "w": 40,
+   "h": 59
+  },
+  "castle_statue": {
+   "url": "assets/img/castle/statue.png",
+   "w": 26,
+   "h": 55
+  },
+  "castle_flowers": {
+   "url": "assets/img/castle/flowers.png",
+   "w": 23,
+   "h": 26
+  },
+  "castle_plant": {
+   "url": "assets/img/castle/plant.png",
+   "w": 23,
+   "h": 25
+  },
+  "castle_fern": {
+   "url": "assets/img/castle/fern.png",
+   "w": 31,
+   "h": 33
+  },
+  "castle_bushpot": {
+   "url": "assets/img/castle/bushpot.png",
+   "w": 21,
+   "h": 33
+  },
+  "castle_vase": {
+   "url": "assets/img/castle/vase.png",
+   "w": 18,
+   "h": 16
+  },
+  "castle_cypress": {
+   "url": "assets/img/castle/cypress.png",
+   "w": 28,
+   "h": 102
+  },
+  "castle_tree": {
+   "url": "assets/img/castle/tree.png",
+   "w": 56,
+   "h": 90
+  },
+  "castle_bust": {
+   "url": "assets/img/castle/bust.png",
+   "w": 21,
+   "h": 45
+  },
+  "castle_urn": {
+   "url": "assets/img/castle/urn.png",
+   "w": 27,
+   "h": 42
+  },
+  "castle_urnrose": {
+   "url": "assets/img/castle/urnrose.png",
+   "w": 29,
+   "h": 54
+  },
+  "castle_garland": {
+   "url": "assets/img/castle/garland.png",
+   "w": 61,
+   "h": 26
+  },
+  "castle_potion": {
+   "url": "assets/img/castle/potion.png",
+   "w": 26,
+   "h": 22
+  },
+  "castle_alchemy": {
+   "url": "assets/img/castle/alchemy.png",
+   "w": 37,
+   "h": 38
+  },
+  "castle_sunflowers": {
+   "url": "assets/img/castle/sunflowers.png",
+   "w": 27,
+   "h": 43
+  },
+  "castle_wall": {
+   "url": "assets/img/castle/wall.png",
+   "w": 32,
+   "h": 32
+  },
+  "castle_window": {
+   "url": "assets/img/castle/window.png",
+   "w": 28,
+   "h": 27
+  },
+  "castle_door": {
+   "url": "assets/img/castle/door.png",
+   "w": 20,
+   "h": 48
   }
  },
  "skies": {
@@ -1973,4 +2167,4 @@ window.BK_MANIFEST = {
   ]
  }
 };
-window.BK_CREDITS = [["Grafika", "Ansimuz: Sunny Land, Tiny RPG, Gothicvania"], ["Grafika", "Crabby Beach, Berie's Adventure: Seaside"], ["Felület", "Complete UI Essential: Crusenho, CC BY 4.0"], ["Ikonok", "Addin's RPG Icon Packs: Addin"], ["Effektek", "Effect and FX Pixel"], ["Égbolt", "Free Sky with Clouds: CraftPix.net"], ["Betűtípus", "Andika, Atkinson Hyperlegible, Lexend (OFL)"], ["Zene", "Music by Clement Panchout"], ["Hangok", "Pixel Combat SFX: Helton Yan"], ["Hangok", "Super Dialogue: Dillon Becker, CC BY 4.0"], ["Motor", "Phaser 3 (phaser.io), MIT licence"], ["Figurák", "Új állatok: a 4.B osztály ötletei. Köszönjük!", "New animals: ideas from class 4.B. Thank you!"]];
+window.BK_CREDITS = [["Grafika", "Ansimuz: Sunny Land, Tiny RPG, Gothicvania"], ["Grafika", "Crabby Beach, Berie's Adventure: Seaside"], ["Felület", "Complete UI Essential: Crusenho, CC BY 4.0"], ["Ikonok", "Addin's RPG Icon Packs: Addin"], ["Effektek", "Effect and FX Pixel"], ["Égbolt", "Free Sky with Clouds: CraftPix.net"], ["Betűtípus", "Andika, Atkinson Hyperlegible, Lexend (OFL)"], ["Zene", "Music by Clement Panchout"], ["Hangok", "Pixel Combat SFX: Helton Yan"], ["Hangok", "Super Dialogue: Dillon Becker, CC BY 4.0"], ["Motor", "Phaser 3 (phaser.io), MIT licence"], ["Figurák", "Új állatok: a 4.B osztály ötletei. Köszönjük!", "New animals: ideas from class 4.B. Thank you!"], ["Vár", "GandalfHardcore: FREE Platformer Assets"], ["Mesék", "Benedek Elek (Grimm-mesék, Magyar mese- és mondavilág)"]];

@@ -499,7 +499,41 @@ BK.Rest = class extends BK.Encounter {
   }
 };
 
-BK.ENCOUNTERS = { walker: BK.Walker, flyer: BK.Flyer, gate: BK.Gate, bridge: BK.Bridge, chest: BK.Chest,
+/** The kitchen: a hearth by the road; each typed recipe sentence makes the pot bubble, and at
+ *  the end the dish appears. */
+BK.Kitchen = class extends BK.Encounter {
+  spawn(x) {
+    var s = this.scene;
+    this.x = x;
+    var key = BK_MANIFEST.sprites.castle_cook ? 'castle_cook' : null;
+    this.hearth = key ? s.add.sprite(x, BK.GROUND_Y + 2, key).setOrigin(0.5, 1).setDepth(39).play(key)
+      : s.add.image(x, BK.GROUND_Y, 'icons_food', this.def.frame).setOrigin(0.5, 1).setDepth(39);
+    this.parts.push(this.hearth);
+    this.stopX = BK.TARGET_X - 10;
+  }
+  bubbleY() { return BK.GROUND_Y - 60; }
+  hitPos() { return { x: this.x, y: BK.GROUND_Y - 22 }; }
+  onChunk() {
+    var s = this.scene;
+    BK.audio.sfx('chime', { volume: 0.5 });
+    for (var i = 0; i < 4; i++) {
+      var b = s.add.image(this.x + (Math.random() - 0.5) * 16, BK.GROUND_Y - 30, 'shot_ball').setTint(0xffffff).setAlpha(0.7).setDepth(42).setScale(0.6);
+      s.tweens.add({ targets: b, y: b.y - 18 - Math.random() * 10, alpha: 0, scale: 1.2, duration: 600, delay: i * 80, onComplete: function () { this.targets[0].destroy(); } });
+    }
+  }
+  finish() {
+    var s = this.scene, self = this;
+    BK.audio.sfx('level_up', { volume: 0.5 });
+    var dish = s.add.image(this.x, BK.GROUND_Y - 40, 'icons_food', this.def.frame).setDepth(60).setScale(0.2);
+    BK.fx.confetti(s, this.x, BK.GROUND_Y - 50);
+    return new Promise(function (ok) {
+      s.tweens.add({ targets: dish, scale: 2, y: BK.GROUND_Y - 64, duration: 500, ease: 'Back.easeOut' });
+      s.time.delayedCall(1400, function () { dish.destroy(); ok(); });
+    });
+  }
+};
+
+BK.ENCOUNTERS = { kitchen: BK.Kitchen, walker: BK.Walker, flyer: BK.Flyer, gate: BK.Gate, bridge: BK.Bridge, chest: BK.Chest,
   mini: BK.Mini, boss: BK.Boss, shop: BK.Shop, rest: BK.Rest };
 
 // creature id -> animation key

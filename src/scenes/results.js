@@ -12,7 +12,7 @@ BK.ResultsScene = class extends Phaser.Scene {
     BK.menuBackground(this, 2, { groundY: 200 });
     BK.audio.music(BK.MUSIC.map);
     BK.ui.nine(this, 16, 4, 352, 182, 'ui_panel2');
-    var modeName = { practice: BK.T.practice, weak: BK.T.weak, endless: BK.T.endless, halloween: 'Halloween', arena: BK.L('Aréna', 'Arena') }[r.practice];
+    var modeName = { practice: BK.T.practice, weak: BK.T.weak, endless: BK.T.endless, halloween: 'Halloween', arena: BK.L('Aréna', 'Arena'), tale: BK.L('Mese', 'Tale'), cook: BK.L('Konyha', 'Kitchen') }[r.practice];
     var head = r.daily ? BK.T.daily + BK.L(': kész!', ': done!') : modeName ? modeName + BK.L(': kész!', ': done!') : BK.T.results;
     BK.ui.text(this, 192, 35, head, { outline: false, size: 2, origin: [0.5, 0.5] });
 
@@ -107,11 +107,23 @@ BK.ResultsScene = class extends Phaser.Scene {
   // Daily, sentence practice and stories go back to the practice corner
   practiceButtons(r) {
     var s = this;
-    var again = { region: r.r, level: r.daily ? 'daily' : r.practice, storyId: r.storyId, boss: r.arenaId, hard: r.hard,
+    var again = { region: r.r, level: r.daily ? 'daily' : r.practice, storyId: r.storyId, boss: r.arenaId, hard: r.hard, taleId: r.tale && r.tale.id,
       seed: r.daily ? BK.util.hash('daily:' + BK.util.today()) : undefined };
-    var tab = r.daily ? 'today' : r.practice === 'story' ? 'story' : r.practice === 'arena' ? 'arena' : 'practice';
+    var tab = r.daily ? 'today' : r.practice === 'story' ? 'story' : r.practice === 'arena' ? 'arena' : r.practice === 'tale' ? 'tales' : 'practice';
     var mode = r.practice === 'practice' ? 'sent' : r.practice;
-    BK.ui.button(this, 78, 196, BK.T.retry, function () { s.scene.start('Level', again); }, { w: 66, h: 18 });
+    if (r.practice === 'cook') {
+      // the dish is on the shelf; back to the bag's kitchen, or the map
+      var rc = BK.RECIPES.find(function (x) { return x.id === r.recipeId; });
+      if (r.newDish && rc) this.time.delayedCall(1400, function () { BK.ui.toast(s, 192, 160, BK.L('Kész: ', 'Ready: ') + rc.name + BK.L('! A Polcon van.', '! It is on the Shelf.'), 0xffd23c, 1, 2400); });
+      BK.ui.button(this, 120, 196, BK.T.map, function () { s.scene.start('Map'); }, { w: 66, h: 18, key: 'ESC' });
+      BK.ui.button(this, 264, 196, BK.L('Konyha', 'Kitchen') + ' (Enter)', function () {
+        s.scene.start('Map', { open: 'Bag', tab: 1 });
+      }, { w: 96, h: 18, key: 'ENTER' });
+      return;
+    }
+    // in a tale "again" goes on with the next part (the place is kept)
+    var goOn = r.practice === 'tale' && r.tale && r.tale.to < r.tale.total;
+    BK.ui.button(this, 78, 196, goOn ? BK.L('Folytatom', 'Go on') : BK.T.retry, function () { s.scene.start('Level', again); }, { w: 66, h: 18 });
     BK.ui.button(this, 192, 196, BK.T.map, function () { s.scene.start('Map'); }, { w: 66, h: 18, key: 'ESC' });
     BK.ui.button(this, 306, 196, BK.T.next + ' (Enter)', function () { s.scene.start('Practice', { tab: tab, mode: mode }); }, { w: 86, h: 18, key: 'ENTER' });
   }

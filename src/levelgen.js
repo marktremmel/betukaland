@@ -25,7 +25,8 @@ BK.levelgen = {
   },
 
   build: function (regionId, levelIdx, profile, rng, opts) {
-    if (levelIdx === 'practice' || levelIdx === 'story' || levelIdx === 'weak' || levelIdx === 'endless') return this.practice(regionId, levelIdx, profile, rng, opts || {});
+    if (levelIdx === 'cook') return this.cook(regionId, profile, rng, opts || {});
+    if (levelIdx === 'tale' || levelIdx === 'practice' || levelIdx === 'story' || levelIdx === 'weak' || levelIdx === 'endless') return this.practice(regionId, levelIdx, profile, rng, opts || {});
     if (levelIdx === 'halloween') return this.halloween(regionId, profile, rng, opts || {});
     if (levelIdx === 'arena') return this.arena(regionId, profile, rng, opts || {});
     var reg = (opts && opts.reg) || BK.REGIONS[regionId - 1];
@@ -183,6 +184,15 @@ BK.levelgen = {
     return plan;
   },
 
+  /* Kitchen: the recipe's sentences at the hearth, one after the other; then the dish is ready. */
+  cook: function (regionId, profile, rng, opts) {
+    var r = BK.RECIPES.find(function (x) { return x.id === opts.recipeId; }) || BK.RECIPES[0];
+    var lang = (profile && profile.lang) === 'en' ? 'en' : 'hu';
+    var reg = BK.REGIONS[regionId - 1];
+    return { encounters: [{ kind: 'kitchen', texts: r[lang].map(BK.util.norm), coins: 0, frame: r.frame, maxWidth: 200 }],
+      sky: reg.sky ? reg.sky[0] : null, bdTint: null, weather: 'clear', music: 'm_chill', practice: 'cook', recipeId: r.id, storyTitle: r.name };
+  },
+
   halloween: function (regionId, profile, rng, opts) {
     var stage = Math.max(0, Math.min(3, opts.stage || 0));
     var reg = BK.halloweenRegion(regionId, stage);
@@ -272,6 +282,13 @@ BK.levelgen = {
       rng.shuffle(pool);
       for (var j = 0; j < nw; j++) lines.push(pool.length ? pool[j % pool.length] : picker.get('words'));
       title = weakKeys.join(' ');
+    } else if (mode === 'tale') {
+      // a part of a tale, from where the child stopped last time
+      var tale = BK.TALES.find(function (x) { return x.id === opts.taleId; }) || BK.TALES[0];
+      var part = BK.talePart(profile, tale);
+      lines = tale.lines.slice(part.from, part.to).map(BK.util.norm);
+      title = tale.title;
+      opts.tale = { id: tale.id, from: part.from, to: part.to, total: tale.lines.length };
     } else if (mode === 'story') {
       var lib = BK.wordbank.storyLibrary(lang);
       var st = lib.find(function (x) { return x.id === opts.storyId; }) || lib[0];
@@ -291,7 +308,8 @@ BK.levelgen = {
     var sky = reg.sky ? rng.pick(reg.sky) : null;
     var bdTint = !reg.sky && reg.bdTint && rng.chance(0.5) ? rng.pick(reg.bdTint) : null;
     return { encounters: out, sky: sky, bdTint: bdTint, weather: rng.pick(['clear', 'clear', 'leaves', 'blow', 'wind']),
-      music: mode === 'story' ? 'm_chill' : (reg.music ? reg.music[0] : 'm_level1'),
-      practice: mode, storyTitle: title, storyLines: mode === 'story' ? lines : null, storyId: opts.storyId || null, weakKeys: weakKeys };
+      music: mode === 'story' || mode === 'tale' ? 'm_chill' : (reg.music ? reg.music[0] : 'm_level1'),
+      practice: mode, storyTitle: title, storyLines: mode === 'story' || mode === 'tale' ? lines : null, storyId: opts.storyId || null, weakKeys: weakKeys,
+      tale: opts.tale || null };
   },
 };

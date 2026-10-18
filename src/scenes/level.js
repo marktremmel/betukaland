@@ -14,15 +14,17 @@ BK.LevelScene = class extends Phaser.Scene {
     this.regionId = data.region || 1;
     this.levelIdx = data.level === undefined ? 0 : data.level;
     this.daily = this.levelIdx === 'daily';
-    this.practiceMode = ['practice', 'story', 'weak', 'endless', 'halloween', 'arena'].indexOf(this.levelIdx) >= 0 ? this.levelIdx : null;
+    this.practiceMode = ['practice', 'story', 'weak', 'endless', 'halloween', 'arena', 'tale', 'cook'].indexOf(this.levelIdx) >= 0 ? this.levelIdx : null;
     this.hwStage = data.stage || 0;
     this.endless = this.levelIdx === 'endless';
     this.storyId = data.storyId || null;
+    this.taleId = data.taleId || null;
+    this.recipeId = data.recipeId || null;
     this.arenaBoss = data.boss || null; this.arenaHard = !!data.hard;
     this.profile = BK.state.profile;
     var seed = data.seed !== undefined ? data.seed : Math.floor(Math.random() * 1e9);
     this.rng = BK.util.rng(seed);
-    this.plan = BK.levelgen.build(this.regionId, this.levelIdx, this.profile, this.rng, { storyId: this.storyId, stage: this.hwStage, boss: this.arenaBoss, hard: this.arenaHard });
+    this.plan = BK.levelgen.build(this.regionId, this.levelIdx, this.profile, this.rng, { storyId: this.storyId, stage: this.hwStage, boss: this.arenaBoss, hard: this.arenaHard, taleId: this.taleId, recipeId: this.recipeId });
     this.queue = this.plan.encounters.slice();
     this.total = this.queue.length;
     this.doneCount = 0;
@@ -210,6 +212,8 @@ BK.LevelScene = class extends Phaser.Scene {
     this.coinIcon = this.add.sprite(12, 9, 'coin').setDepth(260); this.coinIcon.play('coin');
     this.coinText = BK.ui.text(this, 22, 3, '0', { color: 0xffe9a0 }).setDepth(260);
     var label = this.daily ? BK.T.daily : this.practiceMode === 'story' ? this.plan.storyTitle :
+      this.practiceMode === 'cook' ? BK.L('Konyha · ', 'Kitchen · ') + this.plan.storyTitle :
+      this.practiceMode === 'tale' ? this.plan.storyTitle + '  ' + Math.round(this.plan.tale.to / this.plan.tale.total * 100) + '%' :
       this.practiceMode === 'weak' ? BK.T.weak + ': ' + this.plan.storyTitle :
       this.endless ? BK.T.endless + ' · 0 ' + BK.T.wordsUnit :
       this.practiceMode === 'halloween' ? 'Halloween · ' + this.reg.name :
@@ -245,7 +249,7 @@ BK.LevelScene = class extends Phaser.Scene {
     var s = this;
     var focus = BK.wordbank.focus(this.regionId).join(' ');
     var msg = this.levelIdx === 3 ? BK.T.boss + '!' : (this.daily ? BK.T.daily : BK.T.ready);
-    if (this.practiceMode === 'story') msg = this.plan.storyTitle;
+    if (this.practiceMode === 'story' || this.practiceMode === 'tale') msg = this.plan.storyTitle;
     if (this.practiceMode === 'weak') msg = BK.T.weak + ': ' + this.plan.storyTitle;
     if (this.endless) msg = BK.T.endless;
     if (this.practiceMode === 'halloween') { this.halloweenIntro(); return; }
@@ -616,9 +620,9 @@ BK.LevelScene = class extends Phaser.Scene {
       var ar = (P.arena || {})[this.plan.arenaId] || {};
       bonus = stars * 2 + (ar[this.plan.hard ? 'h' : 'n'] ? 0 : (this.plan.hard ? 25 : 12));
     }
-    var lcode = this.daily ? -1 : ({ practice: -2, story: -3, weak: -4, endless: -5, halloween: -6, arena: -7 })[this.practiceMode] || this.levelIdx;
+    var lcode = this.daily ? -1 : ({ practice: -2, story: -3, weak: -4, endless: -5, halloween: -6, arena: -7, tale: -8, cook: -9 })[this.practiceMode] || this.levelIdx;
     var res = { r: this.regionId, l: lcode, practice: this.practiceMode, storyId: this.plan.storyId, stage: this.plan.stage,
-      arenaId: this.plan.arenaId, hard: this.plan.hard,
+      arenaId: this.plan.arenaId, hard: this.plan.hard, tale: this.plan.tale, recipeId: this.plan.recipeId,
       chars: st.chars, words: this.wordsDone, weakKeys: this.plan.weakKeys, wpm: wpm, acc: acc, stars: stars,
       ms: Math.round(performance.now() - this.startedAt), coins: bonus, earned: this.levelCoins + bonus, bonus: bonus,
       daily: this.daily, target: target, levelCoins: this.levelCoins };
@@ -632,6 +636,7 @@ BK.LevelScene = class extends Phaser.Scene {
     this.tweens.add({ targets: this.hero.sprite, x: BK.W + 40, duration: 1200, ease: 'Quad.easeIn' });
     BK.audio.sfx('v_alldone', { volume: 0.6 });
     if (this.practiceMode === 'story') this.time.delayedCall(1300, function () { s.storyRecap(res); });
+    else if (this.practiceMode === 'tale') this.time.delayedCall(1300, function () { s.taleRecap(res); });
     else if (this.practiceMode === 'halloween') this.time.delayedCall(1300, function () { s.halloweenEnd(res); });
     else this.time.delayedCall(1300, function () { s.scene.start('Results', res); });
   }
@@ -679,6 +684,27 @@ BK.LevelScene = class extends Phaser.Scene {
   }
 
   // The whole story on one page, read back once it is typed
+  // a part of a tale: what was typed, and how much of the tale is done
+  taleRecap(res) {
+    var s = this, t = this.plan.tale, end = t.to >= t.total;
+    this.add.rectangle(BK.W / 2, BK.H / 2, BK.W, BK.H, 0x000000, 0.45).setDepth(900);
+    BK.ui.nine(this, 20, 6, BK.W - 40, 186, 'ui_panel2').setDepth(901);
+    this.add.rectangle(BK.W / 2, 204, BK.W, 24, 0x2b1a14, 1).setDepth(901);
+    BK.ui.text(this, BK.W / 2, 36, this.plan.storyTitle, { outline: false, size: 2, origin: [0.5, 0.5] }).setDepth(902);
+    var txt = this.plan.storyLines.join(' ');
+    BK.ui.text(this, 40, 48, txt, { outline: false, width: BK.W - 80, px: txt.length > 520 ? 8 : 9, color: 0x4a2a18 }).setDepth(902);
+    // how far: a bar, and the end of the tale
+    var w = BK.W - 120, done = t.to / t.total;
+    this.add.rectangle(60, 140, w, 6, 0xd8b896).setOrigin(0, 0.5).setDepth(902);
+    this.add.rectangle(60, 140, w * done, 6, 0x6b8a50).setOrigin(0, 0.5).setDepth(903);
+    BK.ui.text(this, BK.W / 2, 152, end ? BK.L('Vége a mesének! Ezt az egészet te írtad le.', 'The end! You typed the whole tale.') :
+      BK.L('Folytatás következik: legközelebb innen mehetsz tovább.', 'To be continued: next time you go on from here.'),
+      { outline: false, origin: [0.5, 0.5], color: 0x9a3d1a, px: 9 }).setDepth(902);
+    BK.audio.sfx(end ? 'level_up' : 'chime');
+    var b = BK.ui.button(this, BK.W / 2, 204, BK.T.next + ' (Enter)', function () { s.scene.start('Results', res); }, { w: 86, h: 18, key: 'ENTER' });
+    b.setDepth && b.setDepth(902);
+  }
+
   storyRecap(res) {
     var s = this;
     this.add.rectangle(BK.W / 2, BK.H / 2, BK.W, BK.H, 0x000000, 0.45).setDepth(900);

@@ -85,13 +85,33 @@ At every correct key a little magic flies from the hero to the creature. In the 
 
 Shapes: Hullám (wave, free, the standard), Csillag (spinning star) 30, Kód (bits of code streaming to the target, like in the films) 40, Szikra (sparkle with a trail) 40, Üstökös (comet with a tail of embers) 50, Villám (lightning) 60, Gravihullám (rings that roll out where they land) 80.
 
-Colours: Klasszikus (yellow, free); Alapszínek 25 and Pasztell 35, where the child then picks one of eight colours; Szivárvány (a new colour every shot) 60; RTX 80 (neon-coloured shots with a glow and a lens flare where they land); Króm 70 (shiny metal with a glint); Neon 75 (shots that flicker on like a tube).
+Colours: Klasszikus (yellow, free); Alapszínek 25 and Pasztell 35, where the child then picks one of eight colours; Szivárvány (a new colour every shot) 60; RTX 80 + 2 rare treasures (neon-coloured shots with a glow and a lens flare where they land); Króm 70 + 1 rare treasure (shiny metal with a glint); Neon 75 + 2 rare treasures (shots that flicker on like a tube). Since v0.11 these three also cost rare treasures from the kitchen, so they are a goal rather than something bought straight away with spare coins.
 
-Light (Fény): what the word bubble does when a shot lands. Off by default (Nincs), since it can be a lot on screen; choosing Nincs again turns it off. Fénykeret 40 (a coloured rim and the letters just typed glowing), Csillanás 40 (a shine slides across), Lüktetés 30 (the bubble breathes once), Szivárvány 55 (a rainbow rim and rainbow letters), Neontábla 65 (the bubble lights up like a neon sign).
+Light (Fény): what the word bubble does when a shot lands. Off by default (Nincs), since it can be a lot on screen; choosing Nincs again turns it off. Fénykeret 40 (a coloured rim and the letters just typed glowing), Csillanás 40 (a shine slides across), Lüktetés 30 (the bubble breathes once), Szivárvány 55 + 1 rare treasure (a rainbow rim and rainbow letters), Neontábla 65 + 1 rare treasure (the bubble lights up like a neon sign).
 
 Impacts (what happens where the shot lands, in the shot's colour): Szikra (the classic, free), Pukk (a ring and dots) 25, Paca (a big paint splat with colourful drops) 35, Pixel (8-bit pieces that fall) 40, Csillagszóró (little stars) 50, Bumm! (a comic-book word every third key: BUMM!, PUFF!, CSATT!...) 60.
 
-A click shows a test shot; the button buys it or puts it in use. Everything bought is in the save code (version 8 since v0.10.1; older codes still load).
+A click shows a test shot; the button buys it or puts it in use. Everything bought is in the save code (version 9 since v0.11, which also carries dishes, rare treasures, the castle, the sign and finished tales; older codes still load).
+
+## Mesék (practice corner, 5th tab)
+
+18 short tales by Benedek Elek (public domain), from his Grimm translations and his Magyar mese- és mondavilág: A csillagtallérok, Vár és forrás, Jakab és a zab, Az öregek, Péterke, Mindentudó doktor, Melyik ér többet?, A só, A hét holló, A madarak királya, A molnárinas és a macska, Hammas Jutka, Az aranyfonál, A muzsikusok, A király nyulai, Az acélgyűrű, A halász és a felesége, A szerencsés János. They were read through and the ones with cruelty, ethnic jokes, beatings played straight or heavy religious punishment were left out (that was most of the long ones too). The words are exactly as Benedek wrote them, old spellings included ("tyukocska", "szívü"); only curly quotes, long dashes and soft hyphens were made typeable, and long sentences are split into two lines at a comma. Two to watch: in A hét holló the girl cuts off her little finger (one short sentence), and in Hammas Jutka the mother hits her lazy daughter at the start.
+
+A child types a part (8 lines for Kezdő, 10 for Haladó, fewer for a slower typist), sees what they typed and how far they are, and next time goes on from the same place ("Folytatom"). A finished tale gets stars and can be read again. The tales open with the accents (region 5, Vörös kanyon) and are Hungarian only. The source files (MEK RTF) are in mesek/ (not in git); tools/build_tales.py makes data/tales_hu.js from them, with the list of chosen tales at the top. The other collections you sent (Kurd, Lett, Litván and Román népmesék) are recent translations (Pór Judit, Dabi István, Bözödi György, Ignácz Rózsa, Jékely Zoltán) and still under copyright, so they are not in the game; they could go in with the translators' or the publisher's permission.
+
+## Kitchen, dishes and rare treasures (Hátizsák)
+
+The bag has three tabs. Kincsek: the treasures from chests, as before. Konyha: nine recipes (Palacsinta, Gyümölcssaláta, Zöldségleves, Almás pite, Répatorta, Fagyikehely, Gyümölcsturmix, Sajtos pogácsa, Ünnepi torta), each needing two or three treasures. Cooking starts a short round at a crackling hearth where the child types the recipe's five sentences; at the end the treasures are used up and the dish goes on the Polc. Polc: a dish can be sold for 14-28 coins, or three different dishes traded for a rare treasure (Gyémánt, Kristály, Aranyrúd, Aranyrög, Tűzgömb, Kincses térkép). Rare treasures pay for RTX, neon, chrome, the brightest bubble lights and the finest castle things. This gives the treasures a use, and slows down the coin inflation: the expensive things now need some cooking (typing) as well as coins. Cooking works from the map (not from a paused level). The recipe sentences use every letter, so a beginner meets keys from later regions here; the on-screen keyboard shows them.
+
+## Váram (the castle room, map menu)
+
+A room to furnish with coins: seven places on the floor and four picture frames on the wall. A click on an empty place opens the list of 33 things (crates, barrels, chairs, tables, a feast table, pots, plants, vases, pumpkins, a potion desk, statues, a scarecrow, an indoor tree, a burning hearth...), 12-90 coins, the finest ones also 1-2 rare treasures. A bought thing can be moved or put away for free. Frames cost 20 coins each and show any treasure, dish or rare treasure the child has. The flag in the middle shows the child's sign from the profile page; clicking it opens the sign maker. The art is from the GandalfHardcore FREE Platformer Assets in your library (tools/build_castle.py cuts the props out of art/castle/).
+
+## Profilom (the child's page)
+
+Opened from the map menu or by clicking the name in the top bar. Jelvény: a sign made of a field shape (pajzs, kör, négyzet, zászló, rombusz), a pattern (csík, fél, kereszt, ék, pöttyök) and a symbol (csillag, szív, hold, korona, villám, nap, virág, drágakő, nyíl, kezdőbetű, mancs), each in one of 12 colours; it shows next to the name and on the castle flag. Háttér: the sky behind the menus. Kitűzők: 20 badges worked out from what the child has done (first level, stars, bosses, a flawless level, 20 and 35 words a minute, streaks, the endless road, tales, cooking, rare treasures, the castle, the arena, Halloween, crowns). Számok: speed over the last 30 rounds, number of rounds, time, best speed, accuracy, stars and the trickiest keys.
+
+The level (Kezdő or Haladó) can now also be changed in Settings (Szint).
 
 ## Kezdő and Haladó
 

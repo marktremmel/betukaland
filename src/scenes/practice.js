@@ -5,6 +5,7 @@
  *                   child's tricky letters, and the endless road
  *   3 Történetek  - the storybook: everyday stories typed sentence by sentence
  *   4 Aréna       - every boss the child has beaten, again, on normal or hard
+ *   5 Mesék       - Benedek Elek's tales, typed a part at a time; the place is kept
  * Keys: 1/2/3 switch tabs, arrows choose, Enter starts, Esc goes back.
  */
 BK.PracticeScene = class extends Phaser.Scene {
@@ -44,10 +45,17 @@ BK.PracticeScene = class extends Phaser.Scene {
     if (this.arenaSel === undefined || !this.bosses[this.arenaSel] || !this.bosses[this.arenaSel].open) {
       this.arenaSel = Math.max(0, this.bosses.map(function (b) { return b.open; }).lastIndexOf(true));
     }
-    var tabs = [['today', BK.T.pToday], ['practice', BK.T.pPractice], ['story', BK.T.pStory], ['arena', BK.L('4: Aréna', '4: Arena')]];
+    if (this.taleSel === undefined) {
+      // the tale the child is in the middle of, or the first one not finished
+      var TL = P.tales || {};
+      this.taleSel = Math.max(0, BK.TALES.findIndex(function (t) { var x = TL[t.id]; return x && x.at > 0 && x.at < t.lines.length; }));
+      if (!(TL[BK.TALES[this.taleSel] && BK.TALES[this.taleSel].id] || {}).at) this.taleSel = Math.max(0, BK.TALES.findIndex(function (t) { return !(TL[t.id] || {}).done; }));
+      this.taleTop = 0;
+    }
+    var tabs = [['today', BK.T.pToday], ['practice', BK.T.pPractice], ['story', BK.T.pStory], ['arena', BK.L('4: Aréna', '4: Arena')], ['tales', BK.L('5: Mesék', '5: Tales')]];
     tabs.forEach(function (t, i) {
-      var b = BK.ui.button(s, 63 + i * 86, 52, t[1], function () { s.setTab(t[0]); }, { w: 82, h: 18 });
-      if (t[0] === s.tab) s.add.rectangle(63 + i * 86, 52, 86, 22).setStrokeStyle(1, 0x9a3d1a);
+      var b = BK.ui.button(s, 54 + i * 69, 52, t[1], function () { s.setTab(t[0]); }, { w: 66, h: 18, fit: 60 });
+      if (t[0] === s.tab) s.add.rectangle(54 + i * 69, 52, 70, 22).setStrokeStyle(1, 0x9a3d1a);
     });
 
     this.page = [];
@@ -63,6 +71,7 @@ BK.PracticeScene = class extends Phaser.Scene {
       else if (e.key === '2') s.setTab('practice');
       else if (e.key === '3') s.setTab('story');
       else if (e.key === '4') s.setTab('arena');
+      else if (e.key === '5') s.setTab('tales');
       else if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') s.move(e.key === 'ArrowLeft' ? -1 : 1, 'h');
       else if (e.key === 'ArrowUp' || e.key === 'ArrowDown') s.move(e.key === 'ArrowUp' ? -1 : 1, 'v');
     });
@@ -130,6 +139,7 @@ BK.PracticeScene = class extends Phaser.Scene {
     }
 
     if (this.tab === 'arena') this.drawArena(x0, y0);
+    if (this.tab === 'tales') this.drawTales(x0, y0);
 
     if (this.tab === 'story') {
       var rows = 6, rh = 12, st = this.stories;
@@ -152,6 +162,39 @@ BK.PracticeScene = class extends Phaser.Scene {
       var more = st.length > rows ? '   (' + (this.storySel + 1) + '/' + st.length + ')' : '';
       this.keep(BK.ui.text(this, 192, y0 + rows * rh + 6, BK.T.pStoryHint + more, { outline: false, origin: [0.5, 0.5], color: 0x9a8a80 }));
     }
+  }
+
+  // Tales: the list with how far the child got in each; they open with the accents (region 5)
+  talesOpen() { return BK.save.regionOpen(this.P, 5); }
+  drawTales(x0, y0) {
+    var s = this, P = this.P, TL = P.tales || {}, rows = 7, rh = 11, T = BK.TALES;
+    if (!this.talesOpen()) {
+      this.keep(BK.ui.text(this, 192, y0 + 30, BK.L('A mesék a Vörös kanyonnál nyílnak ki (ékezetek).', 'The tales open at the Red Canyon (accents).'),
+        { outline: false, origin: [0.5, 0.5], color: 0x9a8a80 }));
+      return;
+    }
+    if (this.taleSel < this.taleTop) this.taleTop = this.taleSel;
+    if (this.taleSel >= this.taleTop + rows) this.taleTop = this.taleSel - rows + 1;
+    for (var i = this.taleTop; i < Math.min(T.length, this.taleTop + rows); i++) (function (i) {
+      var t = T[i], y = y0 - 2 + (i - s.taleTop) * rh, st = TL[t.id] || {}, at = st.at || 0;
+      if (i === s.taleSel) s.keep(s.add.rectangle(192, y + 5, 318, rh, 0xf6c88a, 0.8));
+      s.keep(BK.ui.text(s, x0 + 4, y, t.title, { outline: false, bold: i === s.taleSel, color: 0x4a2c1c, fit: 170 }));
+      // a little progress bar, or the stars of a finished tale
+      if (st.done && (at === 0 || at >= t.lines.length)) s.keep(BK.ui.stars(s, 330, y + 5, st.done, 3, 10));
+      else {
+        s.keep(s.add.rectangle(290, y + 5, 60, 4, 0xd8b896).setOrigin(0, 0.5));
+        if (at) s.keep(s.add.rectangle(290, y + 5, 60 * at / t.lines.length, 4, 0x6b8a50).setOrigin(0, 0.5));
+        s.keep(BK.ui.text(s, 286, y, at ? Math.round(at / t.lines.length * 100) + '%' : BK.L('új', 'new'), { outline: false, origin: [1, 0], px: 8, color: 0x9a8a80 }));
+      }
+      var z = s.keep(s.add.zone(192, y + 5, 318, rh).setInteractive({ useHandCursor: true }));
+      z.on('pointerup', function () {
+        if (s.taleSel === i) { s.go(); return; }
+        s.taleSel = i; BK.audio.sfx('ui'); s.drawTab();
+      });
+    })(i);
+    var cur = T[this.taleSel], parts = Math.ceil(cur.lines.length / ((P.grade === '5-6') ? 10 : 8));
+    this.keep(BK.ui.text(this, 192, y0 + rows * rh + 4, cur.src + BK.L('  ·  kb. ' + parts + ' rész', '  ·  about ' + parts + ' parts') + (P.lang === 'en' ? BK.L('  ·  magyarul', '  ·  in Hungarian') : ''),
+      { outline: false, origin: [0.5, 0.5], px: 8, color: 0x9a8a80, fit: 320 }));
   }
 
   // Arena: one row per boss (locked until beaten), stars on normal and on hard
@@ -207,6 +250,10 @@ BK.PracticeScene = class extends Phaser.Scene {
       var i = this.open.indexOf(this.sentRegion) + d;
       if (i < 0 || i >= this.open.length) { BK.audio.sfx('key_bad', { volume: 0.3 }); return; }
       this.sentRegion = this.open[i];
+    } else if (this.tab === 'tales' && axis === 'v') {
+      var tn = this.taleSel + d;
+      if (tn < 0 || tn >= BK.TALES.length) return;
+      this.taleSel = tn;
     } else if (this.tab === 'arena' && axis === 'v') {
       var a = this.arenaSel + d;
       while (a >= 0 && a < this.bosses.length && !this.bosses[a].open) a += d;
@@ -226,7 +273,7 @@ BK.PracticeScene = class extends Phaser.Scene {
 
   refreshStart() {
     if (!this.startBtn) return;
-    var ok = this.tab === 'arena' ? !!(this.bosses[this.arenaSel] && this.bosses[this.arenaSel].open)
+    var ok = this.tab === 'tales' ? this.talesOpen() : this.tab === 'arena' ? !!(this.bosses[this.arenaSel] && this.bosses[this.arenaSel].open)
       : this.tab !== 'story' || !!(this.stories[this.storySel] && this.storyOpen(this.stories[this.storySel]));
     this.startBtn.setDisabled(!ok);
   }
@@ -240,6 +287,10 @@ BK.PracticeScene = class extends Phaser.Scene {
     } else if (this.tab === 'practice') {
       BK.audio.sfx('chime');
       this.scene.start('Level', { region: this.sentRegion, level: this.mode === 'sent' ? 'practice' : this.mode });
+    } else if (this.tab === 'tales') {
+      if (!this.talesOpen()) { BK.audio.sfx('key_bad', { volume: 0.3 }); return; }
+      BK.audio.sfx('chime');
+      this.scene.start('Level', { region: Math.max(5, this.open[this.open.length - 1] || 5), level: 'tale', taleId: BK.TALES[this.taleSel].id });
     } else if (this.tab === 'arena') {
       var b = this.bosses[this.arenaSel];
       if (!b || !b.open) { BK.audio.sfx('key_bad', { volume: 0.3 }); return; }

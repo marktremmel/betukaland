@@ -44,7 +44,7 @@ BK.i18nField = function (obj, field, en) {
     BK.i18nField(r, 'bossIntro', e[2]); BK.i18nField(r, 'bossOutro', e[3]);
   });
   var names = function (list, map) { list.forEach(function (o) { BK.i18nField(o, 'name', map[o.id]); }); };
-  [BK.SHOT_SHAPES, BK.SHOT_COLOURS, BK.SHOT_IMPACTS, BK.SHOT_GLOWS, BK.KEY_HINT_SETS].forEach(function (list) { list.forEach(function (o) { BK.i18nField(o, 'name', o.en); }); });
+  [BK.SHOT_SHAPES, BK.SHOT_COLOURS, BK.SHOT_IMPACTS, BK.SHOT_GLOWS, BK.KEY_HINT_SETS, BK.RECIPES, BK.RARES, BK.CASTLE_PROPS].forEach(function (list) { list.forEach(function (o) { BK.i18nField(o, 'name', o.en); }); });
   names(BK.OUTFITS, { base: 'Classic', blue: 'Sky blue', mint: 'Mint', pink: 'Pink', night: 'Night', gold: 'Gold' });
   names(BK.PETS, { crabkid: 'Little Crab', sandbug: 'Sand Bug', gull: 'Seagull', bat: BK.PETS[3] && BK.PETS[3].sprite === 'crow_fly' ? 'Crow' : 'Bat' });
   names(BK.HEROES, { bunny: 'Bunny', berie: 'Berie', frog: 'Frog', mush: 'Mushroom', crab: 'Crab', gull: 'Seagull',
