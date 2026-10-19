@@ -2,10 +2,10 @@
 
 Everything for the page is in this folder:
 
-- `betukaland-itch-0.11.0.zip`: the game (upload this)
+- `betukaland-itch-0.12.1.zip`: the game (upload this)
 - `cover_hu_630x500.png` / `cover_en_630x500.png`: cover image (pick one)
 - `screenshots/`: 11 screenshots at 1152×648
-- `DEVLOG_0.11.md`: the devlog post for this update
+- `DEVLOG_0.12.md`: the devlog post for this update
 
 ## 1. Create the project
 
@@ -20,7 +20,7 @@ itch.io → Dashboard → Create new project, then fill in:
 | Kind of project | HTML |
 | Release status | Released (or In development, if you still want to change things) |
 | Pricing | No payments |
-| Uploads | `betukaland-itch-0.11.0.zip`, tick "This file will be played in the browser" |
+| Uploads | `betukaland-itch-0.12.1.zip`, tick "This file will be played in the browser" |
 
 ## 2. Embed options
 
@@ -71,9 +71,11 @@ Gépelős kaland 3–6. osztályosoknak. A nyúl (vagy a tigris, a csikóhal, va
 - Bossaréna: a legyőzött főellenfelek újra kihívhatók, Normál vagy Nehéz fokozaton
 - Varázslövések a boltban: forma, szín (RTX, króm, neon is) és becsapódás
 - A pálya hossza a gyerek tempójához igazodik
-- Benedek Elek meséi részenként begépelve, folytatható
+- Benedek Elek meséi részenként begépelve, folytatható, magyarul és angolul
 - Konyha: kincsekből receptek, ételek és ritka kincsek
-- Saját vár berendezése, saját jelvény, kitűzők és statisztika
+- Saját vár: tárgyak szabadon, egymásra is rakva, vendégek a gép többi játékosai közül, segítők a falak között
+- Saját jelvény, kitűzők, statisztika és haladástérkép
+- Választható billentyűzet a boltban: színátmenet, szivárvány, óceán, neon, ugráló és kattogó billentyűk
 - Főellenfelek, csillagok, korona, bolt ruhákkal és kisállatokkal
 - Gyakorlósarok: napi kihívás, mondatok, rövid történetek, a nehéz betűk gyakorlása és a végtelen út
 - Napi célok és sorozat, hogy legyen mit csinálni a pályák után is
@@ -97,9 +99,11 @@ A typing adventure for ages 8–12. A bunny (or a tiger, a seahorse, or any of 1
 - Boss arena: fight the bosses you have beaten again, on Normal or Hard
 - Magic shots in the shop: shape, colour (RTX, chrome and neon too) and impact
 - Level length follows the child's pace
-- Benedek Elek's tales (in Hungarian), typed part by part, with your place kept
+- Benedek Elek's tales, typed part by part, with your place kept, in Hungarian and in English
 - A kitchen: cook recipes from your treasures, trade dishes for rare treasures
-- Your own castle room to furnish, your own sign, badges and statistics
+- Your own castle: place and stack things freely, invite the other players on the computer, helpers who say what to do next
+- Your own sign, badges, statistics and a progress map
+- Keyboard looks in the shop: gradient, rainbow, ocean, neon, keys that jump and click
 - Bosses, stars, crowns and a shop with outfits and pets
 - Practice corner: daily challenge, sentences, short stories, tricky-letter drills and an endless road
 - Daily goals and a streak, so there is something to do after the last level
@@ -124,7 +128,7 @@ The full list is on the Credits screen in the game.
 
 ## 6. Screenshots
 
-Upload in this order: 01_title, 22_castle, 25_tales, 21_kitchen, 23_profile_sign, 15_pumpkin_king_marks, 02_map, 13_halloween_night, 14_bat_narrator, 18_boss_arena, 17_magic_impacts, 19_rtx_wind, 10_new_figures, 16_halloween_figures, 04_story, 05_boss, 06_practice, 20_settings, 08_title_en, 09_warmup_en. Delete 07_shop, 11_seahorse and 12_shop_figures from the page if you want it shorter; the new shop pictures replace them.
+Upload in this order: 01_title, 27_castle_stack, 28_castle_chat, 30_keyboard_rainbow, 31_keyboard_preview, 29_progress, 32_tales_en, 22_castle, 25_tales, 21_kitchen, 23_profile_sign, 15_pumpkin_king_marks, 02_map, 13_halloween_night, 14_bat_narrator, 18_boss_arena, 17_magic_impacts, 19_rtx_wind, 10_new_figures, 16_halloween_figures, 04_story, 05_boss, 06_practice, 20_settings, 08_title_en, 09_warmup_en. Delete 07_shop, 11_seahorse and 12_shop_figures from the page if you want it shorter; the new shop pictures replace them.
 
 ## 7. Notes for running it from itch
 

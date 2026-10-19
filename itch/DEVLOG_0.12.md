@@ -1,13 +1,13 @@
 # Devlog 0.12: how to post it
 
-First upload the game: Edit game → Uploads → upload betukaland-itch-0.12.0.zip, tick "This file will be played in the browser", delete the older zip. Saves stay.
+First upload the game: Edit game → Uploads → upload betukaland-itch-0.12.1.zip, tick "This file will be played in the browser", delete the older zip. Saves stay.
 
 Then on the game's itch page: Edit game → Devlog → Create a new post.
 
 - Title: Vendégek a várban, színes billentyűzet · Guests in the castle, a colourful keyboard
 - Type: Update
-- Attach the release: tick betukaland-itch-0.12.0.zip
-- Images: 27_castle_stack.png as the cover, then 28_castle_chat.png, 29_progress.png and 30_keyboard_rainbow.png inside the post
+- Attach the release: tick betukaland-itch-0.12.1.zip
+- Images: 27_castle_stack.png as the cover, then 28_castle_chat.png, 29_progress.png, 30_keyboard_rainbow.png, 31_keyboard_preview.png and 32_tales_en.png inside the post (all in screenshots/)
 - Tags: update, new features
 
 Post text (paste from here):
@@ -26,11 +26,14 @@ Haladás. A Profilom új füle megmutatja, hol tartasz: minden vidék minden pá
 
 Szebb jelvény. Árnyék, fény és kis csillogás, mintha kitűző lenne.
 
-Billentyűzet. A boltban új fül van: színátmenet, pasztell, szivárványhullám, óceán, naplemente, erdő, cukorka és neon. A billentyűk felvillanhatnak, ugrálhatnak és kattoghatnak is. Az ujjak színe megmarad egy csíkban, így továbbra is látszik, melyik ujjal kell ütni.
+Billentyűzet. A boltban új fül van: színátmenet, pasztell, szivárványhullám, óceán, naplemente, erdő, cukorka és neon. A billentyűk felvillanhatnak, ugrálhatnak és kattoghatnak is. Az ujjak színe megmarad egy csíkban, így továbbra is látszik, melyik ujjal kell ütni. A színek hullámzása külön bekapcsolható, és vásárlás előtt egy kis előnézet mutatja, hogyan fog kinézni.
+
+Angolul is. Benedek Elek mind a 18 meséje és az összes rövid történet angolul is olvasható és gépelhető, ha a szavak nyelve angol. Nyelvváltáskor ott folytatod a mesét, ahol abbahagytad.
 
 Ami még új:
 
 - Két különböző étel is elég egy ritka kincsért.
+- A Shift-tipp ritkábban szól, és a Beállításokban ki is kapcsolható.
 - Főzés után rendesen ki lehet lépni a Hátizsákból.
 - A mentőkód a vár tárgyait, a kitűzőket és a billentyűzetet is megjegyzi. A régi kódok továbbra is működnek.
 
@@ -48,10 +51,13 @@ Progress. A new tab on the profile page shows where you are: every level of ever
 
 A nicer sign. Shadow, light and a little shine, like a real badge.
 
-Keyboard. A new shop tab: gradient, pastel, rainbow wave, ocean, sunset, forest, candy and neon. Keys can light up, jump and click. The finger colour stays as a stripe, so you still see which finger to use.
+Keyboard. A new shop tab: gradient, pastel, rainbow wave, ocean, sunset, forest, candy and neon. Keys can light up, jump and click. The finger colour stays as a stripe, so you still see which finger to use. Moving colour waves are a separate switch, and a little preview shows each look before you buy it.
+
+In English too. All 18 Benedek Elek tales and every short story can now be read and typed in English when the word language is English. Switch languages and the tale goes on where you stopped.
 
 Also new:
 
 - Two different dishes are now enough for a rare treasure.
+- The Shift tip speaks up less often and can be switched off in Settings.
 - The bag closes properly after cooking.
 - Save codes remember castle things, pinned badges and the keyboard. Old codes still work.
