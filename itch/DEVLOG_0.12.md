@@ -1,12 +1,12 @@
 # Devlog 0.12: how to post it
 
-First upload the game: Edit game → Uploads → upload betukaland-itch-0.12.1.zip, tick "This file will be played in the browser", delete the older zip. Saves stay.
+First upload the game: Edit game → Uploads → upload betukaland-itch-0.12.2.zip, tick "This file will be played in the browser", delete the older zip. Saves stay.
 
 Then on the game's itch page: Edit game → Devlog → Create a new post.
 
 - Title: Vendégek a várban, színes billentyűzet · Guests in the castle, a colourful keyboard
 - Type: Update
-- Attach the release: tick betukaland-itch-0.12.1.zip
+- Attach the release: tick betukaland-itch-0.12.2.zip
 - Images: 27_castle_stack.png as the cover, then 28_castle_chat.png, 29_progress.png, 30_keyboard_rainbow.png, 31_keyboard_preview.png and 32_tales_en.png inside the post (all in screenshots/)
 - Tags: update, new features
 

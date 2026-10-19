@@ -6,7 +6,7 @@
  */
 window.BK = window.BK || {};
 
-BK.VERSION = '0.12.1';
+BK.VERSION = '0.12.2';
 
 // Test mode for the teacher: open the game with ?debug at the end of the address.
 // Every region and level is open; in a level Tab finishes the current word and
@@ -409,31 +409,31 @@ BK.KB_EFFECTS = [
 // Karou, or three different ones traded for a rare treasure. Rare treasures are what the
 // best magic (RTX, neon, chrome) and the finest castle things cost, on top of coins.
 BK.RECIPES = [
-  { id: 'palacsinta', name: 'Palacsinta', en: 'Pancakes', frame: 114, needs: ['egg', 'cheese', 'strawberry'], sell: 18,
+  { id: 'palacsinta', name: 'Palacsinta', nameEn: 'Pancakes', frame: 114, needs: ['egg', 'cheese', 'strawberry'], sell: 18,
     hu: ['Feltöröm a tojást egy tálba.', 'Liszt és tej megy hozzá.', 'Kikeverem a tésztát.', 'Kisütöm a serpenyőben.', 'Eperrel és túróval töltöm meg.'],
     en: ['I crack the egg into a bowl.', 'Flour and milk go in too.', 'I mix the batter.', 'I fry it in the pan.', 'I fill it with strawberries.'] },
-  { id: 'gyumolcssali', name: 'Gyümölcssaláta', en: 'Fruit salad', frame: 106, needs: ['apple', 'banana', 'grapes'], sell: 15,
+  { id: 'gyumolcssali', name: 'Gyümölcssaláta', nameEn: 'Fruit salad', frame: 106, needs: ['apple', 'banana', 'grapes'], sell: 15,
     hu: ['Megmosom a gyümölcsöt.', 'Felszeletelem az almát és a banánt.', 'A szőlőt félbevágom.', 'Mindent egy tálba teszek.', 'Egy kis mézzel keverem össze.'],
     en: ['I wash the fruit.', 'I slice the apple and the banana.', 'I cut the grapes in half.', 'Everything goes into a bowl.', 'I stir it with a little honey.'] },
-  { id: 'leves', name: 'Zöldségleves', en: 'Vegetable soup', frame: 107, needs: ['carrot', 'mushroom'], sell: 14,
+  { id: 'leves', name: 'Zöldségleves', nameEn: 'Vegetable soup', frame: 107, needs: ['carrot', 'mushroom'], sell: 14,
     hu: ['Megpucolom a répát.', 'A gombát kis darabokra vágom.', 'Vizet forralok a fazékban.', 'Beleteszem a zöldséget.', 'Lassan főzöm, és sózom.'],
     en: ['I peel the carrot.', 'I cut the mushrooms into small pieces.', 'I boil water in the pot.', 'In go the vegetables.', 'I cook it slowly and add salt.'] },
-  { id: 'pite', name: 'Almás pite', en: 'Apple pie', frame: 116, needs: ['apple', 'pear', 'egg'], sell: 18,
+  { id: 'pite', name: 'Almás pite', nameEn: 'Apple pie', frame: 116, needs: ['apple', 'pear', 'egg'], sell: 18,
     hu: ['Lisztből és vajból tésztát gyúrok.', 'Felszeletelem az almát és a körtét.', 'Fahéjat szórok rá.', 'Tésztát teszek a tetejére.', 'Megsütöm, amíg aranybarna lesz.'],
     en: ['I make dough from flour and butter.', 'I slice the apple and the pear.', 'I sprinkle cinnamon on top.', 'I put dough over it.', 'I bake it until it is golden.'] },
-  { id: 'repatorta', name: 'Répatorta', en: 'Carrot cake', frame: 168, needs: ['carrot', 'egg', 'cupcake'], sell: 20,
+  { id: 'repatorta', name: 'Répatorta', nameEn: 'Carrot cake', frame: 168, needs: ['carrot', 'egg', 'cupcake'], sell: 20,
     hu: ['Lereszelem a répát.', 'Tojást és cukrot keverek hozzá.', 'A tésztát formába öntöm.', 'Megsütöm a sütőben.', 'Krémet kenek a tetejére.'],
     en: ['I grate the carrot.', 'I mix in eggs and sugar.', 'I pour the batter into a tin.', 'I bake it in the oven.', 'I spread cream on top.'] },
-  { id: 'kehely', name: 'Fagyikehely', en: 'Ice cream sundae', frame: 181, needs: ['icecream', 'cherry', 'strawberry'], sell: 16,
+  { id: 'kehely', name: 'Fagyikehely', nameEn: 'Ice cream sundae', frame: 181, needs: ['icecream', 'cherry', 'strawberry'], sell: 16,
     hu: ['Két gombóc fagyit teszek a pohárba.', 'Epret rakok mellé.', 'Tejszínhabot nyomok rá.', 'A tetejére cseresznye kerül.', 'Gyorsan kell enni!'],
     en: ['I put two scoops in a glass.', 'I add strawberries.', 'I add whipped cream.', 'A cherry goes on top.', 'Eat it quickly!'] },
-  { id: 'turmix', name: 'Gyümölcsturmix', en: 'Smoothie', frame: 213, needs: ['banana', 'orange', 'strawberry'], sell: 14,
+  { id: 'turmix', name: 'Gyümölcsturmix', nameEn: 'Smoothie', frame: 213, needs: ['banana', 'orange', 'strawberry'], sell: 14,
     hu: ['Meghámozom a banánt és a narancsot.', 'A gyümölcs a turmixgépbe kerül.', 'Egy pohár tejet öntök rá.', 'Összeturmixolom.', 'Szívószállal iszom.'],
     en: ['I peel the banana and the orange.', 'The fruit goes into the blender.', 'I pour in a glass of milk.', 'I blend it.', 'I drink it with a straw.'] },
-  { id: 'pogacsa', name: 'Sajtos pogácsa', en: 'Cheese scones', frame: 123, needs: ['cheese', 'egg', 'croissant'], sell: 16,
+  { id: 'pogacsa', name: 'Sajtos pogácsa', nameEn: 'Cheese scones', frame: 123, needs: ['cheese', 'egg', 'croissant'], sell: 16,
     hu: ['Lisztet, vajat és sajtot gyúrok össze.', 'Kinyújtom a tésztát.', 'Kis köröket szaggatok.', 'Tojással kenem meg őket.', 'Sajtot szórok rájuk, és megsütöm.'],
     en: ['I knead flour, butter and cheese.', 'I roll out the dough.', 'I cut out small circles.', 'I brush them with egg.', 'I add cheese on top and bake them.'] },
-  { id: 'unnepi', name: 'Ünnepi torta', en: 'Party cake', frame: 175, needs: ['cake', 'macaron', 'candycane'], sell: 28,
+  { id: 'unnepi', name: 'Ünnepi torta', nameEn: 'Party cake', frame: 175, needs: ['cake', 'macaron', 'candycane'], sell: 28,
     hu: ['Három piskótát teszek egymásra.', 'Közéjük csokikrém kerül.', 'Körbekenem habbal.', 'Macaronokkal díszítem.', 'Gyertyát szúrok bele, és jöhet a buli!'],
     en: ['I stack three sponge cakes.', 'Chocolate cream goes between them.', 'I cover it with cream.', 'I decorate it with macarons.', 'I add a candle, party time!'] },
 ];
