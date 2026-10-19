@@ -193,7 +193,7 @@ BK.PracticeScene = class extends Phaser.Scene {
       });
     })(i);
     var cur = T[this.taleSel], parts = Math.ceil(cur.lines.length / ((P.grade === '5-6') ? 10 : 8));
-    this.keep(BK.ui.text(this, 192, y0 + rows * rh + 4, cur.src + BK.L('  ·  kb. ' + parts + ' rész', '  ·  about ' + parts + ' parts') + (P.lang === 'en' ? BK.L('  ·  magyarul', '  ·  in Hungarian') : ''),
+    this.keep(BK.ui.text(this, 192, y0 + rows * rh + 4, cur.src + BK.L('  ·  kb. ' + parts + ' rész', '  ·  about ' + parts + ' parts') ,
       { outline: false, origin: [0.5, 0.5], px: 8, color: 0x9a8a80, fit: 320 }));
   }
 

@@ -43,7 +43,7 @@ BK.save = (function () {
       nick: nick, avatar: avatar, grade: grade, lang: lang,
       created: BK.util.today(), lastPlayed: null,
       placed: null,                       // region suggested by the placement test
-      settings: { keyboard: true, fingers: true, music: true, sfx: true, speedRun: false, rest: true, kbHint: 'mac-hu' },
+      settings: { keyboard: true, fingers: true, music: true, sfx: true, speedRun: false, rest: true, shiftTip: true, kbHint: 'mac-hu' },
       progress: {},                       // regionId -> { stars: [l1, l2, l3, boss] }
       coins: 0,
       items: {},                          // item id -> count
@@ -63,7 +63,7 @@ BK.save = (function () {
 
   // Fill in fields added in later versions so old saves keep working
   function upgrade(p) {
-    p.settings = Object.assign({ keyboard: true, fingers: true, music: true, sfx: true, speedRun: false, rest: true, kbHint: 'mac-hu' }, p.settings || {});
+    p.settings = Object.assign({ keyboard: true, fingers: true, music: true, sfx: true, speedRun: false, rest: true, shiftTip: true, kbHint: 'mac-hu' }, p.settings || {});
     p.figures = p.figures || [];          // figures that must be owned (Halloween ones)
     p.progress = p.progress || {};
     BK.REGIONS.forEach(function (r) {
@@ -138,7 +138,7 @@ BK.save = (function () {
     local.avatar = inc.avatar;
     (inc.figures || []).forEach(function (f) { if (local.figures.indexOf(f) < 0) local.figures.push(f); });
     if (inc.halloween && (!local.halloween || !local.halloween.stars[3])) local.halloween = inc.halloween;
-    ['rest', 'kbHint'].forEach(function (k) { if (inc.settings[k] !== undefined) local.settings[k] = inc.settings[k]; });
+    ['rest', 'kbHint', 'shiftTip'].forEach(function (k) { if (inc.settings[k] !== undefined) local.settings[k] = inc.settings[k]; });
     if (inc.fx) { (inc.fx.owned || []).forEach(function (o) { if (local.fx.owned.indexOf(o) < 0) local.fx.owned.push(o); }); local.fx.shape = inc.fx.shape; local.fx.colour = inc.fx.colour; local.fx.tone = inc.fx.tone || 0; local.fx.impact = inc.fx.impact || local.fx.impact; local.fx.glow = inc.fx.glow || local.fx.glow; local.fx.kb = inc.fx.kb || local.fx.kb; local.fx.kbOn = inc.fx.kbOn || local.fx.kbOn; }
     ['dishes', 'rares'].forEach(function (k) {
       local[k] = local[k] || {};
@@ -274,7 +274,7 @@ BK.save = (function () {
     // them in a few rounds) and trailing zeros are dropped. Version 1 codes still load.
     var b = new Bits();
     b.put(0, 3);                            // 0 = look at the next 5 bits (versions 8 and up)
-    b.put(10, 5);
+    b.put(11, 5);
     b.put(p.avatar & 7, 3);
     b.put(p.grade === '5-6' ? 1 : 0, 1);
     b.put(p.lang === 'en' ? 1 : 0, 1);
@@ -334,11 +334,14 @@ BK.save = (function () {
     // v10 (v0.12): keyboard looks and effects, the look in use, the effects switched on
     BK.KB_THEMES.forEach(function (o) { b.put(own.indexOf(o.id) >= 0 ? 1 : 0, 1); });
     b.put(Math.max(0, BK.KB_THEMES.findIndex(function (o) { return o.id === fx.kb; })), 4);
-    BK.KB_EFFECTS.forEach(function (o) { b.put(own.indexOf(o.id) >= 0 ? 1 : 0, 1); b.put((fx.kbOn || []).indexOf(o.id) >= 0 ? 1 : 0, 1); });
+    BK.KB_EFFECTS.slice(0, 3).forEach(function (o) { b.put(own.indexOf(o.id) >= 0 ? 1 : 0, 1); b.put((fx.kbOn || []).indexOf(o.id) >= 0 ? 1 : 0, 1); });
     // castle store: how many of each thing (the layout itself stays on this computer); pinned badges
     var inv = (p.castle && p.castle.inv) || {};
     BK.CASTLE_PROPS.forEach(function (o) { b.put(Math.min(7, inv[o.id] || ((cs.props || []).indexOf(o.id) >= 0 ? 1 : 0)), 3); });
     for (var pi = 0; pi < 3; pi++) { var bi = BK.BADGES ? BK.BADGES.findIndex(function (x) { return x.id === (p.pins || [])[pi]; }) : -1; b.put(bi + 1, 5); }
+    // v11 (v0.12.1): keyboard effects added later (moving waves), the Shift tip switch
+    BK.KB_EFFECTS.slice(3).forEach(function (o) { b.put(own.indexOf(o.id) >= 0 ? 1 : 0, 1); b.put((fx.kbOn || []).indexOf(o.id) >= 0 ? 1 : 0, 1); });
+    b.put(p.settings.shiftTip === false ? 1 : 0, 1);
     storyOrder().forEach(function (k) { b.put(Math.min(3, (p.stories || {})[k] || 0), 2); });
     while (b.a.length > 5 && b.a.lastIndexOf(1) < b.a.length - 5) b.a.length -= 5;   // drop trailing zero groups
     while (b.a.length % 5) b.a.push(0);
@@ -364,7 +367,7 @@ BK.save = (function () {
     var rd = new Reader(body);
     var ver = rd.get(3);
     if (ver === 0) ver = rd.get(5);          // version 8 and up
-    if (ver < 1 || ver > 10) throw new Error('version');
+    if (ver < 1 || ver > 11) throw new Error('version');
     var avatar = rd.get(3), grade = rd.get(1) ? '5-6' : '3-4', lang = rd.get(1) ? 'en' : 'hu', placed = rd.get(3) || null;
     var nl = rd.get(4), nick = '';
     for (i = 0; i < nl; i++) nick += NICK[rd.get(7)] || '';
@@ -440,10 +443,14 @@ BK.save = (function () {
       BK.KB_THEMES.forEach(function (o) { if (rd.get(1) && p.fx.owned.indexOf(o.id) < 0) p.fx.owned.push(o.id); });
       var ki = BK.KB_THEMES[rd.get(4)] || BK.KB_THEMES[0];
       p.fx.kb = p.fx.owned.indexOf(ki.id) >= 0 ? ki.id : 'kb_classic';
-      BK.KB_EFFECTS.forEach(function (o) { var ow = rd.get(1), on = rd.get(1); if (ow && p.fx.owned.indexOf(o.id) < 0) p.fx.owned.push(o.id); if (ow && on) p.fx.kbOn.push(o.id); });
+      BK.KB_EFFECTS.slice(0, 3).forEach(function (o) { var ow = rd.get(1), on = rd.get(1); if (ow && p.fx.owned.indexOf(o.id) < 0) p.fx.owned.push(o.id); if (ow && on) p.fx.kbOn.push(o.id); });
       p.castle.inv = {}; p.castle.placed = null;
       BK.CASTLE_PROPS.forEach(function (o) { var v = rd.get(3); if (v) { p.castle.inv[o.id] = v; if (p.castle.props.indexOf(o.id) < 0) p.castle.props.push(o.id); } });
       p.pins = []; for (var pi = 0; pi < 3; pi++) { var bi = rd.get(5); if (bi && BK.BADGES && BK.BADGES[bi - 1]) p.pins.push(BK.BADGES[bi - 1].id); }
+    }
+    if (ver >= 11) {
+      BK.KB_EFFECTS.slice(3).forEach(function (o) { var ow = rd.get(1), on = rd.get(1); if (ow && p.fx.owned.indexOf(o.id) < 0) p.fx.owned.push(o.id); if (ow && on) p.fx.kbOn.push(o.id); });
+      if (rd.get(1)) p.settings.shiftTip = false;
     }
     storyOrder().forEach(function (k) { var v = rd.get(2); if (v) p.stories[k] = v; });
     return p;

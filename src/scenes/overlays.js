@@ -148,9 +148,8 @@ BK.ShopScene = class extends BK.OverlayBase {
     fx.kb = fx.kb || 'kb_classic'; fx.kbOn = fx.kbOn || [];
     var sel = this.kbSel || fx.kb;
     var item = BK.KB_THEMES.find(function (o) { return o.id === sel; }) || BK.KB_EFFECTS.find(function (o) { return o.id === sel; });
-    this.keepD(BK.ui.text(this, b.x + 18, b.y + 60, BK.L('Kinézet', 'Look'), { outline: false, px: 9, color: 0x6b3a20 }));
     BK.KB_THEMES.forEach(function (o, i) {
-      var x = b.x + 26 + i * 36, y = b.y + 86, owned = fx.owned.indexOf(o.id) >= 0, use = fx.kb === o.id;
+      var x = b.x + 26 + i * 36, y = b.y + 80, owned = fx.owned.indexOf(o.id) >= 0, use = fx.kb === o.id;
       s.keepD(BK.ui.nine(s, x - 17, y - 18, 34, 38, use ? 'ui_slot_sel' : 'ui_slot'));
       s.kbIcon(x, y - 6, o);
       s.keepD(BK.ui.text(s, x, y + 6, o.name, { outline: false, origin: [0.5, 0.5], px: 7, color: 0x4a2c1c, fit: 32 }));
@@ -159,19 +158,25 @@ BK.ShopScene = class extends BK.OverlayBase {
       var z = s.keepD(s.add.zone(x, y, 34, 38).setInteractive({ useHandCursor: true }));
       z.on('pointerup', function () { s.kbSel = o.id; BK.audio.sfx('ui'); s.draw(); });
     });
-    this.keepD(BK.ui.text(this, b.x + 18, b.y + 110, BK.L('Hatások (be és ki is kapcsolhatók)', 'Effects (switch them on and off)'), { outline: false, px: 9, color: 0x6b3a20 }));
+    // effects in a 2 x 2 grid on the right
+    this.keepD(BK.ui.text(this, b.x + 174, b.y + 104, BK.L('Hatások (ki-be kapcsolhatók)', 'Effects (on and off)'), { outline: false, origin: [0, 0.5], px: 8, color: 0x6b3a20, fit: 156 }));
     BK.KB_EFFECTS.forEach(function (o, i) {
-      var x = b.x + 60 + i * 110, y = b.y + 132, owned = fx.owned.indexOf(o.id) >= 0, on = fx.kbOn.indexOf(o.id) >= 0;
-      s.keepD(BK.ui.nine(s, x - 50, y - 11, 100, 22, sel === o.id ? 'ui_slot_sel' : 'ui_slot'));
-      s.keepD(BK.ui.text(s, x - 44, y, o.name, { outline: false, origin: [0, 0.5], px: 9, bold: true, color: 0x4a2c1c }));
-      s.keepD(BK.ui.text(s, x + 44, y, owned ? (on ? BK.T.on : BK.T.off) : o.price + '', { outline: false, origin: [1, 0.5], px: 9, bold: true, color: owned ? (on ? 0x2e7d3e : 0x8a3a2a) : 0x9a3d1a }));
-      var z = s.keepD(s.add.zone(x, y, 100, 22).setInteractive({ useHandCursor: true }));
+      var x = b.x + 212 + (i % 2) * 78, y = b.y + 118 + Math.floor(i / 2) * 19, owned = fx.owned.indexOf(o.id) >= 0, on = fx.kbOn.indexOf(o.id) >= 0;
+      s.keepD(BK.ui.nine(s, x - 38, y - 9, 76, 18, sel === o.id ? 'ui_slot_sel' : 'ui_slot'));
+      s.keepD(BK.ui.text(s, x - 33, y, o.name, { outline: false, origin: [0, 0.5], px: 8, bold: true, color: 0x4a2c1c, fit: 44 }));
+      s.keepD(BK.ui.text(s, x + 33, y, owned ? (on ? BK.T.on : BK.T.off) : o.price + '', { outline: false, origin: [1, 0.5], px: 8, bold: true, color: owned ? (on ? 0x2e7d3e : 0x8a3a2a) : 0x9a3d1a }));
+      var z = s.keepD(s.add.zone(x, y, 76, 18).setInteractive({ useHandCursor: true }));
       z.on('pointerup', function () {
         s.kbSel = o.id;
         if (owned) { var k = fx.kbOn.indexOf(o.id); if (k >= 0) fx.kbOn.splice(k, 1); else fx.kbOn.push(o.id); BK.save.persist(); BK.audio.sfx('ui'); }
         s.draw();
       });
     });
+    // live preview of what is selected (before buying too): the look, the effects switched on, plus the selected effect
+    var pTheme = sel.indexOf('kb_') === 0 ? sel : fx.kb, pFx = fx.kbOn.slice();
+    if (sel.indexOf('kbe_') === 0 && pFx.indexOf(sel) < 0) pFx.push(sel);
+    this.keepD(BK.ui.text(this, b.x + 18, b.y + 104, BK.L('Előnézet', 'Preview'), { outline: false, origin: [0, 0.5], px: 8, color: 0x6b3a20 }));
+    this.drawKbPreview(b.x + 16, b.y + 110, pTheme, pFx);
     var owned = fx.owned.indexOf(item.id) >= 0, isTheme = item.id.indexOf('kb_') === 0;
     var inUse = isTheme ? fx.kb === item.id : fx.kbOn.indexOf(item.id) >= 0;
     this.keepD(BK.ui.text(this, b.x + 20, b.y + 160, item.name + (owned ? '' : '  ·  ' + item.price + ' ' + BK.L('érme', 'coins') + (item.rare ? ' + ' + item.rare + ' ' + BK.L('ritka kincs', 'rare treasure') : '')),
@@ -185,6 +190,32 @@ BK.ShopScene = class extends BK.OverlayBase {
       if (isTheme) fx.kb = item.id; else if (fx.kbOn.indexOf(item.id) < 0) fx.kbOn.push(item.id);
       BK.save.persist(); s.coinText.setText(String(P.coins)); s.draw();
     }, { w: 84, h: 16, disabled: inUse }));
+  }
+  // a real keyboard, shrunk, that types by itself
+  drawKbPreview(x, y, theme, effects) {
+    var all = {}; BK.KB_ROWS.forEach(function (r) { r.keys.forEach(function (k) { all[k] = true; }); });
+    var kv = new BK.KeyboardView(this, { allowed: all, fingers: this.P.settings.fingers !== false, theme: theme, effects: effects });
+    var sc = 0.55, list = [kv.g].concat(Object.keys(kv.keys).map(function (k) { return kv.keys[k].t; }).filter(Boolean));
+    kv.panel.destroy(); kv.edge.destroy(); kv.hint.destroy();
+    var minX = Math.min.apply(null, Object.keys(kv.keys).map(function (k) { return kv.keys[k].x; }));
+    var bg = this.keepD(this.add.rectangle(x - 3, y - 2, 146, 42, theme === 'kb_neon' ? 0x140c18 : 0x3e2c28).setOrigin(0, 0));
+    var c = this.keepD(this.add.container(x - minX * sc, y - BK.KB_TOP * sc, list).setScale(sc));
+    this.kbPrev = kv; this.kbPrevT = 0;
+    // keep the preview inside its box: the keyboard is a bit wider than it
+    var w = (Math.max.apply(null, Object.keys(kv.keys).map(function (k) { return kv.keys[k].x + kv.keys[k].w; })) - minX) * sc;
+    if (w > 140) { c.setScale(sc * 140 / w); c.x = x - minX * sc * 140 / w; c.y = y - BK.KB_TOP * sc * 140 / w; }
+    bg.height = (BK.H - BK.KB_TOP) * c.scaleY + 2; bg.displayHeight = bg.height;
+  }
+  update() {
+    var kv = this.kbPrev;
+    if (!kv || !kv.g.active || this.tab !== 4) return;
+    kv.update();
+    if (++this.kbPrevT % 22 === 0) {
+      var keys = 'asdfjklgheirtnou'.split(''), ch = keys[Math.floor(Math.random() * keys.length)];
+      if (Math.random() < 0.25) ch = ch.toUpperCase();
+      if (BK.layout && !BK.layout.accents) ch = ch.replace('é', 'e');
+      kv.press(ch); kv.draw();
+    }
   }
   // a little 3 x 2 keyboard in the look
   kbIcon(x, y, th) {
@@ -516,13 +547,13 @@ BK.SettingsScene = class extends BK.OverlayBase {
     this.clearD();
     var toggles = [
       ['keyboard', BK.T.keyboardHints], ['fingers', BK.T.fingerColours], ['music', BK.T.music],
-      ['sfx', BK.T.sound], ['speedRun', BK.T.speedRun], ['rest', BK.L('Pihenő', 'Rest stop')],
+      ['sfx', BK.T.sound], ['speedRun', BK.T.speedRun], ['rest', BK.L('Pihenő', 'Rest stop')], ['shiftTip', BK.L('Shift-tipp', 'Shift tip')],
     ];
     var STEP = 18;
     toggles.forEach(function (r, i) {
       var y = b.y + 56 + i * STEP;
       s.keepD(BK.ui.text(s, b.x + 20, y, r[1], { outline: false, origin: [0, 0.5], fit: 118 }));
-      var on = r[0] === 'rest' ? P.settings.rest !== false : !!P.settings[r[0]];
+      var on = r[0] === 'rest' || r[0] === 'shiftTip' ? P.settings[r[0]] !== false : !!P.settings[r[0]];
       s.keepD(BK.ui.button(s, b.x + 158, y, on ? BK.T.on : BK.T.off, function () {
         P.settings[r[0]] = P.settings[r[0]] === false ? true : !P.settings[r[0]];
         BK.save.persist();

@@ -148,7 +148,8 @@ BK.CastleScene = class extends Phaser.Scene {
       if (!BK_MANIFEST.sprites[h.key]) return;
       var spr = s.keepR(s.add.sprite(h.x, h.y, h.key).setOrigin(0.5, 1).play(h.key).setDepth(10));
       if (spr.height > 34) spr.setScale(34 / spr.height);
-      if (h.key === 'frog_walk') { spr.anims.pause(); spr.setFlipX(true); }
+      if (h.key === 'frog_walk') spr.anims.pause();
+      if (h.fly) spr.setFlipX(true);
       if (h.fly) s.tweens.add({ targets: spr, y: h.y - 5, duration: 700, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
       var bub = s.keepR(BK.ui.text(s, BK.util.clamp(h.x, 50, BK.CASTLE_W - 50), h.y - spr.displayHeight - 8, h.say, { outline: true, origin: [0.5, 1], px: 8, color: 0xfff2dc, width: 96, align: 1 }));
       s.tweens.add({ targets: bub, y: bub.y - 2, duration: 900, yoyo: true, repeat: -1, delay: i * 200 });
@@ -363,7 +364,7 @@ BK.CastleScene = class extends Phaser.Scene {
     this.guestObjs = [];
     if (this.visit) return;
     C.guests.map(function (id) { return BK.save.get(id); }).filter(Boolean).forEach(function (q, i) {
-      var x = 120 + i * 140 + Math.random() * 40, h = BK.HEROES[q.avatar] || BK.HEROES[0];
+      var x = 90 + i * 80 + Math.random() * 30, h = BK.HEROES[q.avatar] || BK.HEROES[0];
       var spr = s.add.sprite(x, 192, BK.outfitKey(h.run, q)).setOrigin(0.5, 1).setDepth(45).play(BK.outfitKey(h.run, q));
       if (spr.height > 40) spr.setScale(40 / spr.height);
       var tag = BK.ui.text(s, x, 192 - spr.displayHeight - 2, q.nick, { origin: [0.5, 1], px: 8, color: 0xffe9a0 }).setDepth(46);
@@ -372,7 +373,8 @@ BK.CastleScene = class extends Phaser.Scene {
       // they wander about
       var walk = function () {
         if (!spr.active) return;
-        var nx = BK.util.clamp(spr.x + (Math.random() - 0.5) * 160, 30, BK.CASTLE_W - 30);
+        // they stay mostly on the first screen, near the door, where the child is
+        var nx = BK.util.clamp(spr.x + (Math.random() - 0.5) * 140, 40, Math.random() < 0.15 ? BK.CASTLE_W - 40 : 300);
         spr.setFlipX(nx < spr.x ? BK.FACES_LEFT[h.id] !== true : BK.FACES_LEFT[h.id] === true);
         s.tweens.add({ targets: [spr, tag], x: nx, duration: Math.abs(nx - spr.x) * 25 + 300, ease: 'Linear', onComplete: function () { s.time.delayedCall(800 + Math.random() * 2500, walk); } });
       };

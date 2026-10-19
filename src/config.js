@@ -6,7 +6,7 @@
  */
 window.BK = window.BK || {};
 
-BK.VERSION = '0.12.0';
+BK.VERSION = '0.12.1';
 
 // Test mode for the teacher: open the game with ?debug at the end of the address.
 // Every region and level is open; in a level Tab finishes the current word and
@@ -316,7 +316,11 @@ BK.FX_DEFAULT = function () { return { v: 2, shape: 'wave', colour: 'classic', t
 // difficulties. Hard: two more sentences, and the boss sends marks to catch like the Pumpkin King.
 // Tales (Mesék tab): Benedek Elek's texts, typed a part at a time; the place is kept
 // (read when used: data/tales_hu.js loads after this file)
-Object.defineProperty(BK, 'TALES', { get: function () { return window.BK_TALES_HU || []; } });
+// the tales in the child's word language: same ids and lines in both, so the place is kept
+Object.defineProperty(BK, 'TALES', { get: function () {
+  var en = BK.state && BK.state.profile && BK.state.profile.lang === 'en' && window.BK_TALES_EN;
+  return en || window.BK_TALES_HU || [];
+} });
 BK.talePart = function (p, tale) {
   var band = (p && p.grade) || '3-4', at = (((p && p.tales) || {})[tale.id] || {}).at || 0;
   if (at >= tale.lines.length) at = 0;                                   // read again from the start
@@ -397,6 +401,8 @@ BK.KB_EFFECTS = [
   { id: 'kbe_react', name: 'Felvillan', en: 'Light up', price: 20 },
   { id: 'kbe_bounce', name: 'Ugrál', en: 'Bounce', price: 25 },
   { id: 'kbe_click', name: 'Kattog', en: 'Click', price: 20 },
+  // the colour waves (rainbow, ocean...) stand still without this one
+  { id: 'kbe_wave', name: 'Hullámzik', en: 'Waves move', price: 30 },
 ];
 
 // Kitchen (Hátizsák → Konyha): treasures + typing the recipe = a dish. Dishes can be sold to

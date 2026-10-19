@@ -41,7 +41,7 @@ BK.LevelScene = class extends Phaser.Scene {
     this.capsWarned = false;
     // the scene object is reused between levels: nothing may carry over from the last one
     this.paused = false; this.overlayOpen = false; this.pauseUi = [];
-    this.bumps = 0; this.stepT = 0; this.lastShift = null; this.layoutWarned = false;
+    this.bumps = 0; this.stepT = 0; this.lastShift = null; this.layoutWarned = false; this.shiftMiss = 0; this.shiftTipped = false;
     this.enc = null; this.wordsDone = 0;
     this.speed = 76;          // world scroll, pixels per second
     this.startedAt = 0;
@@ -457,10 +457,12 @@ BK.LevelScene = class extends Phaser.Scene {
     if (f === undefined || !this.lastShift) return;
     var want = f <= 3 ? 'ShiftRight' : 'ShiftLeft';
     var used = this.lastShift === 2 ? 'ShiftRight' : (this.lastShift === 1 ? 'ShiftLeft' : this.lastShift);
-    if (used === want) return;
-    var now = performance.now();
-    if (this.shiftTipAt && now - this.shiftTipAt < 20000) return;
-    this.shiftTipAt = now;
+    if (used === want) { this.shiftMiss = 0; return; }
+    // only after a few in a row, once a level, and never when switched off in Settings
+    if (this.profile.settings.shiftTip === false || this.shiftTipped) return;
+    this.shiftMiss = (this.shiftMiss || 0) + 1;
+    if (this.shiftMiss < 3) return;
+    this.shiftTipped = true;
     BK.ui.toast(this, BK.W / 2, 92, want === 'ShiftRight' ? BK.L('Tipp: ehhez a jobb oldali Shift kell!', 'Tip: use the right Shift for this one!') : BK.L('Tipp: ehhez a bal oldali Shift kell!', 'Tip: use the left Shift for this one!'), 0xffd23c);
   }
 

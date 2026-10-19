@@ -46,8 +46,10 @@ BK.KeyboardView = class {
     this.next = null; this.shiftNeeded = null; this.flash = null; this.flashT = 0; this.pulse = 0;
     // the look and the effects the child chose in the shop
     var fx = (BK.state.profile && BK.state.profile.fx) || {};
-    this.theme = (BK.KB_THEMES || []).find(function (t) { return t.id === fx.kb; }) || { id: 'kb_classic' };
-    this.effects = fx.kbOn || [];
+    var thId = this.opts.theme || fx.kb;   // the shop preview passes its own look and effects
+    this.theme = (BK.KB_THEMES || []).find(function (t) { return t.id === thId; }) || { id: 'kb_classic' };
+    this.effects = this.opts.effects || fx.kbOn || [];
+    this.moving = this.effects.indexOf('kbe_wave') >= 0;
     this.pressed = {};          // key -> time of the last press (light up, bounce)
     this.t0 = 0;
     if (this.theme.neon) this.panel.setFillStyle(0x140c18);
@@ -98,7 +100,7 @@ BK.KeyboardView = class {
     if (this.flashT > 0) { this.flashT--; if (!this.flashT) this.flash = null; }
     var busy = false;
     for (var k in this.pressed) if (this.t0 - this.pressed[k] < 20) busy = true;
-    if (this.pulse % 6 === 0 || this.flashT || busy || (this.theme.wave && this.pulse % 2 === 0)) this.draw();
+    if (this.pulse % 6 === 0 || this.flashT || busy || (this.theme.wave && this.moving && this.pulse % 2 === 0)) this.draw();
   }
 
   // the colour of a key in the chosen look; f = finger
@@ -107,7 +109,7 @@ BK.KeyboardView = class {
     if (th.id === 'kb_pastel') { var c = C.IntegerToColor(fc); return C.GetColor((c.r + 255 * 1.2) / 2.2, (c.g + 255 * 1.2) / 2.2, (c.b + 255 * 1.2) / 2.2); }
     if (th.wave) {
       // a slow wave across the keyboard
-      var ph = (K.x / 120 + K.y / 60 - this.t0 / 90);
+      var ph = (K.x / 120 + K.y / 60 - (this.moving ? this.t0 / 90 : 0));
       if (th.wave === 'rainbow') return C.HSVToRGB(((ph % 1) + 1) % 1, 0.55, 1).color;
       var w = th.wave, n = w.length, u = ((ph % 1) + 1) % 1 * n, i = Math.floor(u) % n, j = (i + 1) % n;
       var a = C.IntegerToColor(w[i]), b = C.IntegerToColor(w[j]), m = C.Interpolate.ColorWithColor(a, b, 1, u - Math.floor(u));

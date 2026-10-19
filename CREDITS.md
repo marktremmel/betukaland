@@ -12,7 +12,7 @@ Art
 - New figures (cheetah, panda, fire fox, cockroach, tiger, seahorse, polar bear): ideas from class 4.B, drawn with ChatGPT image generation and cleaned up for the game. Thank you, 4.B!
 
 Texts
-- Tales in the practice corner (Mesék): Benedek Elek (1859-1929), from "Grimm testvérek összegyűjtött meséi" and "Magyar mese- és mondavilág I. A csodaszarvas", public domain, files from the Hungarian Electronic Library (MEK, mek.oszk.hu). Words as he wrote them; only quotes and dashes were made typeable.
+- Tales in the practice corner (Mesék): Benedek Elek (1859-1929), from "Grimm testvérek összegyűjtött meséi" and "Magyar mese- és mondavilág I. A csodaszarvas", public domain, files from the Hungarian Electronic Library (MEK, mek.oszk.hu). Words as he wrote them; only quotes and dashes were made typeable. The English versions (data/tales_en.js) are new line-by-line translations of these texts made for this game.
 
 Font
 - Andika by SIL International (https://software.sil.org/andika/), SIL Open Font License 1.1.
