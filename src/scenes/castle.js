@@ -299,7 +299,7 @@ BK.CastleScene = class extends Phaser.Scene {
     var me = BK.state.profile, C = this.C;
     if ((C.inv[pr.id] || 0) - this.placedCount(pr.id) <= 0) {
       if (me.coins < pr.price) { this.toast(BK.T.notEnough); return; }
-      if (pr.rare && BK.rareCount(me) < pr.rare) { this.toast(BK.L('Ehhez ritka kincs is kell: főzz a Konyhában!', 'This needs rare treasures: cook in the Kitchen!')); return; }
+      if (pr.rare && BK.rareCount(me) < pr.rare) { BK.ui.rareHelp(this, pr.rare); return; }
       if (pr.rare) BK.payRares(me, pr.rare);
       me.coins -= pr.price;
       C.inv[pr.id] = (C.inv[pr.id] || 0) + 1;

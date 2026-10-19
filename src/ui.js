@@ -217,3 +217,28 @@ BK.ui.makeTextures = function (scene) {
     '...#....', '..#o#...', '..#oo#..', '.#oyo#..', '.#oyyo#.', '#oyyyyo#', '#oywwyo#', '#oywwyo#', '.#oyyo#.', '..####..',
   ], { '#': '#5a4a44', 'o': '#8a7a70', 'y': '#a8988c', 'w': '#c8bcb4' });
 };
+
+// When something needs rare treasures: a little card that shows the way there, instead of a "no"
+BK.ui.rareHelp = function (scene, need) {
+  var P = BK.state.profile || {}, have = BK.rareCount ? BK.rareCount(P) : 0;
+  var dishes = Object.keys(P.dishes || {}).filter(function (k) { return P.dishes[k] > 0; }).length;
+  var objs = [], D = 700, x = BK.W / 2, y = BK.H / 2;
+  var keep = function (o) { o.setDepth(D + objs.length * 0.01); objs.push(o); return o; };
+  keep(scene.add.rectangle(0, 0, BK.W, BK.H, 0x000000, 0.35).setOrigin(0, 0).setInteractive());
+  keep(BK.ui.nine(scene, x - 134, y - 76, 268, 152, 'ui_panel2'));
+  keep(scene.add.image(x - 104, y - 40, 'icons_gear', 80).setScale(1.4));
+  keep(BK.ui.text(scene, x - 88, y - 42, BK.L('Ehhez ' + (need || 1) + ' ritka kincs kell!', 'This needs ' + (need || 1) + ' rare treasure' + ((need || 1) > 1 ? 's' : '') + '!'),
+    { outline: false, origin: [0, 0.5], bold: true, color: 0x6b1a6b }));
+  [BK.L('1. Gyűjts kincseket a ládákból a pályákon.', '1. Collect treasures from the chests in the levels.'),
+   BK.L('2. Főzz belőlük: Hátizsák → Konyha.', '2. Cook with them: Backpack → Kitchen.'),
+   BK.L('3. A Polcon 2 különböző étel = 1 ritka kincs.', '3. On the Shelf, 2 different dishes = 1 rare treasure.')].forEach(function (t, i) {
+    keep(BK.ui.text(scene, x - 112, y - 20 + i * 14, t, { outline: false, origin: [0, 0.5], px: 9, color: 0x4a2c1c, fit: 228 }));
+  });
+  keep(BK.ui.text(scene, x, y + 26, BK.L('Most ' + have + ' ritka kincsed és ' + dishes + ' féle ételed van.', 'You have ' + have + ' rare treasures and ' + dishes + ' kinds of dishes now.'),
+    { outline: false, origin: [0.5, 0.5], px: 8, color: 0x9a3d1a }));
+  keep(BK.ui.text(scene, x, y + 40, BK.L('Kattints a bezáráshoz', 'Click to close'), { outline: false, origin: [0.5, 0.5], px: 7, color: 0x9a8a80 }));
+  var close = function () { objs.forEach(function (o) { if (o.active) o.destroy(); }); objs = []; };
+  objs[0].once('pointerup', close);
+  BK.audio.sfx('ui');
+  return close;
+};

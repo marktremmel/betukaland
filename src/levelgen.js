@@ -121,7 +121,8 @@ BK.levelgen = {
         if (sp.kind === 'rest') {
           var pd = BK.PETS.find(function (p) { return p.id === ownedPet; }) || rng.pick(BK.PETS);
           def.pet = pd.id;
-          def.texts = [BK.wordbank.fits(pd.word, picker.set) ? pd.word : picker.get('syllables')];
+          var pw = lang === 'en' ? (pd.wordEn || pd.word) : pd.word;   // the pet's name in the child's word language
+          def.texts = [BK.wordbank.fits(pw, picker.set) ? pw : picker.get('syllables')];
           def.coins = 2;
         }
         // shop and rest words may use keys not unlocked yet; fall back to practice material

@@ -6,7 +6,7 @@
  */
 window.BK = window.BK || {};
 
-BK.VERSION = '0.12.2';
+BK.VERSION = '0.12.3';
 
 // Test mode for the teacher: open the game with ?debug at the end of the address.
 // Every region and level is open; in a level Tab finishes the current word and
@@ -348,13 +348,13 @@ BK.OUTFITS = [
   { id: 'gold', name: 'Arany', price: 80 },
 ];
 BK.PETS = [
-  { id: 'crabkid', name: 'Rákocska', word: 'rák', sprite: 'crabkid_walk', price: 25 },
-  { id: 'sandbug', name: 'Homokbogár', word: 'bogár', sprite: 'sandbug_walk', price: 35 },
-  { id: 'gull', name: 'Sirály', word: 'sirály', sprite: 'gull_fly', price: 50, flies: true },
+  { id: 'crabkid', name: 'Rákocska', word: 'rák', wordEn: 'crab', sprite: 'crabkid_walk', price: 25 },
+  { id: 'sandbug', name: 'Homokbogár', word: 'bogár', wordEn: 'bug', sprite: 'sandbug_walk', price: 35 },
+  { id: 'gull', name: 'Sirály', word: 'sirály', wordEn: 'gull', sprite: 'gull_fly', price: 50, flies: true },
   // Halloween Night reward, not for sale: the drawn bat, or the library crow until it exists
   (window.BK_MANIFEST && BK_MANIFEST.sprites.hw_bat_fly)
-    ? { id: 'bat', name: 'Denevér', word: 'denevér', sprite: 'hw_bat_fly', price: 0, flies: true, reward: true }
-    : { id: 'bat', name: 'Varjú', word: 'varjú', sprite: 'crow_fly', price: 0, flies: true, reward: true },
+    ? { id: 'bat', name: 'Denevér', word: 'denevér', wordEn: 'bat', sprite: 'hw_bat_fly', price: 0, flies: true, reward: true }
+    : { id: 'bat', name: 'Varjú', word: 'varjú', wordEn: 'crow', sprite: 'crow_fly', price: 0, flies: true, reward: true },
 ];
 
 // Collectible items: frames of the Addin food sheet "icons_food" (20 columns, 16 px)

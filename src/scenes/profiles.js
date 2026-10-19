@@ -5,6 +5,7 @@
 BK.ProfilesScene = class extends Phaser.Scene {
   constructor() { super('Profiles'); }
 
+  init(data) { this.saved = data && data.saved; this.savedNick = data && data.nick; }
   create() {
     var s = this;
     BK.menuBackground(this, 5, { groundY: 196 });
@@ -13,7 +14,15 @@ BK.ProfilesScene = class extends Phaser.Scene {
     this.cards = [];
     this.drawCards();
     BK.ui.button(this, 52, 204, BK.T.back, function () { s.scene.start('Title'); }, { w: 70, h: 18, key: 'ESC' });
-    BK.ui.button(this, BK.W / 2, 204, BK.T.loadCode, function () { BK.SaveCodeUI.open(null, function () { s.scene.restart(); }); }, { w: 80, h: 18 });
+    BK.ui.button(this, BK.W / 2, 204, BK.L('Mentőkód / fájl', 'Code / file'), function () { BK.SaveCodeUI.open(null, function () { s.scene.restart({}); }); }, { w: 96, h: 18 });
+    // shared computers: the save lives in this browser profile only
+    var hint = this.saved
+      ? BK.L('Elmentve a Letöltések mappába: ', 'Saved to Downloads: ') + this.saved
+      : BK.L('Nem találod magad? Nézd meg, kinek a Chrome-profiljában vagy (jobbra fent), vagy töltsd be a mentésed fájlból!',
+        'Can\'t find yourself? Check whose Chrome profile is open (top right), or load your save file!');
+    var ht = BK.ui.text(this, BK.W / 2, 188, hint, { origin: [0.5, 0.5], px: 8, color: this.saved ? 0xb8f0a0 : 0xffe9a0, width: 360, align: 1 });
+    if (this.saved) this.time.delayedCall(6000, function () { if (ht.active) ht.setText(BK.L('Nem találod magad? Nézd meg, kinek a Chrome-profiljában vagy (jobbra fent), vagy töltsd be a mentésed fájlból!',
+      'Can\'t find yourself? Check whose Chrome profile is open (top right), or load your save file!')).setTint(0xffe9a0); });
     BK.audio.music(BK.MUSIC.title);
   }
 
@@ -136,7 +145,7 @@ BK.NewProfileScene = class extends Phaser.Scene {
       this.keep(BK.ui.button(this, 192, 116, BK.T.langEn, function () { s.lang = 'en'; s.nextStep(); }, { w: 140 }));
     }
     this.keep(BK.ui.button(this, 52, 204, BK.T.back, function () {
-      if (s.step === 0) s.scene.start('Profiles'); else { s.step--; s.draw(); }
+      if (s.step === 0) s.scene.start('Profiles', {}); else { s.step--; s.draw(); }
     }, { w: 70, h: 18, key: 'ESC' }));
   }
 

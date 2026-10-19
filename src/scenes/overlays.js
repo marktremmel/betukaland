@@ -184,7 +184,7 @@ BK.ShopScene = class extends BK.OverlayBase {
     if (!owned || isTheme) this.keepD(BK.ui.button(this, b.x + b.w - 62, b.y + 160, inUse ? BK.T.using : owned ? BK.T.use : BK.T.buy, function () {
       if (!owned) {
         if (P.coins < item.price) { BK.ui.toast(s, BK.W / 2, b.y + b.h - 34, BK.T.notEnough, 0xff9a7a); BK.audio.sfx('key_bad', { volume: 0.3 }); return; }
-        if (item.rare && !BK.payRares(P, item.rare)) { BK.ui.toast(s, BK.W / 2, b.y + b.h - 34, BK.L('Ehhez ritka kincs is kell: főzz a Konyhában!', 'This needs rare treasures too: cook in the Kitchen!'), 0xd8a0ff); return; }
+        if (item.rare && !BK.payRares(P, item.rare)) { BK.ui.rareHelp(s, item.rare); return; }
         P.coins -= item.price; fx.owned.push(item.id); BK.audio.sfx('buy');
       }
       if (isTheme) fx.kb = item.id; else if (fx.kbOn.indexOf(item.id) < 0) fx.kbOn.push(item.id);
@@ -307,10 +307,9 @@ BK.ShopScene = class extends BK.OverlayBase {
     var P = this.P, fx = P.fx;
     if (fx.owned.indexOf(item.id) < 0) {
       if (P.coins < item.price) { BK.ui.toast(this, BK.W / 2, this.box.y + this.box.h - 34, BK.T.notEnough, 0xff9a7a); BK.audio.sfx('key_bad', { volume: 0.3 }); return; }
-      // the best magic also costs rare treasures (from the kitchen: three dishes for one)
+      // the best magic also costs rare treasures (from the kitchen: two dishes for one)
       if (item.rare && BK.rareCount(P) < item.rare) {
-        BK.ui.toast(this, BK.W / 2, this.box.y + this.box.h - 34, BK.L('Ehhez ritka kincs is kell: főzz a Konyhában!', 'This needs rare treasures too: cook in the Kitchen!'), 0xd8a0ff);
-        BK.audio.sfx('key_bad', { volume: 0.3 }); return;
+        BK.ui.rareHelp(this, item.rare); return;
       }
       if (item.rare) BK.payRares(P, item.rare);
       P.coins -= item.price;

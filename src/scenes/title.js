@@ -48,7 +48,7 @@ BK.TitleScene = class extends Phaser.Scene {
     // the scene object is reused, so the "already leaving" flag must start fresh every time
     this.leaving = false;
     this.langClick = false;
-    var go = function () { if (s.leaving) return; s.leaving = true; BK.audio.sfx('chime'); s.scene.start('Profiles'); };
+    var go = function () { if (s.leaving) return; s.leaving = true; BK.audio.sfx('chime'); s.scene.start('Profiles', {}); };
     // a plain window listener: Phaser skips keys the page already handled (Space, Backspace)
     var onKey = function (e) { if (e.key !== 'Tab' && e.key !== 'Escape' && !e.repeat && !s.langClick) go(); };
     window.addEventListener('keydown', onKey);

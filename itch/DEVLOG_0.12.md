@@ -1,12 +1,12 @@
 # Devlog 0.12: how to post it
 
-First upload the game: Edit game → Uploads → upload betukaland-itch-0.12.2.zip, tick "This file will be played in the browser", delete the older zip. Saves stay.
+First upload the game: Edit game → Uploads → upload betukaland-itch-0.12.3.zip, tick "This file will be played in the browser", delete the older zip. Saves stay.
 
 Then on the game's itch page: Edit game → Devlog → Create a new post.
 
 - Title: Vendégek a várban, színes billentyűzet · Guests in the castle, a colourful keyboard
 - Type: Update
-- Attach the release: tick betukaland-itch-0.12.2.zip
+- Attach the release: tick betukaland-itch-0.12.3.zip
 - Images: 27_castle_stack.png as the cover, then 28_castle_chat.png, 29_progress.png, 30_keyboard_rainbow.png, 31_keyboard_preview.png and 32_tales_en.png inside the post (all in screenshots/)
 - Tags: update, new features
 
@@ -34,6 +34,8 @@ Ami még új:
 
 - Két különböző étel is elég egy ritka kincsért.
 - A Shift-tipp ritkábban szól, és a Beállításokban ki is kapcsolható.
+- Kilépéskor a mentés a Letöltések mappába kerül, így másik Chrome-profilból is betölthető (Mentőkód / fájl).
+- Ha valamihez ritka kincs kell, egy kis kártya megmutatja, hogyan lehet szerezni.
 - Főzés után rendesen ki lehet lépni a Hátizsákból.
 - A mentőkód a vár tárgyait, a kitűzőket és a billentyűzetet is megjegyzi. A régi kódok továbbra is működnek.
 
@@ -59,5 +61,7 @@ Also new:
 
 - Two different dishes are now enough for a rare treasure.
 - The Shift tip speaks up less often and can be switched off in Settings.
+- On Exit the save file goes to Downloads, so it can be loaded from another Chrome profile too (Code / file).
+- When something needs a rare treasure, a small card shows how to get one.
 - The bag closes properly after cooking.
 - Save codes remember castle things, pinned badges and the keyboard. Old codes still work.

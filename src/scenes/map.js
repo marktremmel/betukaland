@@ -10,7 +10,7 @@ BK.MapScene = class extends Phaser.Scene {
 
   create() {
     var s = this, P = this.P = BK.state.profile;
-    if (!P) { this.scene.start('Profiles'); return; }
+    if (!P) { this.scene.start('Profiles', {}); return; }
     BK.menuBackground(this, 5, { groundY: 118 });
     BK.audio.apply(P.settings);
     BK.audio.music(BK.MUSIC.map);
@@ -160,7 +160,12 @@ BK.MapScene = class extends Phaser.Scene {
       [BK.T.saveCode, function () { BK.SaveCodeUI.open(P, function () { s.scene.restart({}); }); }],
       [BK.L('Váram', 'My castle'), function () { BK.audio.sfx('chime'); s.scene.start('Castle'); }],
       [BK.L('Profilom', 'Profile'), function () { BK.audio.sfx('chime'); s.scene.start('Profile'); }],
-      [BK.T.switchPlayer, function () { s.scene.start('Profiles'); }],
+      [BK.T.switchPlayer, function () {
+        // a copy of the save in Downloads, so it can be found from any Chrome profile
+        var saved = null;
+        if (BK.save.autoFile()) { BK.save.persist(); saved = BK.save.fileName(P); BK.util.download(saved, BK.save.toFile(P), 'application/json'); }
+        s.scene.start('Profiles', { saved: saved, nick: P.nick });
+      }],
     ];
     items.forEach(function (it, i) {
       var x = 286 + (i % 2) * 64, y = 134 + Math.floor(i / 2) * 20;

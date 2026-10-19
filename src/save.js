@@ -495,6 +495,9 @@ BK.save = (function () {
     pinHash: pinHash,
     teacher: function () { return load().teacher; },
     // Halloween Night on this computer (Teacher screen switch)
+    // the teacher's switch: Exit on the map also downloads the child's save file (default on)
+    autoFile: function (v) { var t = load().teacher; if (v !== undefined) { t.autoFile = !!v; persist(); } return t.autoFile !== false; },
+    fileName: function (p) { return 'betukaland-' + p.nick.replace(/[^\p{L}0-9]+/gu, '_') + '-' + BK.util.today() + '.json'; },
     halloween: function (v) { var t = load().teacher; if (v !== undefined) { t.halloween = !!v; persist(); } return !!t.halloween; },
   };
 })();

@@ -101,7 +101,7 @@ A child types a part (8 lines for Kezdő, 10 for Haladó, fewer for a slower typ
 
 ## Kitchen, dishes and rare treasures (Hátizsák)
 
-The bag has three tabs. Kincsek: the treasures from chests, as before. Konyha: nine recipes (Palacsinta, Gyümölcssaláta, Zöldségleves, Almás pite, Répatorta, Fagyikehely, Gyümölcsturmix, Sajtos pogácsa, Ünnepi torta), each needing two or three treasures. Cooking starts a short round at a crackling hearth where the child types the recipe's five sentences; at the end the treasures are used up and the dish goes on the Polc. Polc: a dish can be sold for 14-28 coins, or two different dishes traded for a rare treasure (Gyémánt, Kristály, Aranyrúd, Aranyrög, Tűzgömb, Kincses térkép). Rare treasures pay for RTX, neon, chrome, the brightest bubble lights and the finest castle things. This gives the treasures a use, and slows down the coin inflation: the expensive things now need some cooking (typing) as well as coins. Cooking works from the map (not from a paused level). The recipe sentences use every letter, so a beginner meets keys from later regions here; the on-screen keyboard shows them.
+The bag has three tabs. Kincsek: the treasures from chests, as before. Konyha: nine recipes (Palacsinta, Gyümölcssaláta, Zöldségleves, Almás pite, Répatorta, Fagyikehely, Gyümölcsturmix, Sajtos pogácsa, Ünnepi torta), each needing two or three treasures. Cooking starts a short round at a crackling hearth where the child types the recipe's five sentences; at the end the treasures are used up and the dish goes on the Polc. Polc: a dish can be sold for 14-28 coins, or two different dishes traded for a rare treasure (Gyémánt, Kristály, Aranyrúd, Aranyrög, Tűzgömb, Kincses térkép). When something needs a rare treasure the child does not have yet, a small card shows the way there (chests → cooking → two dishes for one rare treasure) and how many dishes and rare treasures they have. Rare treasures pay for RTX, neon, chrome, the brightest bubble lights and the finest castle things. This gives the treasures a use, and slows down the coin inflation: the expensive things now need some cooking (typing) as well as coins. Cooking works from the map (not from a paused level). The recipe sentences use every letter, so a beginner meets keys from later regions here; the on-screen keyboard shows them.
 
 ## Váram (the castle room, map menu)
 
@@ -191,6 +191,10 @@ Halloween figures: after making the Pumpkin King laugh, the child gets Szellemke
 ## Taking the warm-up test again
 
 A child who skipped the warm-up test (Kihagyom), or who has improved a lot, can take it again from Settings on the map: "Bemelegítés: Újra". A new result can only move the start forward; no region is ever taken away.
+
+## Shared computers and Chrome profiles
+
+Saves live in the browser profile, so a child who sits down in a classmate's Chrome profile does not see their own player. Two things help. The "Ki játszik?" screen now says so: check whose Chrome profile is open (top right), or load your save with "Mentőkód / fájl". And when a child presses Kilépés on the map, the game downloads their save file to the Downloads folder (betukaland-<name>-<date>.json). Downloads are shared by all Chrome profiles of the same computer account, so the file can be opened from any profile with Mentőkód / fájl → Fájl megnyitása (the newest one is the right one). The teacher screen has a switch for this (Save file on Exit, on by default).
 
 ## Teacher screen
 
