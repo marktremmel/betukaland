@@ -14,7 +14,7 @@ BK.LevelScene = class extends Phaser.Scene {
     this.regionId = data.region || 1;
     this.levelIdx = data.level === undefined ? 0 : data.level;
     this.daily = this.levelIdx === 'daily';
-    this.practiceMode = ['practice', 'story', 'weak', 'endless', 'halloween', 'arena', 'tale', 'cook'].indexOf(this.levelIdx) >= 0 ? this.levelIdx : null;
+    this.practiceMode = ['practice', 'story', 'weak', 'endless', 'halloween', 'nemoke', 'arena', 'tale', 'cook'].indexOf(this.levelIdx) >= 0 ? this.levelIdx : null;
     this.hwStage = data.stage || 0;
     this.endless = this.levelIdx === 'endless';
     this.storyId = data.storyId || null;
@@ -217,6 +217,7 @@ BK.LevelScene = class extends Phaser.Scene {
       this.practiceMode === 'weak' ? BK.T.weak + ': ' + this.plan.storyTitle :
       this.endless ? BK.T.endless + ' · 0 ' + BK.T.wordsUnit :
       this.practiceMode === 'halloween' ? 'Halloween · ' + this.reg.name :
+      this.practiceMode === 'nemoke' ? BK.L('NEM OKÉ · ', 'NOT OKAY · ') + this.reg.name :
       this.practiceMode === 'arena' ? BK.L('Aréna', 'Arena') + (this.plan.hard ? BK.L(' · nehéz', ' · hard') : '') :
       this.practiceMode ? BK.T.practice + ' · ' + BK.REGIONS[this.regionId - 1].name : (BK.REGIONS[this.regionId - 1].name + ' · ' +
       (this.levelIdx === 3 ? BK.T.boss : this.regionId + '-' + (this.levelIdx + 1)));
@@ -253,6 +254,7 @@ BK.LevelScene = class extends Phaser.Scene {
     if (this.practiceMode === 'weak') msg = BK.T.weak + ': ' + this.plan.storyTitle;
     if (this.endless) msg = BK.T.endless;
     if (this.practiceMode === 'halloween') { this.halloweenIntro(); return; }
+    if (this.practiceMode === 'nemoke') { this.nemokeIntro(); return; }
     var t = BK.ui.text(this, BK.W / 2, 60, msg, { size: 2, origin: [0.5, 0.5], color: 0xfff2dc }).setDepth(400);
     this.time.delayedCall(1100, function () {
       t.destroy();
@@ -617,13 +619,13 @@ BK.LevelScene = class extends Phaser.Scene {
     if (acc >= BK.STARS.two) stars = 2;
     if (acc >= BK.STARS.three && wpm >= target) stars = 3;
     var hwBoss = this.practiceMode === 'halloween' && this.plan.boss;
-    var bonus = stars * (this.practiceMode && this.practiceMode !== 'halloween' ? 1 : 3) + (this.levelIdx === 3 || hwBoss ? 10 : 0);
+    var bonus = stars * (this.practiceMode && this.practiceMode !== 'halloween' && this.practiceMode !== 'nemoke' ? 1 : 3) + (this.levelIdx === 3 || hwBoss ? 10 : 0);
     if (this.practiceMode === 'arena') {
       // the first win on each difficulty pays well, later ones a little
       var ar = (P.arena || {})[this.plan.arenaId] || {};
       bonus = stars * 2 + (ar[this.plan.hard ? 'h' : 'n'] ? 0 : (this.plan.hard ? 25 : 12));
     }
-    var lcode = this.daily ? -1 : ({ practice: -2, story: -3, weak: -4, endless: -5, halloween: -6, arena: -7, tale: -8, cook: -9 })[this.practiceMode] || this.levelIdx;
+    var lcode = this.daily ? -1 : ({ practice: -2, story: -3, weak: -4, endless: -5, halloween: -6, arena: -7, tale: -8, cook: -9, nemoke: -10 })[this.practiceMode] || this.levelIdx;
     var res = { r: this.regionId, l: lcode, practice: this.practiceMode, storyId: this.plan.storyId, stage: this.plan.stage,
       arenaId: this.plan.arenaId, hard: this.plan.hard, tale: this.plan.tale, recipeId: this.plan.recipeId,
       chars: st.chars, words: this.wordsDone, weakKeys: this.plan.weakKeys, wpm: wpm, acc: acc, stars: stars,
@@ -641,6 +643,7 @@ BK.LevelScene = class extends Phaser.Scene {
     if (this.practiceMode === 'story') this.time.delayedCall(1300, function () { s.storyRecap(res); });
     else if (this.practiceMode === 'tale') this.time.delayedCall(1300, function () { s.taleRecap(res); });
     else if (this.practiceMode === 'halloween') this.time.delayedCall(1300, function () { s.halloweenEnd(res); });
+    else if (this.practiceMode === 'nemoke') this.time.delayedCall(1300, function () { s.nemokeEnd(res); });
     else this.time.delayedCall(1300, function () { s.scene.start('Results', res); });
   }
 
@@ -656,6 +659,124 @@ BK.LevelScene = class extends Phaser.Scene {
   }
   narrate(text, done) {
     return new BK.Narrator(this, { sprite: 'hw_bat_fly', name: BK.L('Denevérke', 'Batty'), voice: 720, text: text, onDone: done });
+  }
+
+  // NEM OKÉ: Karou tells each chapter; after the typing: what happened, a choice in chapters 3-4,
+  // then the chapter's Fontos! card; after the last one the ending and who to turn to
+  nemokeStory() { return BK.NEMOKE_STORY[BK.uiLang === 'en' ? 'en' : 'hu']; }
+  nemokeNarrate(text, done) {
+    return new BK.Narrator(this, { sprite: 'karou_sit', name: 'Karou', voice: 620, text: text, onDone: done });
+  }
+  nemokeIntro() {
+    var s = this, ch = this.nemokeStory().chapters[this.plan.stage];
+    var t = BK.ui.text(this, BK.W / 2, 30, (this.plan.stage + 1) + '. ' + ch.name, { size: 2, origin: [0.5, 0.5], color: 0xfff2dc }).setDepth(895);
+    this.nemokeNarrate(ch.intro, function () {
+      t.destroy();
+      BK.audio.sfx('v_letsgo', { volume: 0.6 });
+      s.beginWalk();
+    });
+  }
+  nemokeEnd(res) {
+    var s = this, i = this.plan.stage, ch = this.nemokeStory().chapters[i];
+    var card = function () { BK.nemokeCard(s, i, function () { if (i === 4) s.nemokeFinale(res); else s.scene.start('Results', res); }, { got: true }); };
+    var after = function () { s.nemokeNarrate(ch.after, card); };
+    if (ch.choice) this.nemokeChoice(ch.choice, after); else after();
+  }
+  // a choice: the child types the grey word of an option (accents do not matter); "again" options
+  // get a gentle answer and the question comes back
+  nemokeChoice(c, done) {
+    var s = this, objs = [], D = 940, story = this.nemokeStory();
+    var keep = function (o) { if (o.setDepth) o.setDepth(D + objs.length * 0.01); objs.push(o); return o; };
+    var plain = function (t) { return t.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase(); };
+    keep(this.add.rectangle(BK.W / 2, BK.H / 2, BK.W, BK.H, 0x000000, 0.45).setInteractive());
+    keep(BK.ui.nine(this, 24, 8, BK.W - 48, 194, 'ui_panel2'));
+    keep(BK.ui.text(this, BK.W / 2, 40, c.q, { outline: false, origin: [0.5, 0.5], bold: true, color: 0x2e6a3e, fit: BK.W - 90 }));
+    var rows = c.options.map(function (o, k) {
+      var y = 54 + k * 16;
+      var key = keep(BK.ui.text(s, 52, y, o.key, { outline: false, px: 10, bold: true, color: 0x9a8a80 }));
+      var hit = keep(BK.ui.text(s, 52, y, '', { outline: false, px: 10, bold: true, color: 0x2e7d3e }));
+      keep(BK.ui.text(s, 118, y, o.label, { outline: false, px: 9, color: 0x4a2c1c, fit: BK.W - 168 }));
+      var z = keep(s.add.zone(BK.W / 2, y + 6, BK.W - 80, 16).setInteractive({ useHandCursor: true }));
+      z.on('pointerup', function () { if (!busy) choose(k); });
+      return { o: o, key: key, hit: hit };
+    });
+    var hint = keep(BK.ui.text(this, BK.W / 2, 54 + c.options.length * 16 + 6, story.choiceHint, { outline: false, origin: [0.5, 0], px: 8, color: 0x9a8a80 }));
+    var typed = '', busy = false;
+    var show = function () {
+      rows.forEach(function (r) {
+        var on = typed && plain(r.o.key).indexOf(plain(typed)) === 0;
+        r.hit.setText(on ? r.o.key.slice(0, typed.length) : '');
+      });
+    };
+    var choose = function (k) {
+      busy = true;
+      var o = c.options[k];
+      BK.audio.sfx(o.again ? 'ui' : 'chime');
+      rows.forEach(function (r, j) { r.key.setAlpha(j === k ? 1 : 0.35); });
+      var reply = keep(BK.ui.text(s, BK.W / 2, 54 + c.options.length * 16 + 4, o.reply, { outline: false, origin: [0.5, 0], width: BK.W - 90, align: 1, px: 9, color: o.again ? 0x9a3d1a : 0x2e6a3e }));
+      hint.setVisible(false);
+      var b = BK.ui.button(s, BK.W / 2, 188, o.again ? BK.L('Újra (Enter)', 'Again (Enter)') : BK.T.next + ' (Enter)', function () { next(); }, { w: 96, h: 18 });
+      keep(b); if (b.zone) { b.zone.setDepth(D + 1); objs.push(b.zone); }
+      var next = function () {
+        if (!busy) return;
+        if (o.again) {
+          reply.destroy(); b.destroy(); if (b.zone) b.zone.destroy();
+          hint.setVisible(true); typed = ''; show(); busy = false;
+          rows.forEach(function (r) { r.key.setAlpha(1); });
+          return;
+        }
+        window.removeEventListener('keydown', onKey, true);
+        objs.forEach(function (x) { if (x.active) x.destroy(); });
+        done();
+      };
+      s.choiceNext = next;
+    };
+    var onKey = function (e) {
+      e.stopPropagation();
+      if (busy) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); s.choiceNext(); } return; }
+      if (e.key === 'Backspace') { typed = typed.slice(0, -1); show(); e.preventDefault(); return; }
+      if (e.key === 'Enter') {
+        var m = rows.findIndex(function (r) { return plain(r.o.key) === plain(typed); });
+        if (m < 0) m = rows.findIndex(function (r) { return typed && plain(r.o.key).indexOf(plain(typed)) === 0; });
+        if (m >= 0) choose(m); else BK.audio.sfx('key_bad', { volume: 0.3 });
+        return;
+      }
+      if (e.key.length !== 1) return;
+      var t2 = typed + e.key;
+      if (rows.some(function (r) { return plain(r.o.key).indexOf(plain(t2)) === 0; })) {
+        typed = t2; BK.audio.sfx('key_ok', { volume: 0.5 }); show();
+        var full = rows.findIndex(function (r) { return plain(r.o.key) === plain(typed); });
+        if (full >= 0) s.time.delayedCall(250, function () { if (!busy && plain(rows[full].o.key) === plain(typed)) choose(full); });
+      } else BK.audio.sfx('key_bad', { volume: 0.25 });
+    };
+    window.addEventListener('keydown', onKey, true);
+    this.events.once('shutdown', function () { window.removeEventListener('keydown', onKey, true); });
+  }
+  // the last chapter: everyone together, then who to turn to
+  nemokeFinale(res) {
+    var s = this, st = this.nemokeStory(), objs = [];
+    var keep = function (o) { if (o.setDepth) o.setDepth(960 + objs.length * 0.01); objs.push(o); return o; };
+    keep(this.add.rectangle(BK.W / 2, BK.H / 2, BK.W, BK.H, 0x000000, 0.45).setInteractive());
+    keep(BK.ui.nine(this, 24, 6, BK.W - 48, 188, 'ui_panel2'));
+    keep(BK.ui.text(this, BK.W / 2, 40, st.title, { outline: false, origin: [0.5, 0.5], bold: true, color: 0x2e6a3e, fit: BK.W - 90 }));
+    keep(BK.ui.text(this, BK.W / 2, 50, st.end, { outline: false, origin: [0.5, 0], width: BK.W - 96, align: 1, px: 9, color: 0x4a2c1c }));
+    // the classmates together
+    var S = BK_MANIFEST.sprites, kids = ['nm_hedgy_walk', 'nm_magpie_walk', 'frog_taunt', 'karou_sit', 'mush_walk', 'crab_walk', 'gull_fly'].filter(function (k) { return S[k]; });
+    kids.forEach(function (k, i) {
+      var x = 70 + i * (244 / Math.max(1, kids.length - 1)), g = keep(s.add.sprite(x, 116, k).setOrigin(0.5, 1));
+      g.play(k);
+      if (g.height > 28) g.setScale(28 / g.height);
+      s.tweens.add({ targets: g, y: g.y - 4, duration: 320 + i * 40, yoyo: true, repeat: -1, ease: 'Sine.easeInOut', delay: i * 90 });
+    });
+    // who to turn to: a box that stands out
+    var g2 = keep(this.add.graphics());
+    g2.fillStyle(0xe8f4ff, 1).fillRoundedRect(44, 121, BK.W - 88, 50, 5);
+    g2.lineStyle(1, 0x2e8fd8, 1).strokeRoundedRect(44, 121, BK.W - 88, 50, 5);
+    keep(BK.ui.text(this, BK.W / 2, 125, st.help, { outline: false, origin: [0.5, 0], width: BK.W - 104, align: 1, px: 9, color: 0x1a4a7a }));
+    BK.fx.confetti(this, BK.W / 2, 40);
+    BK.audio.sfx('chime');
+    var b = BK.ui.button(this, BK.W / 2, 186, BK.T.next + ' (Enter)', function () { s.scene.start('Results', res); }, { w: 86, h: 18, key: 'ENTER' });
+    keep(b); if (b.zone) { b.zone.setDepth(961); objs.push(b.zone); }
   }
 
   // Halloween Night: what happened, after each stage; the ending (with everyone dancing) after the King

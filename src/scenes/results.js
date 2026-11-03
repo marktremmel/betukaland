@@ -12,7 +12,7 @@ BK.ResultsScene = class extends Phaser.Scene {
     BK.menuBackground(this, 2, { groundY: 200 });
     BK.audio.music(BK.MUSIC.map);
     BK.ui.nine(this, 16, 4, 352, 182, 'ui_panel2');
-    var modeName = { practice: BK.T.practice, weak: BK.T.weak, endless: BK.T.endless, halloween: 'Halloween', arena: BK.L('Aréna', 'Arena'), tale: BK.L('Mese', 'Tale'), cook: BK.L('Konyha', 'Kitchen') }[r.practice];
+    var modeName = { practice: BK.T.practice, weak: BK.T.weak, endless: BK.T.endless, halloween: 'Halloween', nemoke: BK.L('NEM OKÉ', 'NOT OKAY'), arena: BK.L('Aréna', 'Arena'), tale: BK.L('Mese', 'Tale'), cook: BK.L('Konyha', 'Kitchen') }[r.practice];
     var head = r.daily ? BK.T.daily + BK.L(': kész!', ': done!') : modeName ? modeName + BK.L(': kész!', ': done!') : BK.T.results;
     BK.ui.text(this, 192, 35, head, { outline: false, size: 2, origin: [0.5, 0.5] });
 
@@ -84,6 +84,7 @@ BK.ResultsScene = class extends Phaser.Scene {
     this.chart(196, 52, 160, 92, P.history.slice(-12));
 
     if (r.practice === 'halloween') { this.halloweenButtons(r); return; }
+    if (r.practice === 'nemoke') { this.nemokeButtons(r); return; }
     if (r.daily || r.practice) { this.practiceButtons(r); return; }
     var nextLevel = (r.l < 3) ? r.l + 1 : null, nextRegion = r.r;
     if (!r.daily && r.l === 3 && r.r < BK.REGIONS.length && BK.save.regionOpen(P, r.r + 1)) {
@@ -126,6 +127,31 @@ BK.ResultsScene = class extends Phaser.Scene {
     BK.ui.button(this, 78, 196, goOn ? BK.L('Folytatom', 'Go on') : BK.T.retry, function () { s.scene.start('Level', again); }, { w: 66, h: 18 });
     BK.ui.button(this, 192, 196, BK.T.map, function () { s.scene.start('Map'); }, { w: 66, h: 18, key: 'ESC' });
     BK.ui.button(this, 306, 196, BK.T.next + ' (Enter)', function () { s.scene.start('Practice', { tab: tab, mode: mode }); }, { w: 86, h: 18, key: 'ENTER' });
+  }
+
+  // NEM OKÉ: again, the next chapter, or back to the chapter list; the rare treasure and Süni at the end
+  nemokeButtons(r) {
+    var s = this, last = r.stage >= 4;
+    if (last && r.newRare) {
+      BK.fx.confetti(this, 192, 60);
+      var rd = BK.RARES.find(function (x) { return x.id === r.newRare; });
+      this.time.delayedCall(1600, function () {
+        BK.ui.toast(s, 192, 160, BK.L('Ritka kincs: Barátság-', 'Rare treasure: Friendship ') + (rd ? rd.name.toLowerCase() : '') + '!', 0xd8a0ff, 1, 2400);
+        BK.audio.sfx('level_up', { volume: 0.5 });
+      });
+      if (r.newFigure) {
+        var fh = BK.HEROES.find(function (h) { return h.id === r.newFigure; });
+        this.time.delayedCall(4300, function () {
+          BK.ui.toast(s, 192, 160, BK.L('Új figura: ', 'New figure: ') + fh.name + '!', 0xffd23c, 1, 2600);
+          BK.audio.sfx('level_up', { volume: 0.5 });
+        });
+      }
+    }
+    BK.ui.button(this, 78, 196, BK.T.retry, function () { s.scene.start('Level', { region: r.r, level: 'nemoke', stage: r.stage }); }, { w: 66, h: 18 });
+    BK.ui.button(this, 192, 196, BK.T.map, function () { s.scene.start('Map', {}); }, { w: 66, h: 18, key: 'ESC' });
+    BK.ui.button(this, 306, 196, BK.T.next + ' (Enter)', function () {
+      s.scene.start('Nemoke', { sel: last ? 4 : r.stage + 1 });
+    }, { w: 86, h: 18, key: 'ENTER' });
   }
 
   // Halloween Night: again, the next stage, or back to the Halloween page

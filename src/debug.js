@@ -27,7 +27,7 @@ BK.debug = {
     var P = BK.state.profile, d = this;
     var acts = [
       ['coins', '+500 érme'], ['rares', '+5 ritka kincs'], ['items', 'Minden kincs ×3'], ['dishes', 'Minden étel ×2'],
-      ['regions', 'Minden vidék kész (3 csillag)'], ['halloween', 'Halloween kész'], ['magic', 'Minden varázs és figura'],
+      ['regions', 'Minden vidék kész (3 csillag)'], ['halloween', 'Halloween kész'], ['nemoke', 'NEM OKÉ kész'], ['magic', 'Minden varázs és figura'],
       ['castle', 'Minden vártárgy'], ['tales', 'Minden mese kész'], ['win', 'Ezt a pályát megnyerem (3 csillag)'],
       ['progress', 'Kihagyott pálya (teszt)'], ['map', 'Vissza a térképre'], ['off', 'Debug kikapcsolása'],
     ];
@@ -47,6 +47,7 @@ BK.debug = {
     if (a === 'items') BK.ITEMS.forEach(function (it) { P.items[it.id] = 3; });
     if (a === 'dishes') { P.dishes = P.dishes || {}; BK.RECIPES.forEach(function (r) { P.dishes[r.id] = (P.dishes[r.id] || 0) + 2; }); }
     if (a === 'regions') BK.REGIONS.forEach(function (r) { if (P.progress[r.id]) P.progress[r.id].stars = [3, 3, 3, 3]; });
+    if (a === 'nemoke') { P.nemoke = { stars: [3, 3, 3, 3, 0] }; }
     if (a === 'halloween') { P.halloween = { stars: [3, 3, 3, 3] }; if (P.pets.indexOf('bat') < 0) P.pets.push('bat'); }
     if (a === 'magic') {
       [BK.SHOT_SHAPES, BK.SHOT_COLOURS, BK.SHOT_IMPACTS, BK.SHOT_GLOWS, BK.KB_THEMES || []].forEach(function (l) { l.forEach(function (o) { if (P.fx.owned.indexOf(o.id) < 0) P.fx.owned.push(o.id); }); });

@@ -6,7 +6,7 @@
  */
 window.BK = window.BK || {};
 
-BK.VERSION = '0.12.3';
+BK.VERSION = '0.13.0';
 
 // Test mode for the teacher: open the game with ?debug at the end of the address.
 // Every region and level is open; in a level Tab finishes the current word and
@@ -215,6 +215,31 @@ BK.halloweenRegion = function (regionId, stage) {
   r.name = en ? st.en : st.name;
   r.theme = 'halloween';
   r.stories = false;       // the story regions write the boss from stories; here the themed sentences do
+  return r;
+};
+
+// NEM OKÉ (switched on in the Teacher screen): five chapters of a story about bullying in the
+// Forest School (data/nemoke.js), on a sunny road with the keys of the child's newest region.
+// The classmates on the road are the friendly creatures of the first regions.
+BK.NEMOKE = {
+  chapters: [
+    { walkers: ['frog', 'mush'], flyers: ['gull'], sky: 1 },
+    { walkers: ['mush', 'crab'], flyers: ['gull'], sky: 5 },
+    { walkers: ['frog', 'sandbug', 'crab'], flyers: ['gull'], sky: 2, choice: true },
+    { walkers: ['starfish', 'mush', 'frog'], flyers: ['gull'], sky: 4, choice: true },
+    { walkers: ['frog', 'mush', 'crab', 'sandbug'], flyers: ['gull'], sky: 1 },
+  ],
+  rare: 'crystal',        // the reward for the whole story: a rare treasure (Barátság-kristály)
+  gift: 'nmhedgy',        // and Süni as a figure, once she is drawn (the magpie can then be bought)
+};
+BK.nemokeRegion = function (regionId, ch) {
+  var c = BK.NEMOKE.chapters[ch] || BK.NEMOKE.chapters[0], st = BK.NEMOKE_STORY[BK.uiLang === 'en' ? 'en' : 'hu'];
+  var r = Object.assign({}, BK.REGIONS[regionId - 1]);
+  r.backdrop = null; r.bdOffset = 0; r.bdTint = null; r.ground = 'ground'; r.groundTint = null; r.decor = null; r.tint = null;
+  r.walkers = c.walkers.slice(); r.flyers = c.flyers.slice(); r.flyer = r.flyers[0]; r.tints = {};
+  r.sky = [c.sky]; r.music = ['m_chill']; r.capitals = false; r.stories = false;
+  r.name = st.chapters[ch].name;
+  r.theme = 'nemoke';
   return r;
 };
 
@@ -504,9 +529,16 @@ BK.HEROES = [
   { id: 'hwmummy', name: 'Múmia', idle: 'hw_mummy_walk', run: 'hw_mummy_walk', creature: 'hw_mummy', lock: 'halloween', price: 80 },
   { id: 'hwbat', name: 'Denevérke', idle: 'hw_bat_fly', run: 'hw_bat_fly', flies: true, creature: 'hw_bat', lock: 'halloween', price: 80 },
 ];
+// NEM OKÉ figures: only once they are drawn (art/nemoke, tools/clean_ai_sprites.py); Süni is the gift
+if (window.BK_MANIFEST && BK_MANIFEST.sprites.nm_hedgy_walk) BK.HEROES.push({ id: 'nmhedgy', name: 'Süni', idle: 'nm_hedgy_walk', run: 'nm_hedgy_walk', lock: 'nemoke', price: 0 });
+if (window.BK_MANIFEST && BK_MANIFEST.sprites.nm_magpie_walk) BK.HEROES.push({ id: 'nmmagpie', name: 'Szarka', idle: 'nm_magpie_walk', run: 'nm_magpie_walk', lock: 'nemoke', price: 60 });
 // Can this child play this figure? Locked ones must be owned (bought or given).
 BK.heroOwned = function (p, h) { return !h.lock || ((p && p.figures) || []).indexOf(h.id) >= 0; };
-BK.heroUnlocked = function (p, h) { return !h.lock || !!(p && p.halloween && p.halloween.stars && p.halloween.stars[3]); };
+BK.heroUnlocked = function (p, h) {
+  if (!h.lock) return true;
+  if (h.lock === 'nemoke') return !!(p && p.nemoke && p.nemoke.stars && p.nemoke.stars[4]);
+  return !!(p && p.halloween && p.halloween.stars && p.halloween.stars[3]);
+};
 BK.HW_GIFT = 'hwghost';
 // a new profile chooses from the figures everyone has (the locked ones come last in the list)
 BK.N_FREE_HEROES = BK.HEROES.filter(function (h) { return !h.lock; }).length;

@@ -28,12 +28,13 @@ BK.levelgen = {
     if (levelIdx === 'cook') return this.cook(regionId, profile, rng, opts || {});
     if (levelIdx === 'tale' || levelIdx === 'practice' || levelIdx === 'story' || levelIdx === 'weak' || levelIdx === 'endless') return this.practice(regionId, levelIdx, profile, rng, opts || {});
     if (levelIdx === 'halloween') return this.halloween(regionId, profile, rng, opts || {});
+    if (levelIdx === 'nemoke') return this.nemoke(regionId, profile, rng, opts || {});
     if (levelIdx === 'arena') return this.arena(regionId, profile, rng, opts || {});
     var reg = (opts && opts.reg) || BK.REGIONS[regionId - 1];
     var band = (profile && profile.grade) || '3-4';
     var lang = (profile && profile.lang) || 'hu';
     var picker = new BK.wordbank.Picker(regionId, lang, band, rng, profile);
-    if (reg.theme) picker = BK.levelgen.themed(picker, lang, rng);
+    if (reg.theme) picker = BK.levelgen.themed(picker, lang, rng, reg.theme);
     var daily = levelIdx === 'daily';
     var li = daily ? 1 : levelIdx;
     var phases = daily ? ['syllables', 'words', 'pairs'] : BK.LEVEL_PHASES[li];
@@ -194,6 +195,21 @@ BK.levelgen = {
       sky: reg.sky ? reg.sky[0] : null, bdTint: null, weather: 'clear', music: 'm_chill', practice: 'cook', recipeId: r.id, storyTitle: r.name };
   },
 
+  /* NEM OKÉ: a chapter, built like level 3 without the mini-boss, kind words and sentences mixed in */
+  nemoke: function (regionId, profile, rng, opts) {
+    var ch = Math.max(0, Math.min(4, opts.stage || 0));
+    var reg = BK.nemokeRegion(regionId, ch);
+    var plan = this.build(regionId, 2, profile, rng, { reg: reg });
+    plan.encounters = plan.encounters.filter(function (e) { return e.kind !== 'mini' && e.kind !== 'shop'; });
+    plan.reg = reg;
+    plan.practice = 'nemoke';
+    plan.stage = ch;
+    plan.sky = reg.sky[0];
+    plan.weather = rng.pick(['clear', 'clear', 'leaves', 'blow']);
+    plan.music = 'm_chill';
+    return plan;
+  },
+
   halloween: function (regionId, profile, rng, opts) {
     var stage = Math.max(0, Math.min(3, opts.stage || 0));
     var reg = BK.halloweenRegion(regionId, stage);
@@ -213,10 +229,11 @@ BK.levelgen = {
    * bank, but only those that fit the keys (picker.set). Anything else is the
    * normal material.
    */
-  themed: function (picker, lang, rng) {
+  themed: function (picker, lang, rng, theme) {
     var fits = function (t) { return BK.wordbank.fits(t, picker.set) && !BK.wordbank.blocked(t); };
-    var words = (BK.HALLOWEEN_WORDS[lang] || []).filter(fits);
-    var sents = (BK.HALLOWEEN_SENTENCES[lang] || []).filter(fits);
+    var W = theme === 'nemoke' ? BK.NEMOKE_WORDS : BK.HALLOWEEN_WORDS, S = theme === 'nemoke' ? BK.NEMOKE_SENTENCES : BK.HALLOWEEN_SENTENCES;
+    var words = (W[lang] || []).filter(fits);
+    var sents = (S[lang] || []).filter(fits);
     var get = picker.get.bind(picker), sentence = picker.sentence.bind(picker);
     picker.get = function (phase) {
       if (words.length && (phase === 'words' || phase === 'syllables') && rng.chance(0.7)) return rng.pick(words);
