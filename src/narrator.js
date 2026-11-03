@@ -56,7 +56,7 @@ BK.Narrator = class {
 
   // split into pages of whole sentences, about n characters each
   static paginate(text, n) {
-    var parts = text.match(/[^.!?]+[.!?]*\s*/g) || [text], pages = [], cur = '';
+    var parts = text.match(/[^.!?]+[.!?]*[\"”']?\s*/g) || [text], pages = [], cur = '';
     parts.forEach(function (p) {
       if (cur && (cur + p).length > n) { pages.push(cur.trim()); cur = ''; }
       cur += p;

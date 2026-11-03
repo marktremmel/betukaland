@@ -176,8 +176,13 @@ BK.MapScene = class extends Phaser.Scene {
       var oa = this.openAfter; this.openAfter = null;
       this.time.delayedCall(50, function () { s.openOverlay(oa.open, { tab: oa.tab }); });
     }
-    if (BK.save.halloween()) {
-      BK.ui.button(s, 318, 114, 'Halloween', function () { BK.audio.sfx('chime'); s.scene.start('Halloween'); }, { w: 126, h: 18, color: 0xb8480c });
+    // Halloween Night and NEM OKÉ, while the teacher has them switched on (side by side when both are)
+    var hwOn = BK.save.halloween(), nmOn = BK.save.nemoke();
+    if (hwOn) {
+      BK.ui.button(s, nmOn ? 286 : 318, 114, 'Halloween', function () { BK.audio.sfx('chime'); s.scene.start('Halloween'); }, { w: nmOn ? 62 : 126, h: 18, color: 0xb8480c });
+    }
+    if (nmOn) {
+      BK.ui.button(s, hwOn ? 350 : 318, 114, BK.L('NEM OKÉ', 'NOT OKAY'), function () { BK.audio.sfx('chime'); s.scene.start('Nemoke', {}); }, { w: hwOn ? 62 : 126, h: 18, color: 0x2e7d3e });
     }
   }
 

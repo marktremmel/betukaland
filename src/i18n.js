@@ -49,7 +49,7 @@ BK.i18nField = function (obj, field, en) {
   names(BK.PETS, { crabkid: 'Little Crab', sandbug: 'Sand Bug', gull: 'Seagull', bat: BK.PETS[3] && BK.PETS[3].sprite === 'crow_fly' ? 'Crow' : 'Bat' });
   names(BK.HEROES, { bunny: 'Bunny', berie: 'Berie', frog: 'Frog', mush: 'Mushroom', crab: 'Crab', gull: 'Seagull',
     cheetah: 'Cheetah', panda: 'Panda', firefox: 'Fire Fox', roach: 'Cockroach', tiger: 'Tiger', seahorse: 'Seahorse', polar: 'Polar Bear',
-    hwghost: 'Little Ghost', hwpumpkin: 'Pumpkin Head', hwcat: 'Witch Cat', hwmummy: 'Mummy', hwbat: 'Little Bat' });
+    hwghost: 'Little Ghost', hwpumpkin: 'Pumpkin Head', hwcat: 'Witch Cat', hwmummy: 'Mummy', hwbat: 'Little Bat', nmhedgy: 'Hedgy', nmmagpie: 'Magpie' });
   names(BK.ITEMS, {
     apple: 'apple', cherry: 'cherry', strawberry: 'strawberry', banana: 'banana', watermelon: 'watermelon',
     grapes: 'grapes', pear: 'pear', carrot: 'carrot', orange: 'orange', mushroom: 'mushroom', cheese: 'cheese',
