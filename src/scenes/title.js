@@ -41,6 +41,13 @@ BK.TitleScene = class extends Phaser.Scene {
       s.scene.restart();
     }, { w: 88, h: 18, color: BK.save.halloween() ? 0xb8480c : 0x4a2c1c });
     hb.zone.on('pointerdown', function () { s.langClick = true; setTimeout(function () { s.langClick = false; }, 400); });
+    // NEM OKÉ on/off the same way
+    var nb = BK.ui.button(this, 50, 34, BK.L('NEM OKÉ: ', 'NOT OKAY: ') + (BK.save.nemoke() ? BK.L('be', 'on') : BK.L('ki', 'off')), function () {
+      BK.save.nemoke(!BK.save.nemoke());
+      BK.audio.sfx('chime');
+      s.scene.restart();
+    }, { w: 88, h: 18, color: BK.save.nemoke() ? 0x2e7d3e : 0x4a2c1c });
+    nb.zone.on('pointerdown', function () { s.langClick = true; setTimeout(function () { s.langClick = false; }, 400); });
     if (BK.DEBUG) BK.ui.text(this, BK.W / 2, 140, BK.L('TESZT MÓD: minden pálya nyitva', 'TEST MODE: every level open'), { origin: [0.5, 0.5], color: 0xff9a7a });
     BK.ui.text(this, BK.W / 2, 208, 'v' + BK.VERSION, { origin: [0.5, 0.5], color: 0xfff2dc }).setAlpha(0.6);
 
