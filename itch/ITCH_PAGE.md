@@ -2,10 +2,10 @@
 
 Everything for the page is in this folder:
 
-- `betukaland-itch-0.12.3.zip`: the game (upload this)
+- `betukaland-itch-0.16.2.zip`: the game (upload this)
 - `cover_hu_630x500.png` / `cover_en_630x500.png`: cover image (pick one)
-- `screenshots/`: 11 screenshots at 1152×648
-- `DEVLOG_0.12.md`: the devlog post for this update
+- `screenshots/`: screenshots at 1152×648
+- `DEVLOG_0.16.md`: the devlog post for this update
 
 ## 1. Create the project
 
@@ -20,7 +20,7 @@ itch.io → Dashboard → Create new project, then fill in:
 | Kind of project | HTML |
 | Release status | Released (or In development, if you still want to change things) |
 | Pricing | No payments |
-| Uploads | `betukaland-itch-0.12.3.zip`, tick "This file will be played in the browser" |
+| Uploads | `betukaland-itch-0.16.2.zip`, tick "This file will be played in the browser" |
 
 ## 2. Embed options
 
@@ -68,6 +68,9 @@ Gépelős kaland 3–6. osztályosoknak. A nyúl (vagy a tigris, a csikóhal, va
 - Bemelegítő teszt az elején, ami megmondja, honnan érdemes kezdeni
 - 13 figura, köztük a 4.B osztály hét állata, és a boltban bármikor lehet figurát váltani
 - Halloween éjszaka: barátságosan kísérteties kaland a Tökkirállyal (a címképernyőn kapcsolható)
+- NEM OKÉ: öt fejezetes történet az iskolai bántalmazásról és a kiállásról az Erdei Iskolában, választásokkal és Fontos! kártyákkal (a címképernyőn kapcsolható)
+- A 4.A osztály 21 szuper digitális polgára osztálytársként az úton és figuraként a boltban
+- Hangok: a mesélők és a szereplők felolvassák a soraikat, a begépelendő szót hiba után kimondja a játék (a Beállításokban állítható)
 - Bossaréna: a legyőzött főellenfelek újra kihívhatók, Normál vagy Nehéz fokozaton
 - Varázslövések a boltban: forma, szín (RTX, króm, neon is) és becsapódás
 - A pálya hossza a gyerek tempójához igazodik
@@ -96,6 +99,9 @@ A typing adventure for ages 8–12. A bunny (or a tiger, a seahorse, or any of 1
 - A short warm-up at the start finds the right place to begin
 - 13 figures, seven of them suggested by class 4.B, and you can switch figures in the shop any time
 - Halloween Night: a friendly spooky adventure with the Pumpkin King (switch on the title screen)
+- NOT OKAY: a five-chapter story about bullying and standing up, at the Forest School, with choices and Important! cards (switch on the title screen)
+- Class 4.A's 21 super digital citizens as classmates on the road and figures in the shop
+- Voices: narrators and characters speak their lines, and the word to type is read out after mistakes (set in Settings)
 - Boss arena: fight the bosses you have beaten again, on Normal or Hard
 - Magic shots in the shop: shape, colour (RTX, chrome and neon too) and impact
 - Level length follows the child's pace
@@ -120,7 +126,9 @@ Tip: click the game before you start typing.
 Art: Ansimuz (Sunny Land, Tiny RPG Battle Sprites, Gothicvania), Crabby Beach Assets Pack, Berie's Adventure: Seaside, Complete UI Essential Pack by Crusenho (CC BY 4.0), Addin's RPG Icon Packs, Effect and FX Pixel, Free Sky with Clouds Background by CraftPix.net.
 Fonts: Andika (SIL), Atkinson Hyperlegible (Braille Institute), Lexend, all SIL Open Font License 1.1.
 Music: Clement Panchout. Sound: Pixel Combat SFX by Helton Yan, Super Dialogue Audio Pack by Dillon Becker (CC BY 4.0), voices by Karen Cenon and Alex Brodie.
-New figures: ideas from class 4.B, drawn with ChatGPT image generation and cleaned up into pixel art for the game.
+New figures: ideas from class 4.B, and the super digital citizen heroes drawn by class 4.A, made with ChatGPT image generation and cleaned up into pixel art for the game; the NEM OKÉ backgrounds were made the same way.
+Voices: Piper (Hungarian voices Anna, Berta, Imre; CC0 training data), Kokoro-82M (Apache-2.0) for English, Microsoft Azure neural voices (Noémi, Tamás) for the Hungarian words to type.
+NEM OKÉ: written for our school's part in the NEM OKÉ anti-bullying programme.
 Engine: Phaser 3 (MIT).
 The full list is on the Credits screen in the game.
 
@@ -128,7 +136,7 @@ The full list is on the Credits screen in the game.
 
 ## 6. Screenshots
 
-Upload in this order: 01_title, 27_castle_stack, 28_castle_chat, 30_keyboard_rainbow, 31_keyboard_preview, 29_progress, 32_tales_en, 22_castle, 25_tales, 21_kitchen, 23_profile_sign, 15_pumpkin_king_marks, 02_map, 13_halloween_night, 14_bat_narrator, 18_boss_arena, 17_magic_impacts, 19_rtx_wind, 10_new_figures, 16_halloween_figures, 04_story, 05_boss, 06_practice, 20_settings, 08_title_en, 09_warmup_en. Delete 07_shop, 11_seahorse and 12_shop_figures from the page if you want it shorter; the new shop pictures replace them.
+Upload in this order: 33_nemoke_treehouse, 35_nemoke_choice, 34_nemoke_pond, 01_title, 27_castle_stack, 28_castle_chat, 30_keyboard_rainbow, 31_keyboard_preview, 29_progress, 32_tales_en, 22_castle, 25_tales, 21_kitchen, 23_profile_sign, 15_pumpkin_king_marks, 02_map, 13_halloween_night, 14_bat_narrator, 18_boss_arena, 17_magic_impacts, 19_rtx_wind, 10_new_figures, 16_halloween_figures, 04_story, 05_boss, 06_practice, 20_settings, 08_title_en, 09_warmup_en. Delete 07_shop, 11_seahorse and 12_shop_figures from the page if you want it shorter; the new shop pictures replace them.
 
 ## 7. Notes for running it from itch
 

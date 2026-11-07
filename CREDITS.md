@@ -27,3 +27,10 @@ Sound
 
 Engine
 - Phaser 3.90 (https://phaser.io), MIT licence (vendor/PHASER_LICENSE.md).
+
+## Voices (since v0.16)
+
+- Hungarian narrators and characters: Piper text-to-speech (github.com/OHF-Voice/piper1-gpl), voices hu_HU anna, berta and imre, trained on CC0 data (OHF-Voice voice-datasets).
+- English narrators and characters: Kokoro-82M (hexgrad, Apache-2.0).
+- Hungarian words and sentences to type: Microsoft Azure AI Speech neural voices (hu-HU Noémi, Tamás).
+- Pitch, speed and effects per character made with FFmpeg.
