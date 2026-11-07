@@ -1,7 +1,8 @@
 """
 Azure neural voices (hu-HU Noémi and Tamás) for the words the child types, where the Piper voices
-struggle with gy, ty, ny. Only Python's standard library, runs on the Mac:
-    python3 tools/voice/azure_tts.py lab      the hard words, Azure next to the best Piper take
+struggle with gy, ty, ny. Runs on the Mac, with the voice setup's Python (it has truststore, which
+uses the Mac's own certificate trust):
+    voice/env/piper-arm64/bin/python tools/voice/azure_tts.py lab      the hard words, Azure next to the best Piper take
                                               -> voice/wordlab3/index.html
     python3 tools/voice/azure_tts.py words    every word and typing sentence with the chosen
                                               Azure voice -> voice/out/hu (the review page)
@@ -10,7 +11,7 @@ The key stays on your Mac: put it in voice/azure.env (not in git):
     AZURE_SPEECH_REGION=westeurope
 The free tier (F0) covers 0.5 million characters a month; all the words are about 4,000.
 """
-import json, os, sys, shutil, time, hashlib, urllib.request, urllib.error, subprocess
+import json, os, sys, shutil, time, hashlib, urllib.request, urllib.error, subprocess, ssl
 from xml.sax.saxutils import escape
 HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.abspath(os.path.join(HERE, "..", ".."))
 ENV = os.path.join(ROOT, "voice", "azure.env")
@@ -26,6 +27,24 @@ def creds():
     return kv["AZURE_SPEECH_KEY"].strip(), kv.get("AZURE_SPEECH_REGION", "westeurope").strip()
 
 
+def tls():
+    """trust what the Mac trusts (the Keychain), so a network or security tool that inspects
+    HTTPS with its own certificate still works; then certifi; then Python's own list"""
+    try:
+        import truststore
+        return truststore.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+    except ImportError:
+        pass
+    try:
+        import certifi
+        return ssl.create_default_context(cafile=certifi.where())
+    except ImportError:
+        return ssl.create_default_context()
+
+
+CTX = tls()
+
+
 def speak(text, voice, rate, mp3, key, region):
     ssml = ("<speak version='1.0' xml:lang='hu-HU'><voice name='%s'><prosody rate='%s'>%s</prosody></voice></speak>"
             % (voice, rate, escape(text)))
@@ -34,7 +53,7 @@ def speak(text, voice, rate, mp3, key, region):
         "X-Microsoft-OutputFormat": "audio-24khz-48kbitrate-mono-mp3", "User-Agent": "betukaland-voice"})
     for attempt in range(5):
         try:
-            data = urllib.request.urlopen(req, timeout=30).read(); break
+            data = urllib.request.urlopen(req, timeout=30, context=CTX).read(); break
         except urllib.error.HTTPError as e:
             if e.code == 429: time.sleep(2 + attempt * 2); continue      # free tier: a few requests a second
             raise SystemExit("Azure said %s: %s (check the key and the region in voice/azure.env)" % (e.code, e.read()[:200]))
