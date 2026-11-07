@@ -2388,6 +2388,158 @@ window.BK_MANIFEST = {
     "w": 240,
     "h": 240
    }
+  ],
+  "nmsky_1": [
+   {
+    "url": "assets/bd/nmsky_1.png",
+    "w": 998,
+    "h": 378,
+    "hd": 3
+   }
+  ],
+  "nmsky_2": [
+   {
+    "url": "assets/bd/nmsky_2.png",
+    "w": 998,
+    "h": 378,
+    "hd": 3
+   }
+  ],
+  "nmsky_3": [
+   {
+    "url": "assets/bd/nmsky_3.png",
+    "w": 998,
+    "h": 378,
+    "hd": 3
+   }
+  ],
+  "nmsky_4": [
+   {
+    "url": "assets/bd/nmsky_4.png",
+    "w": 998,
+    "h": 378,
+    "hd": 3
+   }
+  ],
+  "nmsky_5": [
+   {
+    "url": "assets/bd/nmsky_5.png",
+    "w": 998,
+    "h": 378,
+    "hd": 3
+   }
+  ],
+  "nmfar_1": [
+   {
+    "url": "assets/bd/nmfar_1.png",
+    "w": 998,
+    "h": 378,
+    "hd": 3
+   }
+  ],
+  "nmfar_2": [
+   {
+    "url": "assets/bd/nmfar_2.png",
+    "w": 998,
+    "h": 378,
+    "hd": 3
+   }
+  ],
+  "nmfar_3": [
+   {
+    "url": "assets/bd/nmfar_3.png",
+    "w": 998,
+    "h": 378,
+    "hd": 3
+   }
+  ],
+  "nmfar_4": [
+   {
+    "url": "assets/bd/nmfar_4.png",
+    "w": 998,
+    "h": 378,
+    "hd": 3
+   }
+  ],
+  "nmmid_1": [
+   {
+    "url": "assets/bd/nmmid_1.png",
+    "w": 1633,
+    "h": 378,
+    "hd": 3
+   }
+  ],
+  "nmmid_2": [
+   {
+    "url": "assets/bd/nmmid_2.png",
+    "w": 1960,
+    "h": 378,
+    "hd": 3
+   }
+  ],
+  "nmmid_3": [
+   {
+    "url": "assets/bd/nmmid_3.png",
+    "w": 2395,
+    "h": 378,
+    "hd": 3
+   }
+  ],
+  "nmmid_4": [
+   {
+    "url": "assets/bd/nmmid_4.png",
+    "w": 998,
+    "h": 378,
+    "hd": 3
+   }
+  ],
+  "nmmid_5": [
+   {
+    "url": "assets/bd/nmmid_5.png",
+    "w": 1742,
+    "h": 378,
+    "hd": 3
+   }
+  ],
+  "nmmid_6": [
+   {
+    "url": "assets/bd/nmmid_6.png",
+    "w": 998,
+    "h": 378,
+    "hd": 3
+   }
+  ],
+  "nmnear_1": [
+   {
+    "url": "assets/bd/nmnear_1.png",
+    "w": 798,
+    "h": 378,
+    "hd": 3
+   }
+  ],
+  "nmnear_2": [
+   {
+    "url": "assets/bd/nmnear_2.png",
+    "w": 798,
+    "h": 378,
+    "hd": 3
+   }
+  ],
+  "nmnear_3": [
+   {
+    "url": "assets/bd/nmnear_3.png",
+    "w": 798,
+    "h": 378,
+    "hd": 3
+   }
+  ],
+  "nmnear_4": [
+   {
+    "url": "assets/bd/nmnear_4.png",
+    "w": 798,
+    "h": 378,
+    "hd": 3
+   }
   ]
  }
 };

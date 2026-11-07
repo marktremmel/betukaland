@@ -266,7 +266,7 @@ Assets: `tools/build_assets.py` copies what the game uses from the Game Assets l
 - Outfit colours for the drawn figures (4.A heroes, Hedgy, Magpie) are made in the browser the first time a child needs them, so the download does not grow.
 - Figures without a standing animation breathe and shift their weight while the child types. The frog figure now walks forwards and looks back over its shoulder now and then.
 - Castle: Karou, the frog and the bat are all on the first screen; the rest of the hall is free for furniture. Invited guests stop and look around, and sometimes bump into a thing on the floor.
-- NEM OKÉ backdrops: drawn parallax pieces in art/nemoke_bd (sky_*.png, far_*.png, mid_*.png, near_*.png) are picked at random, one of each, for every NEM OKÉ level once they exist (tools/build_assets.py --local adds them).
+- NEM OKÉ backdrops (since v0.16.1 in use: 5 skies, 4 far, 6 middle and 4 near pieces, the teacher's own ChatGPT pictures in new_gb, cut by tools/clean_backdrops.py; every NEM OKÉ level mixes a sky, usually a far piece, a scene and half the time bushes in front; chapter 4, the evening chat, gets a sunset sky): drawn parallax pieces in art/nemoke_bd (sky_*.png, far_*.png, mid_*.png, near_*.png) are picked at random, one of each, for every NEM OKÉ level once they exist (tools/build_assets.py --local adds them).
 
 ## Voices (since v0.16)
 

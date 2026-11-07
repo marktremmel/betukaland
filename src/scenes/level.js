@@ -88,6 +88,9 @@ BK.LevelScene = class extends Phaser.Scene {
       for (var j = 0; j < nL; j++) {
         var b = this.add.tileSprite(0, 0, BK.W, BK.KB_TOP, keys[j]).setOrigin(0, 0).setDepth(j + 1);
         b.tilePositionY = reg.bdOffset || 0;
+        // drawn at 3x (the NEM OKÉ pieces): shown at game size, sharp on a big screen
+        var lay = reg.bdLayers ? (BK_MANIFEST.backdrops[reg.bdLayers[j]] || [])[0] : null;
+        if (lay && lay.hd) b.setTileScale(1 / lay.hd);
         b.speed = nL > 1 ? 0.04 + 0.5 * Math.pow(j / (nL - 1), 1.5) : 0;
         if (this.plan.bdTint) b.setTint(this.plan.bdTint);
         this.skyLayers.push(b);

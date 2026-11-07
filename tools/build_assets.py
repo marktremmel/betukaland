@@ -385,7 +385,7 @@ def nemoke_backdrops(manifest):
             img = Image.open(f).convert("RGBA")
             name = "nm%s_%d" % (kind, i + 1)
             img.save(os.path.join(OUT, "bd", name + ".png"))
-            manifest.setdefault("backdrops", {})[name] = [dict(url="assets/bd/%s.png" % name, w=img.width, h=img.height)]
+            manifest.setdefault("backdrops", {})[name] = [dict(url="assets/bd/%s.png" % name, w=img.width, h=img.height, hd=3)]
             log("nemoke backdrop", name, img.size)
 
 

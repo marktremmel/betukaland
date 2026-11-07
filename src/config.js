@@ -6,7 +6,7 @@
  */
 window.BK = window.BK || {};
 
-BK.VERSION = '0.16.0';
+BK.VERSION = '0.16.1';
 
 // Test mode for the teacher: open the game with ?debug at the end of the address.
 // Every region and level is open; in a level Tab finishes the current word and
@@ -254,7 +254,11 @@ BK.nemokeRegion = function (regionId, ch) {
   if (skies.length) {
     // the drawn NEM OKÉ pieces, mixed: one sky, then one of each layer in front (when there is one)
     var pick = function (l) { return l[Math.floor(Math.random() * l.length)]; };
-    r.bdLayers = [pick(skies)].concat(['far', 'mid', 'near'].map(kind).filter(function (l) { return l.length; }).map(pick));
+    // the sky always, a far layer most times, the scene, and the bushes in front half the time
+    var chance = { far: 0.8, mid: 1, near: 0.55 };
+    // the class chat happens in the evening: a sunset sky for chapter 4
+    var eve = skies.filter(function (k) { return k === 'nmsky_2' || k === 'nmsky_5'; });
+    r.bdLayers = [pick(ch === 3 && eve.length ? eve : skies)].concat(['far', 'mid', 'near'].filter(function (k) { return kind(k).length && Math.random() < chance[k]; }).map(function (k) { return pick(kind(k)); }));
     r.backdrop = r.bdLayers[0]; r.bdOffset = 0;
   } else if (c.backdrop && bds[c.backdrop]) { r.backdrop = c.backdrop; r.bdOffset = c.bdOffset || 0; if (c.ground) r.ground = c.ground; }
   r.sky = [c.sky]; r.music = ['m_chill']; r.capitals = false; r.stories = false;
