@@ -13,6 +13,7 @@ def normalize(text, lang="hu"):
     t = re.sub(r"\s[-–—]\s", ", ", t)                         # a dash between words: a pause
     t = re.sub(r"”\s+(?=\w)", ", ", t)                      # „...” írtad: a pause after the quote
     t = re.sub(r"[\"„”“«»]", "", t)                          # quotation marks
+    t = t.replace("(", "").replace(")", "")                 # (Többet is választhatsz.) is read as a sentence
     t = re.sub(r"(\.\.\.|…)+\s*$", ".", t)                    # trailing ellipsis: end of sentence
     t = re.sub(r"(\.\.\.|…)+\s*", ", ", t)                    # ellipsis inside: a pause
     # digit groups separated by spaces (phone numbers): say each group, pause between

@@ -1,0 +1,57 @@
+{
+ "_about": "Who speaks with which voice. Each character has a few variants to choose from on voice/cast/index.html. voice: piper-<anna|berta|imre> (Hungarian) or kokoro-<name> (English). pitch: semitones up (+) or down (-), tempo stays. speed: 1 = normal, 0.9 = slower. fx: extra ffmpeg filter. lines: ids from voice/lines.json.",
+ "hu": {
+  "karou": {"name": "Karou (mesélő madár)", "lines": ["nm.hu.c2.intro", "nm.hu.c3.q", "nm.hu.c2.after"], "variants": {
+    "A": {"voice": "piper-imre", "pitch": 0, "speed": 1.0},
+    "B": {"voice": "piper-imre", "pitch": 2, "speed": 0.97},
+    "C": {"voice": "piper-berta", "pitch": 0, "speed": 0.97}}},
+  "magpie": {"name": "Szarka", "lines": ["nm.hu.c1.beat1", "nm.hu.c2.beat1", "nm.hu.c4.beat1", "nm.hu.c5.beat2"], "variants": {
+    "A": {"voice": "piper-berta", "pitch": 3, "speed": 1.08},
+    "B": {"voice": "piper-berta", "pitch": 5, "speed": 1.12},
+    "C": {"voice": "piper-anna", "pitch": 3, "speed": 1.1}}},
+  "hedgy": {"name": "Süni", "lines": ["nm.hu.c1.beat2", "nm.hu.c3.beat2", "nm.hu.c5.beat3"], "variants": {
+    "A": {"voice": "piper-anna", "pitch": 4, "speed": 0.92},
+    "B": {"voice": "piper-anna", "pitch": 6, "speed": 0.9},
+    "C": {"voice": "piper-berta", "pitch": 5, "speed": 0.92}}},
+  "owl": {"name": "Bagoly tanító néni", "lines": ["nm.hu.c5.beat1", "nm.hu.c3.beat3", "nm.hu.c5.q"], "variants": {
+    "A": {"voice": "piper-anna", "pitch": -2, "speed": 0.9},
+    "B": {"voice": "piper-berta", "pitch": -2, "speed": 0.9},
+    "C": {"voice": "piper-anna", "pitch": -1, "speed": 0.94}}},
+  "bat": {"name": "Denevérke (Halloween)", "lines": ["hw.hu.stage1", "hw.hu.after1"], "variants": {
+    "A": {"voice": "piper-berta", "pitch": 3, "speed": 1.06},
+    "B": {"voice": "piper-anna", "pitch": 5, "speed": 1.08},
+    "C": {"voice": "piper-imre", "pitch": 5, "speed": 1.08}}},
+  "king": {"name": "Tökkirály", "lines": ["hw.hu.king2", "hw.hu.king4", "hw.hu.king8"], "variants": {
+    "A": {"voice": "piper-imre", "pitch": -4, "speed": 0.92, "fx": "aecho=0.8:0.6:45:0.25"},
+    "B": {"voice": "piper-imre", "pitch": -6, "speed": 0.88, "fx": "aecho=0.8:0.6:60:0.3"},
+    "C": {"voice": "piper-imre", "pitch": -3, "speed": 0.95}}},
+  "reader": {"name": "Felolvasó (gépelendő szavak)", "lines": ["w.hu.szekér", "w.hu.tortaszelet", "sen.hu.th1", "sen.hu.th3"], "variants": {
+    "A": {"voice": "piper-imre", "pitch": 0, "speed": 0.85},
+    "B": {"voice": "piper-berta", "pitch": 0, "speed": 0.85},
+    "C": {"voice": "piper-anna", "pitch": 0, "speed": 0.85}}},
+  "narrator": {"name": "Mesélő (mesék, történetek)", "lines": ["tale.hu.csillagtallerok.1", "tale.hu.csillagtallerok.10", "st.hu.kert.3"], "variants": {
+    "A": {"voice": "piper-imre", "pitch": 0, "speed": 0.95},
+    "B": {"voice": "piper-berta", "pitch": 0, "speed": 0.95},
+    "C": {"voice": "piper-anna", "pitch": 0, "speed": 0.95}}}
+ },
+ "en": {
+  "karou": {"name": "Karou", "lines": ["nm.en.c2.intro", "nm.en.c3.q"], "variants": {
+    "A": {"voice": "kokoro-am_michael", "pitch": 0, "speed": 1.0},
+    "B": {"voice": "kokoro-af_heart", "pitch": 0, "speed": 1.0}}},
+  "magpie": {"name": "Magpie", "lines": ["nm.en.c1.beat1", "nm.en.c4.beat1"], "variants": {
+    "A": {"voice": "kokoro-af_bella", "pitch": 3, "speed": 1.08},
+    "B": {"voice": "kokoro-af_heart", "pitch": 4, "speed": 1.1}}},
+  "hedgy": {"name": "Hedgy", "lines": ["nm.en.c1.beat2", "nm.en.c5.beat3"], "variants": {
+    "A": {"voice": "kokoro-af_heart", "pitch": 4, "speed": 0.92},
+    "B": {"voice": "kokoro-af_bella", "pitch": 5, "speed": 0.92}}},
+  "owl": {"name": "Mrs Owl", "lines": ["nm.en.c5.beat1"], "variants": {
+    "A": {"voice": "kokoro-bf_emma", "pitch": -1, "speed": 0.92},
+    "B": {"voice": "kokoro-af_heart", "pitch": -2, "speed": 0.92}}},
+  "king": {"name": "Pumpkin King", "lines": ["hw.en.king2", "hw.en.king4"], "variants": {
+    "A": {"voice": "kokoro-bm_george", "pitch": -4, "speed": 0.92, "fx": "aecho=0.8:0.6:45:0.25"},
+    "B": {"voice": "kokoro-am_michael", "pitch": -5, "speed": 0.9, "fx": "aecho=0.8:0.6:45:0.25"}}},
+  "reader": {"name": "Reader", "lines": ["w.en.friend", "sen.en.th1"], "variants": {
+    "A": {"voice": "kokoro-af_heart", "pitch": 0, "speed": 0.85},
+    "B": {"voice": "kokoro-am_michael", "pitch": 0, "speed": 0.85}}}
+ }
+}
