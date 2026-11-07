@@ -10,8 +10,8 @@ import json, os, sys, subprocess, wave, hashlib, tempfile
 HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.abspath(os.path.join(HERE, "..", ".."))
 sys.path.insert(0, HERE)
 from normalize import normalize
-OUT = os.path.join(ROOT, "voice", "cast"); MODELS = os.path.join(ROOT, "voice", "models")
-CAST = json.load(open(os.path.join(HERE, "cast.json"), encoding="utf-8"))
+OUT = os.path.join(ROOT, "voice", os.environ.get("BK_CAST_OUT", "cast")); MODELS = os.path.join(ROOT, "voice", "models")
+CAST = json.load(open(os.environ.get("BK_CAST") or os.path.join(HERE, "cast.json"), encoding="utf-8"))
 LINES = {l["id"]: l for l in json.load(open(os.path.join(ROOT, "voice", "lines.json"), encoding="utf-8"))}
 os.makedirs(OUT, exist_ok=True)
 _piper, _kokoro = {}, {}
@@ -22,6 +22,8 @@ _piper, _kokoro = {}, {}
 # then pitch and effects go over the whole line. Piper's noise settings: lower = steadier, clearer
 # voice (less "döcögés"); the defaults of Piper are 0.667 / 0.8.
 DEFAULTS = {"speed": 1.0, "pitch": 0, "gap": 0.4, "noise": 0.5, "noise_w": 0.6}
+# word modes for single words: speed factor by length (<=2, <=4, <=6, longer letters)
+WORD_SLOW = {"slow": (0.6, 0.65, 0.72, 0.8), "mild": (0.75, 0.8, 0.85, 0.9), "stretch": (0.65, 0.7, 0.78, 0.85)}
 TARGET_RMS = 0.08            # every sentence gets this loudness before the line is put together
 
 
@@ -63,18 +65,20 @@ def render(spec0, text, mp3):
     eng, voice = spec["voice"].split("-", 1)
     raw = raw_piper if eng == "piper" else raw_kokoro
     parts, sr = [], 24000
-    ss = sentences(text)
+    ss = sentences(text); stretch = None
     # a bare word or two (what the child types): "word" mode decides how it is said
     if spec.get("word") and len(ss) == 1 and not ss[0].rstrip()[-1:] in ".!?":
-        if spec["word"] in ("period", "slow"): ss = [ss[0][0].upper() + ss[0][1:] + "."]
+        if spec["word"] != "plain": ss = [ss[0][0].upper() + ss[0][1:] + "."]
     for s in ss:
         sp = spec
         # a very short sentence inside a longer line ("Elhallgatott.") is said more slowly
         if len(ss) > 1 and len(s.split()) <= 2: sp = dict(spec, speed=spec["speed"] * 0.85)
-        if spec.get("word") == "slow" and len(ss) == 1 and len(s.split()) <= 2:
+        if spec.get("word") in WORD_SLOW and len(ss) == 1 and len(s.split()) <= 2:
             # the shorter the word, the more it is drawn out ("ujj", "szia" were too quick)
-            n = len(s.strip(".!? "))
-            sp = dict(spec, speed=spec["speed"] * (0.6 if n <= 2 else 0.65 if n <= 4 else 0.72 if n <= 6 else 0.8))
+            n = len(s.strip(".!? ")); tab = WORD_SLOW[spec["word"]]
+            f = tab[0] if n <= 2 else tab[1] if n <= 4 else tab[2] if n <= 6 else tab[3]
+            if spec["word"] == "stretch": stretch = f       # said at normal speed, stretched afterwards
+            else: sp = dict(spec, speed=spec["speed"] * f)
         a, sr = raw(voice, s, sp)
         a = trim(np.asarray(a, dtype=np.float32), sr)
         rms = float(np.sqrt(np.mean(a ** 2))) or 1.0
@@ -87,6 +91,7 @@ def render(spec0, text, mp3):
         wf.setnchannels(1); wf.setsampwidth(2); wf.setframerate(sr); wf.writeframes((a * 32767).astype("<i2").tobytes())
     f = 2 ** (spec["pitch"] / 12.0)
     chain = ["asetrate=%d" % round(sr * f), "aresample=%d" % sr, "atempo=%.4f" % (1 / f)] if f != 1 else []
+    if stretch: chain.append("atempo=%.3f" % stretch)
     if spec.get("fx"): chain.append(spec["fx"])
     if spec.get("gain"): chain.append("volume=%sdB" % spec["gain"])
     chain.append("alimiter=limit=0.95")          # a fixed gain, no loudnorm "riding" the volume

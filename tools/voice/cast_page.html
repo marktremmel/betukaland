@@ -47,7 +47,7 @@ function render() {
     Object.entries(c.variants).forEach(([vk, sp]) => {
       const id = key + '-' + vk, v = document.createElement('div');
       v.className = 'var' + (S[key] === vk ? ' picked' : '');
-      const set = `${sp.voice} · hangmagasság ${sp.pitch > 0 ? '+' : ''}${sp.pitch || 0} · tempó ${sp.speed || 1}${sp.fx ? ' · visszhang' : ''}${sp.gain ? ' · +' + sp.gain + ' dB' : ''}${sp.word ? ' · szó: ' + ({plain: 'ahogy van', period: 'mondatként', slow: 'lassabban'}[sp.word] || sp.word) : ''}`;
+      const set = `${sp.voice} · hangmagasság ${sp.pitch > 0 ? '+' : ''}${sp.pitch || 0} · tempó ${sp.speed || 1}${sp.fx ? ' · visszhang' : ''}${sp.gain ? ' · +' + sp.gain + ' dB' : ''}${sp.word ? ' · szó: ' + ({plain: 'ahogy van', period: 'mondatként', slow: 'lassabban', mild: 'kicsit lassabban', stretch: 'normál tempó, utólag nyújtva'}[sp.word] || sp.word) : ''}`;
       v.innerHTML = `<b>${vk}</b> <span class="set">${esc(set)}</span> <button class="pick ${S[key] === vk ? 'on' : ''}">Ez legyen</button> <button class="pl">▶</button>` +
         (D.have[id] || []).map(l => `<div class="ln">${esc(D.lines[l])}</div><audio controls preload="none" src="${encodeURI(id + '/' + l + '.mp3')}"></audio>`).join('') +
         ((D.have[id] || []).length ? '' : '<div class="mute">még nincs felvétel</div>');

@@ -1,0 +1,1146 @@
+{
+ "_about": "Word lab: the flagged words (and a few that were fine) said six ways. A = how it is now.",
+ "hu": {
+  "fék": {
+   "name": "fék",
+   "lines": [
+    "w.hu.fék"
+   ],
+   "variants": {
+    "A": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "slow"
+    },
+    "B": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "C": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "stretch"
+    },
+    "D": {
+     "voice": "piper-anna",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "E": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "F": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "stretch"
+    }
+   }
+  },
+  "kék": {
+   "name": "kék",
+   "lines": [
+    "w.hu.kék"
+   ],
+   "variants": {
+    "A": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "slow"
+    },
+    "B": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "C": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "stretch"
+    },
+    "D": {
+     "voice": "piper-anna",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "E": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "F": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "stretch"
+    }
+   }
+  },
+  "séf": {
+   "name": "séf",
+   "lines": [
+    "w.hu.séf"
+   ],
+   "variants": {
+    "A": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "slow"
+    },
+    "B": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "C": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "stretch"
+    },
+    "D": {
+     "voice": "piper-anna",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "E": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "F": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "stretch"
+    }
+   }
+  },
+  "laska": {
+   "name": "laska",
+   "lines": [
+    "w.hu.laska"
+   ],
+   "variants": {
+    "A": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "slow"
+    },
+    "B": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "C": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "stretch"
+    },
+    "D": {
+     "voice": "piper-anna",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "E": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "F": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "stretch"
+    }
+   }
+  },
+  "adj": {
+   "name": "adj",
+   "lines": [
+    "w.hu.adj"
+   ],
+   "variants": {
+    "A": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "slow"
+    },
+    "B": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "C": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "stretch"
+    },
+    "D": {
+     "voice": "piper-anna",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "E": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "F": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "stretch"
+    }
+   }
+  },
+  "add": {
+   "name": "add",
+   "lines": [
+    "w.hu.add"
+   ],
+   "variants": {
+    "A": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "slow"
+    },
+    "B": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "C": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "stretch"
+    },
+    "D": {
+     "voice": "piper-anna",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "E": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "F": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "stretch"
+    }
+   }
+  },
+  "lakj": {
+   "name": "lakj",
+   "lines": [
+    "w.hu.lakj"
+   ],
+   "variants": {
+    "A": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "slow"
+    },
+    "B": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "C": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "stretch"
+    },
+    "D": {
+     "voice": "piper-anna",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "E": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "F": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "stretch"
+    }
+   }
+  },
+  "kaja": {
+   "name": "kaja",
+   "lines": [
+    "w.hu.kaja"
+   ],
+   "variants": {
+    "A": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "slow"
+    },
+    "B": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "C": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "stretch"
+    },
+    "D": {
+     "voice": "piper-anna",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "E": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "F": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "stretch"
+    }
+   }
+  },
+  "sakkal": {
+   "name": "sakkal",
+   "lines": [
+    "w.hu.sakkal"
+   ],
+   "variants": {
+    "A": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "slow"
+    },
+    "B": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "C": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "stretch"
+    },
+    "D": {
+     "voice": "piper-anna",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "E": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "F": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "stretch"
+    }
+   }
+  },
+  "pipa": {
+   "name": "pipa",
+   "lines": [
+    "w.hu.pipa"
+   ],
+   "variants": {
+    "A": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "slow"
+    },
+    "B": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "C": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "stretch"
+    },
+    "D": {
+     "voice": "piper-anna",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "E": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "F": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "stretch"
+    }
+   }
+  },
+  "hegyi": {
+   "name": "hegyi",
+   "lines": [
+    "w.hu.hegyi"
+   ],
+   "variants": {
+    "A": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "slow"
+    },
+    "B": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "C": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "stretch"
+    },
+    "D": {
+     "voice": "piper-anna",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "E": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "F": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "stretch"
+    }
+   }
+  },
+  "tart": {
+   "name": "tart",
+   "lines": [
+    "w.hu.tart"
+   ],
+   "variants": {
+    "A": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "slow"
+    },
+    "B": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "C": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "stretch"
+    },
+    "D": {
+     "voice": "piper-anna",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "E": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "F": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "stretch"
+    }
+   }
+  },
+  "jegy": {
+   "name": "jegy",
+   "lines": [
+    "w.hu.jegy"
+   ],
+   "variants": {
+    "A": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "slow"
+    },
+    "B": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "C": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "stretch"
+    },
+    "D": {
+     "voice": "piper-anna",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "E": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "F": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "stretch"
+    }
+   }
+  },
+  "hely": {
+   "name": "hely",
+   "lines": [
+    "w.hu.hely"
+   ],
+   "variants": {
+    "A": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "slow"
+    },
+    "B": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "C": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "stretch"
+    },
+    "D": {
+     "voice": "piper-anna",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "E": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "F": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "stretch"
+    }
+   }
+  },
+  "író": {
+   "name": "író",
+   "lines": [
+    "w.hu.író"
+   ],
+   "variants": {
+    "A": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "slow"
+    },
+    "B": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "C": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "stretch"
+    },
+    "D": {
+     "voice": "piper-anna",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "E": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "F": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "stretch"
+    }
+   }
+  },
+  "öröm": {
+   "name": "öröm",
+   "lines": [
+    "w.hu.öröm"
+   ],
+   "variants": {
+    "A": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "slow"
+    },
+    "B": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "C": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "stretch"
+    },
+    "D": {
+     "voice": "piper-anna",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "E": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "F": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "stretch"
+    }
+   }
+  },
+  "vár": {
+   "name": "vár",
+   "lines": [
+    "w.hu.vár"
+   ],
+   "variants": {
+    "A": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "slow"
+    },
+    "B": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "C": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "stretch"
+    },
+    "D": {
+     "voice": "piper-anna",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "E": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "F": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "stretch"
+    }
+   }
+  },
+  "rizs": {
+   "name": "rizs",
+   "lines": [
+    "w.hu.rizs"
+   ],
+   "variants": {
+    "A": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "slow"
+    },
+    "B": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "C": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "stretch"
+    },
+    "D": {
+     "voice": "piper-anna",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "E": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "F": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "stretch"
+    }
+   }
+  },
+  "öcs": {
+   "name": "öcs",
+   "lines": [
+    "w.hu.öcs"
+   ],
+   "variants": {
+    "A": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "slow"
+    },
+    "B": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "C": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "stretch"
+    },
+    "D": {
+     "voice": "piper-anna",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "E": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "F": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "stretch"
+    }
+   }
+  },
+  "báty": {
+   "name": "báty",
+   "lines": [
+    "w.hu.báty"
+   ],
+   "variants": {
+    "A": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "slow"
+    },
+    "B": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "C": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "stretch"
+    },
+    "D": {
+     "voice": "piper-anna",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "E": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "F": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "stretch"
+    }
+   }
+  },
+  "anya": {
+   "name": "anya",
+   "lines": [
+    "w.hu.anya"
+   ],
+   "variants": {
+    "A": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "slow"
+    },
+    "B": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "C": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "stretch"
+    },
+    "D": {
+     "voice": "piper-anna",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "E": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "F": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "stretch"
+    }
+   }
+  },
+  "ujj": {
+   "name": "ujj  (ez jó volt)",
+   "lines": [
+    "w.hu.ujj"
+   ],
+   "variants": {
+    "A": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "slow"
+    },
+    "B": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "C": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "stretch"
+    },
+    "D": {
+     "voice": "piper-anna",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "E": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "F": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "stretch"
+    }
+   }
+  },
+  "szia": {
+   "name": "szia  (ez jó volt)",
+   "lines": [
+    "w.hu.szia"
+   ],
+   "variants": {
+    "A": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "slow"
+    },
+    "B": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "C": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "stretch"
+    },
+    "D": {
+     "voice": "piper-anna",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "E": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "F": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "stretch"
+    }
+   }
+  },
+  "kés": {
+   "name": "kés  (ez jó volt)",
+   "lines": [
+    "w.hu.kés"
+   ],
+   "variants": {
+    "A": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "slow"
+    },
+    "B": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "C": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "stretch"
+    },
+    "D": {
+     "voice": "piper-anna",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "E": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "F": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "stretch"
+    }
+   }
+  },
+  "fal": {
+   "name": "fal  (ez jó volt)",
+   "lines": [
+    "w.hu.fal"
+   ],
+   "variants": {
+    "A": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "slow"
+    },
+    "B": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "C": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "stretch"
+    },
+    "D": {
+     "voice": "piper-anna",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "E": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "F": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "stretch"
+    }
+   }
+  },
+  "tej": {
+   "name": "tej  (ez jó volt)",
+   "lines": [
+    "w.hu.tej"
+   ],
+   "variants": {
+    "A": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "slow"
+    },
+    "B": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "C": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "stretch"
+    },
+    "D": {
+     "voice": "piper-anna",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "E": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "F": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "stretch"
+    }
+   }
+  },
+  "ló": {
+   "name": "ló  (ez jó volt)",
+   "lines": [
+    "w.hu.ló"
+   ],
+   "variants": {
+    "A": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "slow"
+    },
+    "B": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "C": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "stretch"
+    },
+    "D": {
+     "voice": "piper-anna",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "E": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "F": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "stretch"
+    }
+   }
+  },
+  "cukor": {
+   "name": "cukor  (ez jó volt)",
+   "lines": [
+    "w.hu.cukor"
+   ],
+   "variants": {
+    "A": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "slow"
+    },
+    "B": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "C": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "stretch"
+    },
+    "D": {
+     "voice": "piper-anna",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "E": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "F": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "stretch"
+    }
+   }
+  },
+  "szőnyeg": {
+   "name": "szőnyeg  (ez jó volt)",
+   "lines": [
+    "w.hu.szőnyeg"
+   ],
+   "variants": {
+    "A": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "slow"
+    },
+    "B": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "C": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "stretch"
+    },
+    "D": {
+     "voice": "piper-anna",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "E": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "F": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "stretch"
+    }
+   }
+  },
+  "kas": {
+   "name": "a kas kék",
+   "lines": [
+    "sen.hu.21"
+   ],
+   "variants": {
+    "A": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "slow"
+    },
+    "B": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "C": {
+     "voice": "piper-berta",
+     "speed": 0.85,
+     "word": "stretch"
+    },
+    "D": {
+     "voice": "piper-anna",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "E": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "F": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "stretch"
+    }
+   }
+  }
+ },
+ "en": {}
+}
