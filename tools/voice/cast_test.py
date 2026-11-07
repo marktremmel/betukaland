@@ -17,32 +17,65 @@ os.makedirs(OUT, exist_ok=True)
 _piper, _kokoro = {}, {}
 
 
-def raw_piper(voice, text, speed, wav):
+# How a line is "acted": it is spoken sentence by sentence, every sentence brought to the same
+# loudness (so the end of a line does not fade), with a real pause between sentences ("gap", s),
+# then pitch and effects go over the whole line. Piper's noise settings: lower = steadier, clearer
+# voice (less "döcögés"); the defaults of Piper are 0.667 / 0.8.
+DEFAULTS = {"speed": 1.0, "pitch": 0, "gap": 0.4, "noise": 0.5, "noise_w": 0.6}
+TARGET_RMS = 0.08            # every sentence gets this loudness before the line is put together
+
+
+def sentences(text):
+    import re
+    parts = re.split(r"(?<=[.!?])\s+(?=\S)", text.strip())
+    return [p for p in parts if p.strip()]
+
+
+def raw_piper(voice, text, spec):
+    import numpy as np
     from piper import PiperVoice, SynthesisConfig
     if voice not in _piper: _piper[voice] = PiperVoice.load(os.path.join(MODELS, "piper", "hu_HU-%s-medium.onnx" % voice))
     v = _piper[voice]
-    with wave.open(wav, "wb") as wf:
-        v.synthesize_wav(text, wf, syn_config=SynthesisConfig(length_scale=1.0 / speed))
-    return v.config.sample_rate
+    cfg = SynthesisConfig(length_scale=1.0 / spec["speed"], noise_scale=spec["noise"], noise_w_scale=spec["noise_w"])
+    a = np.concatenate([c.audio_float_array for c in v.synthesize(text, syn_config=cfg)])
+    return a, v.config.sample_rate
 
 
-def raw_kokoro(voice, text, speed, wav):
-    import soundfile as sf, numpy as np
+def raw_kokoro(voice, text, spec):
+    import numpy as np
     from kokoro import KPipeline
     lc = voice[0]
     if lc not in _kokoro: _kokoro[lc] = KPipeline(lang_code=lc, repo_id="hexgrad/Kokoro-82M")
-    sf.write(wav, np.concatenate([a for _, _, a in _kokoro[lc](text, voice=voice, speed=speed)]), 24000)
-    return 24000
+    return np.concatenate([a for _, _, a in _kokoro[lc](text, voice=voice, speed=spec["speed"])]), 24000
 
 
-def render(spec, text, mp3):
+def trim(a, th=0.01):
+    import numpy as np
+    idx = np.where(np.abs(a) > th)[0]
+    return a[max(0, idx[0] - 200): idx[-1] + 400] if len(idx) else a
+
+
+def render(spec0, text, mp3):
+    import numpy as np
+    spec = dict(DEFAULTS, **spec0)
     eng, voice = spec["voice"].split("-", 1)
+    raw = raw_piper if eng == "piper" else raw_kokoro
+    parts, sr = [], 24000
+    for s in sentences(text):
+        a, sr = raw(voice, s, spec)
+        a = trim(np.asarray(a, dtype=np.float32))
+        rms = float(np.sqrt(np.mean(a ** 2))) or 1.0
+        parts.append(a * (TARGET_RMS / rms))
+        parts.append(np.zeros(int(sr * spec["gap"]), dtype=np.float32))
+    a = np.concatenate([np.zeros(int(sr * 0.05), dtype=np.float32)] + parts[:-1] + [np.zeros(int(sr * 0.15), dtype=np.float32)])
+    a = np.clip(a / max(1.0, float(np.max(np.abs(a))) / 0.95), -1, 1)
     fd, wav = tempfile.mkstemp(suffix=".wav"); os.close(fd)
-    sr = (raw_piper if eng == "piper" else raw_kokoro)(voice, text, spec.get("speed", 1.0), wav)
-    f = 2 ** (spec.get("pitch", 0) / 12.0)
+    with wave.open(wav, "wb") as wf:
+        wf.setnchannels(1); wf.setsampwidth(2); wf.setframerate(sr); wf.writeframes((a * 32767).astype("<i2").tobytes())
+    f = 2 ** (spec["pitch"] / 12.0)
     chain = ["asetrate=%d" % round(sr * f), "aresample=%d" % sr, "atempo=%.4f" % (1 / f)] if f != 1 else []
     if spec.get("fx"): chain.append(spec["fx"])
-    chain += ["apad=pad_dur=0.15", "loudnorm=I=-18:TP=-2:LRA=11"]
+    chain.append("alimiter=limit=0.95")          # a fixed gain, no loudnorm "riding" the volume
     subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", wav, "-af", ",".join(chain), "-ar", "24000", "-ac", "1", "-b:a", "64k", mp3], check=True)
     os.remove(wav)
 
@@ -55,7 +88,7 @@ def main(langs):
                 d = os.path.join(OUT, "%s-%s-%s" % (lang, ch, vk)); os.makedirs(d, exist_ok=True)
                 for lid in c["lines"]:
                     text = normalize(LINES[lid]["text"], lang)
-                    h = hashlib.md5((json.dumps(spec, sort_keys=True) + text).encode()).hexdigest()[:10]
+                    h = hashlib.md5((json.dumps(dict(DEFAULTS, **spec), sort_keys=True) + text + "v2").encode()).hexdigest()[:10]
                     mp3 = os.path.join(d, lid + ".mp3"); side = mp3 + ".hash"
                     if os.path.exists(mp3) and os.path.exists(side) and open(side).read() == h: continue
                     try:
