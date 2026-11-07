@@ -1,5 +1,5 @@
 {
- "_about": "Who speaks with which voice. Each character has a few variants to choose from on voice/cast/index.html. voice: piper-<anna|berta|imre> (Hungarian) or kokoro-<name> (English). pitch: semitones up (+) or down (-), tempo stays. speed: 1 = normal, 0.9 = slower. fx: extra ffmpeg filter. lines: ids from voice/lines.json. gap: pause between sentences (s). noise / noise_w: Piper variation, lower = steadier.",
+ "_about": "Who speaks with which voice. Each character has a few variants to choose from on voice/cast/index.html. voice: piper-<anna|berta|imre> (Hungarian) or kokoro-<name> (English). pitch: semitones up (+) or down (-), tempo stays. speed: 1 = normal, 0.9 = slower. fx: extra ffmpeg filter. lines: ids from voice/lines.json. gap: pause between sentences (s). noise / noise_w: Piper variation, lower = steadier. gain: dB louder. word (reader): plain | period (said as a sentence) | slow.",
  "hu": {
   "karou": {
    "name": "Karou (mesélő madár)",
@@ -12,20 +12,6 @@
     "A": {
      "voice": "piper-berta",
      "pitch": 0,
-     "speed": 1.0,
-     "gap": 0.45
-    },
-    "B": {
-     "voice": "piper-berta",
-     "pitch": 0,
-     "speed": 1.05,
-     "gap": 0.5,
-     "noise": 0.4,
-     "noise_w": 0.5
-    },
-    "C": {
-     "voice": "piper-imre",
-     "pitch": 1,
      "speed": 1.05,
      "gap": 0.5,
      "noise": 0.4,
@@ -105,23 +91,40 @@
      "voice": "piper-imre",
      "pitch": -4,
      "speed": 0.92,
-     "fx": "aecho=0.8:0.6:45:0.25"
+     "fx": "aecho=0.8:0.6:45:0.25",
+     "gain": 5
     }
    }
   },
   "reader": {
    "name": "Felolvasó (gépelendő szavak)",
    "lines": [
+    "w.hu.kés",
+    "w.hu.fal",
+    "w.hu.szia",
+    "w.hu.ujj",
     "w.hu.szekér",
     "w.hu.tortaszelet",
-    "sen.hu.th1",
-    "sen.hu.th3"
+    "sen.hu.th1"
    ],
    "variants": {
     "A": {
      "voice": "piper-berta",
      "pitch": 0,
-     "speed": 0.85
+     "speed": 0.85,
+     "word": "plain"
+    },
+    "B": {
+     "voice": "piper-berta",
+     "pitch": 0,
+     "speed": 0.85,
+     "word": "period"
+    },
+    "C": {
+     "voice": "piper-berta",
+     "pitch": 0,
+     "speed": 0.85,
+     "word": "slow"
     }
    }
   },
@@ -208,7 +211,8 @@
      "voice": "kokoro-am_michael",
      "pitch": -5,
      "speed": 0.9,
-     "fx": "aecho=0.8:0.6:45:0.25"
+     "fx": "aecho=0.8:0.6:45:0.25",
+     "gain": 5
     }
    }
   },
@@ -222,7 +226,8 @@
     "A": {
      "voice": "kokoro-af_heart",
      "pitch": 0,
-     "speed": 0.85
+     "speed": 0.85,
+     "word": "period"
     }
    }
   }
