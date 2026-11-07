@@ -1,12 +1,12 @@
 # Devlog 0.16: how to post it
 
-First upload the game: Edit game → Uploads → upload betukaland-itch-0.16.2.zip, tick "This file will be played in the browser", delete the older zip. Saves stay.
+First upload the game: Edit game → Uploads → upload betukaland-itch-0.16.3.zip, tick "This file will be played in the browser", delete the older zip. Saves stay.
 
 Then on the game's itch page: Edit game → Devlog → Create a new post.
 
 - Title: NEM OKÉ, hangok és új tájak · NOT OKAY, voices and new landscapes
 - Type: Update
-- Attach the release: tick betukaland-itch-0.16.2.zip
+- Attach the release: tick betukaland-itch-0.16.3.zip
 - Images: 33_nemoke_treehouse.png as the cover, then 35_nemoke_choice.png and 34_nemoke_pond.png inside the post (all in screenshots/)
 - Tags: update, new features
 
