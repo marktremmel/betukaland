@@ -50,7 +50,7 @@ BK.NemokeScene = class extends Phaser.Scene {
       if (ok) keep(BK.ui.stars(s, 326, y + 5, s.stars[i] || 0, 3, 10));
       else keep(BK.ui.text(s, 340, y, BK.L('előbb az előző', 'finish the one before'), { outline: false, origin: [1, 0], px: 9, color: 0x9a8a80 }));
       // the chapter's card, once it is earned
-      if (s.stars[i]) keep(s.add.image(298, y + 5, 'icons_food', 202).setScale(0.55));
+      if (s.stars[i]) keep(BK_MANIFEST.sprites.nm_icons_set ? s.add.image(298, y + 5, 'nm_icons_set', i).setScale(0.45) : s.add.image(298, y + 5, 'icons_food', 202).setScale(0.55));
       var z = keep(s.add.zone(192, y + 5, 318, 13).setInteractive({ useHandCursor: true }));
       z.on('pointerup', function () { if (s.sel === i) s.go(); else s.pick(i); });
     });
@@ -98,6 +98,10 @@ BK.nemokeCard = function (scene, i, onClose, opts) {
   g.fillStyle(0xffffff, 0.25).fillRect(BK.W / 2 - 52, 26, 104, 4);
   var big = keep(BK.ui.text(scene, BK.W / 2, 34, BK.L('FONTOS!', 'IMPORTANT!'), { outline: false, origin: [0.5, 0.5], size: 2, color: 0xffffff, bold: true }));
   scene.tweens.add({ targets: big, scale: { from: 1.25, to: 1 }, duration: 380, ease: 'Back.easeOut' });
+  if (BK_MANIFEST.sprites.nm_icons_set) {
+    var ic = keep(scene.add.image(66, 40, 'nm_icons_set', i).setScale(0.9));
+    scene.tweens.add({ targets: ic, angle: { from: -6, to: 6 }, duration: 900, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+  }
   keep(BK.ui.text(scene, BK.W / 2, 56, (i + 1) + '. ' + ch.card, { outline: false, origin: [0.5, 0.5], bold: true, color: 0x2e6a3e, fit: BK.W - 100 }));
   keep(BK.ui.text(scene, 54, 66, ch.lesson, { outline: false, width: BK.W - 108, px: 9, color: 0x4a2c1c }));
   if (opts.got) keep(BK.ui.text(scene, BK.W / 2, 152, st.cardGot + ': ' + (i + 1) + ' / 5', { outline: false, origin: [0.5, 0.5], px: 8, color: 0x9a3d1a }));

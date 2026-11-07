@@ -6,7 +6,7 @@
  */
 window.BK = window.BK || {};
 
-BK.VERSION = '0.13.1';
+BK.VERSION = '0.14.0';
 
 // Test mode for the teacher: open the game with ?debug at the end of the address.
 // Every region and level is open; in a level Tab finishes the current word and
@@ -237,6 +237,15 @@ BK.nemokeRegion = function (regionId, ch) {
   var r = Object.assign({}, BK.REGIONS[regionId - 1]);
   r.backdrop = null; r.bdOffset = 0; r.bdTint = null; r.ground = 'ground'; r.groundTint = null; r.decor = null; r.tint = null;
   r.walkers = c.walkers.slice(); r.flyers = c.flyers.slice(); r.flyer = r.flyers[0]; r.tints = {};
+  // the 4.A heroes are the classmates on the road, once drawn: a different few in every chapter
+  var drawn = (BK.H4 || []).filter(function (h) { return h.drawn; });
+  if (drawn.length) {
+    drawn.forEach(function (h) { BK.CREATURES['h4' + h.id] = h.key; });
+    var walk = drawn.filter(function (h) { return !h.flies; }), fly = drawn.filter(function (h) { return h.flies; });
+    r.walkers = walk.filter(function (h, i) { return i % 5 === ch % 5 || (i + 2) % 5 === ch % 5; }).map(function (h) { return 'h4' + h.id; });
+    if (fly.length) { r.flyers = fly.map(function (h) { return 'h4' + h.id; }); r.flyer = r.flyers[0]; }
+  }
+  if (window.BK_MANIFEST && BK_MANIFEST.sprites.nm_decor) { r.decor = ['nm_decor']; r.decorChance = 0.85; }
   r.sky = [c.sky]; r.music = ['m_chill']; r.capitals = false; r.stories = false;
   r.name = st.chapters[ch].name;
   r.theme = 'nemoke';
@@ -532,6 +541,39 @@ BK.HEROES = [
 // NEM OKÉ figures: only once they are drawn (art/nemoke, tools/clean_ai_sprites.py); Süni is the gift
 if (window.BK_MANIFEST && BK_MANIFEST.sprites.nm_hedgy_walk) BK.HEROES.push({ id: 'nmhedgy', name: 'Süni', idle: 'nm_hedgy_walk', run: 'nm_hedgy_walk', lock: 'nemoke', price: 0 });
 if (window.BK_MANIFEST && BK_MANIFEST.sprites.nm_magpie_walk) BK.HEROES.push({ id: 'nmmagpie', name: 'Szarka', idle: 'nm_magpie_walk', run: 'nm_magpie_walk', lock: 'nemoke', price: 60 });
+// The 4.A digital citizen heroes (drawn by the class, finished with ChatGPT): figures in the shop
+// once NEM OKÉ is done, and classmates on the NEM OKÉ road, each with the class's own tip.
+// The order is the save code's: new ones go at the end.
+BK.H4 = [
+  { id: 'lime', name: 'Lime', en: 'Lime', tip: ['Átnézem az üzeneteket: ami csúnya vagy veszélyes, megállítom.', 'I check messages: mean or risky ones stop here.'] },
+  { id: 'globe', name: 'Földgömb', en: 'Globe', tip: ['Erős jelszó, és soha senkinek ne mondd el!', 'A strong password, and never tell anyone!'] },
+  { id: 'cat', name: 'Kardigán Cica', en: 'Cardigan Cat', tip: ['Kedves vagyok mindenkivel, online is.', 'I am kind to everyone, online too.'] },
+  { id: 'banana', name: 'Szemüveges Banán', en: 'Banana', tip: ['Figyelek a többiekre.', 'I look out for the others.'] },
+  { id: 'bat', name: 'Lila Denevér', en: 'Purple Bat', tip: ['Ne tölts le ismeretlen játékot!', 'Don\'t install games you don\'t know!'], flies: true },
+  { id: 'lora', name: 'Vigyázó Lány', en: 'Stay Safe Girl', tip: ['Vigyázz magadra!', 'Stay safe!'], flies: true },
+  { id: 'potato', name: 'Nindzsa Krumpli', en: 'Ninja Potato', tip: ['Kiállok a társaimért!', 'I stand up for my friends!'] },
+  { id: 'turtle', name: 'Teknős és Egér', en: 'Turtle and Mouse', tip: ['Segítek annak, akit bántottak.', 'I help the one who got hurt.'] },
+  { id: 'robot', name: 'Robotkirály', en: 'Robot King', tip: ['Idegennek ne írj! Akit nem ismersz, tiltsd le.', 'Don\'t DM strangers! Block people you don\'t know.'] },
+  { id: 'bacon', name: 'Szalonna Hős', en: 'Bacon Hero', tip: ['Együtt erősebbek vagyunk!', 'We are stronger together!'] },
+  { id: 'pickle', name: 'Uborka', en: 'Pickle', tip: ['Valódi fotót ne posztolj magadról!', 'Don\'t post real-life photos!'] },
+  { id: 'cheese', name: 'Sajtgolyó', en: 'Cheese Ball', tip: ['Egy mosoly is segít.', 'A smile helps too.'] },
+  { id: 'pea', name: 'Borsó', en: 'Pea Pod', tip: ['Szívből segítek.', 'I help from the heart.'] },
+  { id: 'bean', name: 'Bulibab', en: 'Party Bean', tip: ['Ne légy csúnya az interneten! Légy kedves!', 'Don\'t be mean on the internet! Be kind!'] },
+  { id: 'snake', name: 'Rózsaszín Kígyó', en: 'Pink Snake', tip: ['Ne bánts senkit!', 'Don\'t be mean!'] },
+  { id: 'block', name: 'Tiltókígyó', en: 'Block Snake', tip: ['Aki bánt, azt letiltom!', 'I block everyone who is mean!'] },
+  { id: 'suitb', name: 'Kék Öltönyös', en: 'Blue Suit', tip: ['Hosszú, egyedi jelszót használj!', 'Use a long, unique password!'] },
+  { id: 'suitr', name: 'Piros Öltönyös', en: 'Red Suit', tip: ['Gondold át, mit posztolsz!', 'Think before you post!'] },
+  { id: 'burpi', name: 'Burpi Főnök', en: 'Burpi Boss', tip: ['Idegennek ne írj a játékban: tiltsd le vagy jelentsd!', 'Don\'t text strangers in games: block or report!'] },
+  { id: 'blob', name: 'Bíbor Paca', en: 'Magenta Blob', tip: ['Bátran kérj segítséget!', 'Ask for help, it takes courage!'] },
+  { id: 'egg', name: 'Tojás Hős', en: 'Egg Hero', tip: ['Légy mindig kedves!', 'Be always nice!'] },
+];
+BK.H4.forEach(function (h) {
+  var key = 'h4_' + h.id + (h.flies ? '_fly' : '_walk');
+  h.key = key;
+  if (!(window.BK_MANIFEST && BK_MANIFEST.sprites[key])) return;
+  h.drawn = true;
+  BK.HEROES.push({ id: 'h4' + h.id, name: h.name, en: h.en, idle: key, run: key, flies: !!h.flies, lock: 'nemoke', price: 40, tip: h.tip, by: '4.A' });
+});
 // Can this child play this figure? Locked ones must be owned (bought or given).
 BK.heroOwned = function (p, h) { return !h.lock || ((p && p.figures) || []).indexOf(h.id) >= 0; };
 BK.heroUnlocked = function (p, h) {

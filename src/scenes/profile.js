@@ -151,7 +151,7 @@ BK.BADGES = [
   { id: 'halloween', name: ['Halloween éjszaka', 'Halloween Night'], icon: 40, test: function (p) { return !!(p.halloween && p.halloween.stars && p.halloween.stars[3]); } },
   { id: 'crowns', name: ['Korona', 'A crown'], icon: 197, test: function (p) { return Object.keys(p.crowns || {}).length > 0; } },
   // new badges go at the end (pinned badges are saved by their place in this list)
-  { id: 'nemoke', name: ['Kiálló', 'Upstander'], icon: 202, test: function (p) { return !!(p.nemoke && p.nemoke.stars && p.nemoke.stars[4]); } },
+  { id: 'nemoke', name: ['Kiálló', 'Upstander'], icon: 202, tex: 'nm_medal_one', test: function (p) { return !!(p.nemoke && p.nemoke.stars && p.nemoke.stars[4]); } },
 ];
 
 // Where the child is in the game: per region and level 'done', 'skipped' (an earlier level left
@@ -174,6 +174,12 @@ BK.progressMap = function (p) {
 };
 BK.regionSkipped = function (p, rid) {
   var m = BK.progressMap(p); return (m[rid] || []).some(function (c) { return c.state === 'skipped'; });
+};
+
+// a badge's picture: its own drawing when there is one, else an icon from the food sheet
+BK.badgeImage = function (scene, x, y, b, scale) {
+  if (b.tex && BK_MANIFEST.sprites[b.tex]) return scene.add.image(x, y, b.tex).setScale(scale * 16 / 22);
+  return scene.add.image(x, y, 'icons_food', b.icon).setScale(scale);
 };
 
 BK.ProfileScene = class extends Phaser.Scene {
@@ -249,7 +255,7 @@ BK.ProfileScene = class extends Phaser.Scene {
       var rh = BK.BADGES.length > 20 ? 15.5 : 19, x = 44 + (i % 4) * 82, y = 66 + Math.floor(i / 4) * rh, ok = b.test(P), pinned = P.pins.indexOf(b.id) >= 0;
       if (ok) got++;
       s.keep(BK.ui.nine(s, x - 8, y - 8, 16, 16, ok ? 'ui_slot_sel' : 'ui_slot_off'));
-      var im = s.keep(s.add.image(x, y, 'icons_food', b.icon).setScale(0.7));
+      var im = s.keep(BK.badgeImage(s, x, y, b, 0.7));
       if (!ok) im.setTint(0x302828).setAlpha(0.5);
       if (pinned) { var g = s.keep(s.add.graphics()); g.fillStyle(0x6b1a1a, 1).fillCircle(x + 7, y - 7, 3.5); g.fillStyle(0xe84a4a, 1).fillCircle(x + 7, y - 7, 2.5); g.fillStyle(0xffffff, 0.8).fillCircle(x + 6, y - 8, 0.9); }
       s.keep(BK.ui.text(s, x + 12, y, BK.L(b.name[0], b.name[1]), { outline: false, origin: [0, 0.5], px: 8, color: pinned ? 0x9a1a1a : (ok ? 0x4a2c1c : 0x9a8a80), bold: pinned, fit: 66 }));

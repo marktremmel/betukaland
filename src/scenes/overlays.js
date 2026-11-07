@@ -29,7 +29,7 @@ BK.OverlayBase = class extends Phaser.Scene {
 BK.ShopScene = class extends BK.OverlayBase {
   constructor() { super('Shop'); }
   create() {
-    this.tab = 0;
+    this.tab = 0; this.figPage = undefined;
     this.frame(BK.T.shop, 340, 196);
     var s = this, b = this.box;
     this.karou = this.add.sprite(b.x + 34, b.y + b.h - 6, 'karou_sit').setOrigin(0.5, 1).play('karou_sit');
@@ -333,8 +333,20 @@ BK.ShopScene = class extends BK.OverlayBase {
   drawFigures() {
     var s = this, P = this.P, b = this.box;
     var sel = this.figSel !== undefined ? this.figSel : (P.avatar || 0);
+    // 12 figures a page (two rows), arrows when there are more
+    var PER = 12, pages = Math.ceil(BK.HEROES.length / PER);
+    if (this.figPage === undefined) this.figPage = Math.floor(sel / PER);
+    this.figPage = Math.max(0, Math.min(pages - 1, this.figPage));
+    if (pages > 1) {
+      var pg = function (d) { s.figPage = (s.figPage + d + pages) % pages; BK.audio.sfx('ui'); s.draw(); };
+      this.keepD(BK.ui.button(this, b.x + 12, b.y + 88, '<', function () { pg(-1); }, { w: 14, h: 30 }));
+      this.keepD(BK.ui.button(this, b.x + b.w - 12, b.y + 88, '>', function () { pg(1); }, { w: 14, h: 30 }));
+      this.keepD(BK.ui.text(this, b.x + b.w / 2, b.y + 126, (this.figPage + 1) + ' / ' + pages, { outline: false, origin: [0.5, 0.5], px: 8, color: 0x9a8a80 }));
+    }
     BK.HEROES.forEach(function (h, i) {
-      var x = b.x + (b.w - 324) / 2 + 27 + (i % 6) * 54, y = b.y + 72 + Math.floor(i / 6) * 31;
+      if (Math.floor(i / PER) !== s.figPage) return;
+      var j = i % PER;
+      var x = b.x + (b.w - 324) / 2 + 27 + (j % 6) * 54, y = b.y + 72 + Math.floor(j / 6) * 31;
       var cur = i === (P.avatar || 0), owned = BK.heroOwned(P, h), open = BK.heroUnlocked(P, h);
       s.keepD(BK.ui.nine(s, x - 25, y - 15, 50, 30, cur ? 'ui_slot_sel' : open ? 'ui_slot' : 'ui_slot_off'));
       var spr = s.keepD(BK.avatarSprite(s, x, y + 14, i, P));
@@ -363,11 +375,12 @@ BK.ShopScene = class extends BK.OverlayBase {
     });
     var h = BK.HEROES[sel], owned = BK.heroOwned(P, h), open = BK.heroUnlocked(P, h);
     var y2 = b.y + 160;
+    if (h.tip) this.keepD(BK.ui.text(this, b.x + 20, b.y + 140, BK.L('A 4.A hőse: ', 'A hero by class 4.A: ') + '"' + BK.L(h.tip[0], h.tip[1]) + '"', { outline: false, origin: [0, 0.5], px: 8, color: 0x2e6a3e, fit: b.w - 70 }));
     if (owned) {
       this.keepD(BK.ui.text(this, b.x + 20, y2, BK.T.figureNow + ' ' + BK.heroOf(P).name, { outline: false, origin: [0, 0.5], color: 0x4a2c1c, bold: true, fit: 180 }));
       this.keepD(BK.ui.text(this, b.x + b.w - 20, y2, BK.L('Kattints egy figurára a váltáshoz', 'Click a figure to switch'), { outline: false, origin: [1, 0.5], px: 9, color: 0x9a8a80, fit: 140 }));
     } else if (!open) {
-      this.keepD(BK.ui.text(this, b.x + 20, y2, h.name + ': ' + BK.L('teljesítsd a Halloween éjszakát!', 'finish Halloween Night first!'), { outline: false, origin: [0, 0.5], color: 0x6a2a8a, bold: true, fit: 300 }));
+      this.keepD(BK.ui.text(this, b.x + 20, y2, h.name + ': ' + (h.lock === 'nemoke' ? BK.L('teljesítsd a NEM OKÉ kalandot!', 'finish NOT OKAY first!') : BK.L('teljesítsd a Halloween éjszakát!', 'finish Halloween Night first!')), { outline: false, origin: [0, 0.5], color: 0x6a2a8a, bold: true, fit: 300 }));
     } else {
       this.keepD(BK.ui.text(this, b.x + 20, y2, h.name + '  ·  ' + h.price + ' ' + BK.L('érme', 'coins'), { outline: false, origin: [0, 0.5], color: 0x4a2c1c, bold: true, fit: 160 }));
       this.keepD(BK.ui.button(this, b.x + b.w - 62, y2, BK.T.buy, function () {

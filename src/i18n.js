@@ -50,6 +50,7 @@ BK.i18nField = function (obj, field, en) {
   names(BK.HEROES, { bunny: 'Bunny', berie: 'Berie', frog: 'Frog', mush: 'Mushroom', crab: 'Crab', gull: 'Seagull',
     cheetah: 'Cheetah', panda: 'Panda', firefox: 'Fire Fox', roach: 'Cockroach', tiger: 'Tiger', seahorse: 'Seahorse', polar: 'Polar Bear',
     hwghost: 'Little Ghost', hwpumpkin: 'Pumpkin Head', hwcat: 'Witch Cat', hwmummy: 'Mummy', hwbat: 'Little Bat', nmhedgy: 'Hedgy', nmmagpie: 'Magpie' });
+  BK.HEROES.forEach(function (h) { if (h.en && h.id.indexOf('h4') === 0) BK.i18nField(h, 'name', h.en); });
   names(BK.ITEMS, {
     apple: 'apple', cherry: 'cherry', strawberry: 'strawberry', banana: 'banana', watermelon: 'watermelon',
     grapes: 'grapes', pear: 'pear', carrot: 'carrot', orange: 'orange', mushroom: 'mushroom', cheese: 'cheese',

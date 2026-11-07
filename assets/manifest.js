@@ -1543,6 +1543,230 @@ window.BK_MANIFEST = {
    "fh": 32,
    "frames": 6,
    "fps": 10
+  },
+  "nm_hedgy_walk": {
+   "url": "assets/sprites/nm_hedgy_walk.png",
+   "fw": 84,
+   "fh": 102,
+   "frames": 6,
+   "fps": 9,
+   "hd": 3
+  },
+  "nm_magpie_walk": {
+   "url": "assets/sprites/nm_magpie_walk.png",
+   "fw": 132,
+   "fh": 90,
+   "frames": 6,
+   "fps": 9,
+   "hd": 3
+  },
+  "nm_owl_idle": {
+   "url": "assets/sprites/nm_owl_idle.png",
+   "fw": 126,
+   "fh": 132,
+   "frames": 4,
+   "fps": 4,
+   "hd": 3
+  },
+  "nm_decor": {
+   "url": "assets/sprites/nm_decor.png",
+   "fw": 150,
+   "fh": 168,
+   "frames": 12,
+   "fps": 1,
+   "hd": 3
+  },
+  "nm_icons_set": {
+   "url": "assets/sprites/nm_icons_set.png",
+   "fw": 114,
+   "fh": 72,
+   "frames": 5,
+   "fps": 1,
+   "hd": 3
+  },
+  "nm_medal_one": {
+   "url": "assets/sprites/nm_medal_one.png",
+   "fw": 66,
+   "fh": 72,
+   "frames": 1,
+   "fps": 1,
+   "hd": 3
+  },
+  "nm_gem_one": {
+   "url": "assets/sprites/nm_gem_one.png",
+   "fw": 66,
+   "fh": 60,
+   "frames": 1,
+   "fps": 1,
+   "hd": 3
+  },
+  "h4_bat_fly": {
+   "url": "assets/sprites/h4_bat_fly.png",
+   "fw": 132,
+   "fh": 84,
+   "frames": 6,
+   "fps": 10,
+   "hd": 3
+  },
+  "h4_lora_fly": {
+   "url": "assets/sprites/h4_lora_fly.png",
+   "fw": 144,
+   "fh": 114,
+   "frames": 6,
+   "fps": 9,
+   "hd": 3
+  },
+  "h4_lime_walk": {
+   "url": "assets/sprites/h4_lime_walk.png",
+   "fw": 84,
+   "fh": 126,
+   "frames": 6,
+   "fps": 9,
+   "hd": 3
+  },
+  "h4_globe_walk": {
+   "url": "assets/sprites/h4_globe_walk.png",
+   "fw": 102,
+   "fh": 96,
+   "frames": 6,
+   "fps": 9,
+   "hd": 3
+  },
+  "h4_cat_walk": {
+   "url": "assets/sprites/h4_cat_walk.png",
+   "fw": 102,
+   "fh": 108,
+   "frames": 6,
+   "fps": 9,
+   "hd": 3
+  },
+  "h4_banana_walk": {
+   "url": "assets/sprites/h4_banana_walk.png",
+   "fw": 78,
+   "fh": 126,
+   "frames": 6,
+   "fps": 9,
+   "hd": 3
+  },
+  "h4_potato_walk": {
+   "url": "assets/sprites/h4_potato_walk.png",
+   "fw": 108,
+   "fh": 102,
+   "frames": 6,
+   "fps": 9,
+   "hd": 3
+  },
+  "h4_turtle_walk": {
+   "url": "assets/sprites/h4_turtle_walk.png",
+   "fw": 120,
+   "fh": 102,
+   "frames": 6,
+   "fps": 9,
+   "hd": 3
+  },
+  "h4_robot_walk": {
+   "url": "assets/sprites/h4_robot_walk.png",
+   "fw": 108,
+   "fh": 126,
+   "frames": 6,
+   "fps": 9,
+   "hd": 3
+  },
+  "h4_bacon_walk": {
+   "url": "assets/sprites/h4_bacon_walk.png",
+   "fw": 102,
+   "fh": 126,
+   "frames": 6,
+   "fps": 9,
+   "hd": 3
+  },
+  "h4_pickle_walk": {
+   "url": "assets/sprites/h4_pickle_walk.png",
+   "fw": 102,
+   "fh": 120,
+   "frames": 6,
+   "fps": 9,
+   "hd": 3
+  },
+  "h4_cheese_walk": {
+   "url": "assets/sprites/h4_cheese_walk.png",
+   "fw": 138,
+   "fh": 96,
+   "frames": 6,
+   "fps": 9,
+   "hd": 3
+  },
+  "h4_pea_walk": {
+   "url": "assets/sprites/h4_pea_walk.png",
+   "fw": 84,
+   "fh": 120,
+   "frames": 6,
+   "fps": 9,
+   "hd": 3
+  },
+  "h4_bean_walk": {
+   "url": "assets/sprites/h4_bean_walk.png",
+   "fw": 96,
+   "fh": 108,
+   "frames": 6,
+   "fps": 9,
+   "hd": 3
+  },
+  "h4_snake_walk": {
+   "url": "assets/sprites/h4_snake_walk.png",
+   "fw": 168,
+   "fh": 54,
+   "frames": 6,
+   "fps": 9,
+   "hd": 3
+  },
+  "h4_block_walk": {
+   "url": "assets/sprites/h4_block_walk.png",
+   "fw": 174,
+   "fh": 60,
+   "frames": 6,
+   "fps": 9,
+   "hd": 3
+  },
+  "h4_suitb_walk": {
+   "url": "assets/sprites/h4_suitb_walk.png",
+   "fw": 78,
+   "fh": 126,
+   "frames": 6,
+   "fps": 9,
+   "hd": 3
+  },
+  "h4_suitr_walk": {
+   "url": "assets/sprites/h4_suitr_walk.png",
+   "fw": 78,
+   "fh": 126,
+   "frames": 6,
+   "fps": 9,
+   "hd": 3
+  },
+  "h4_burpi_walk": {
+   "url": "assets/sprites/h4_burpi_walk.png",
+   "fw": 66,
+   "fh": 126,
+   "frames": 6,
+   "fps": 9,
+   "hd": 3
+  },
+  "h4_blob_walk": {
+   "url": "assets/sprites/h4_blob_walk.png",
+   "fw": 96,
+   "fh": 96,
+   "frames": 6,
+   "fps": 9,
+   "hd": 3
+  },
+  "h4_egg_walk": {
+   "url": "assets/sprites/h4_egg_walk.png",
+   "fw": 114,
+   "fh": 102,
+   "frames": 6,
+   "fps": 9,
+   "hd": 3
   }
  },
  "images": {
@@ -2167,4 +2391,4 @@ window.BK_MANIFEST = {
   ]
  }
 };
-window.BK_CREDITS = [["Grafika", "Ansimuz: Sunny Land, Tiny RPG, Gothicvania"], ["Grafika", "Crabby Beach, Berie's Adventure: Seaside"], ["Felület", "Complete UI Essential: Crusenho, CC BY 4.0"], ["Ikonok", "Addin's RPG Icon Packs: Addin"], ["Effektek", "Effect and FX Pixel"], ["Égbolt", "Free Sky with Clouds: CraftPix.net"], ["Betűtípus", "Andika, Atkinson Hyperlegible, Lexend (OFL)"], ["Zene", "Music by Clement Panchout"], ["Hangok", "Pixel Combat SFX: Helton Yan"], ["Hangok", "Super Dialogue: Dillon Becker, CC BY 4.0"], ["Motor", "Phaser 3 (phaser.io), MIT licence"], ["Figurák", "Új állatok: a 4.B osztály ötletei. Köszönjük!", "New animals: ideas from class 4.B. Thank you!"], ["Vár", "GandalfHardcore: FREE Platformer Assets"], ["Mesék", "Benedek Elek (Grimm-mesék, Magyar mese- és mondavilág)"]];
+window.BK_CREDITS = [["Grafika", "Ansimuz: Sunny Land, Tiny RPG, Gothicvania"], ["Grafika", "Crabby Beach, Berie's Adventure: Seaside"], ["Felület", "Complete UI Essential: Crusenho, CC BY 4.0"], ["Ikonok", "Addin's RPG Icon Packs: Addin"], ["Effektek", "Effect and FX Pixel"], ["Égbolt", "Free Sky with Clouds: CraftPix.net"], ["Betűtípus", "Andika, Atkinson Hyperlegible, Lexend (OFL)"], ["Zene", "Music by Clement Panchout"], ["Hangok", "Pixel Combat SFX: Helton Yan"], ["Hangok", "Super Dialogue: Dillon Becker, CC BY 4.0"], ["Motor", "Phaser 3 (phaser.io), MIT licence"], ["Figurák", "Új állatok: a 4.B osztály ötletei. Köszönjük!", "New animals: ideas from class 4.B. Thank you!"], ["Figurák", "Digitális hősök: a 4.A osztály rajzai alapján. Köszönjük!", "Digital heroes: drawn by class 4.A. Thank you!"]];

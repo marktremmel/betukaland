@@ -56,6 +56,52 @@ HW_CFG = {
     "hw_ghost": [("float", 6, 34)], "hw_bat": [("fly", 4, 30)], "hw_cat": [("walk", 6, 38)],
     "hw_pumpkin": [("walk", 6, 34)], "hw_mummy": [("walk", 6, 46)], "hw_king": [("idle", 6, 78)],
 }
+# NEM OKÉ characters and the 4.A digital heroes (ChatGPT sheets on white, in the folder
+# "nemOké & 4a heroes") -> art/nemoke/<name>_<kind>.png. A sheet with several heroes in rows
+# names the row: (kind, frames, height, row, rows).
+import glob as _glob
+_nm = _glob.glob(os.path.join(ROOT, "nemOk*4a heroes"))
+NM_SRC = _nm[0] if _nm else os.path.join(ROOT, "nemoke_art"); NM_DST = os.path.join(ROOT, "art", "nemoke")
+NM_FILES = {
+    "nm_hedgy": {"walk": "Chibi Hedgehog Girl Walking Cycle.png"},
+    "nm_magpie": {"walk": "Pixel-Art Magpie Hop-Walk Cycle.png"},
+    "nm_owl": {"idle": "Pixel-Art Owl Teacher Sprite Sheet.png"},
+    "h4_lime": {"walk": "Lime Robot\u2019s Pixel Walk Cycle.png"},
+    "h4_globe": {"walk": "Pixel Earth Walking Cycle Frames.png"},
+    "h4_cat": {"walk": "Pixel Cat Walking Cycle Sprite Sheet.png"},
+    "h4_banana": {"walk": "Pixel Banana Walking Cycle.png"},
+    "h4_bat": {"fly": "Fluffy Purple Bat Flight Cycle.png"},
+    "h4_lora": {"fly": "Pixel-Art Superhero Flying Sprite Sheet.png"},
+    "h4_potato": {"walk": "Pixel Potato Hero Running Sprite Sheet.png"},
+    "h4_turtle": {"walk": "Six-Frame Pixel Turtle Walking Cycle.png"},
+    "h4_robot": {"walk": "Pixel Robot King Walk Cycle.png"},
+    "h4_bacon": {"walk": "Bacon Hero Pixel Walk Cycle.png"},
+    "h4_pickle": {"walk": "Pixel-Art Superhero Walk Cycles.png"},
+    "h4_cheese": {"walk": "Pixel-Art Superhero Walk Cycles.png"},
+    "h4_pea": {"walk": "Pixel-Art Superhero Walk Cycles.png"},
+    "h4_bean": {"walk": "Pixel Art Jellybean Hop Cycle.png"},
+    "h4_snake": {"walk": "Pink-Striped Snake Animation Cycle.png"},
+    "h4_block": {"walk": "Six-Frame Pixel Snake Slither Cycle.png"},
+    "h4_suitb": {"walk": "Blond Pixel Hero Walking Cycle.png"},
+    "h4_suitr": {"walk": "Blond Pixel Hero Red Walk Cycle.png"},
+    "h4_burpi": {"walk": "Cheerful Alien Walking Cycle Sprite Sheet.png"},
+    "h4_blob": {"walk": "Magenta Blob Walking Cycle Sprite Sheet.png"},
+    "h4_egg": {"walk": "Pixel Art Egg Hero Walking Cycle.png"},
+    "nm_icons": {"set": "Colorful Pixel-Art Connection Icons.png"},
+    "nm_medal": {"one": "Pixel Art Gold Medal Badge.png"},
+    "nm_gem": {"one": "Pixel Art Heart Gem with Sparkles.png"},
+}
+NM_CFG = {
+    "nm_hedgy": [("walk", 6, 32)], "nm_magpie": [("walk", 6, 28)], "nm_owl": [("idle", 4, 42)],
+    "h4_lime": [("walk", 6, 40)], "h4_globe": [("walk", 6, 30)], "h4_cat": [("walk", 6, 34)],
+    "h4_banana": [("walk", 6, 40)], "h4_bat": [("fly", 6, 26)], "h4_lora": [("fly", 6, 36)],
+    "h4_potato": [("walk", 6, 32)], "h4_turtle": [("walk", 6, 32)], "h4_robot": [("walk", 6, 40)],
+    "h4_bacon": [("walk", 6, 40)], "h4_pickle": [("walk", 6, 38, 0, 3)], "h4_cheese": [("walk", 6, 30, 1, 3)],
+    "h4_pea": [("walk", 6, 38, 2, 3)], "h4_bean": [("walk", 6, 34)], "h4_snake": [("walk", 6, 16)],
+    "h4_block": [("walk", 6, 18)], "h4_suitb": [("walk", 6, 40)], "h4_suitr": [("walk", 6, 40)],
+    "h4_burpi": [("walk", 6, 40)], "h4_blob": [("walk", 6, 30)], "h4_egg": [("walk", 6, 32)],
+    "nm_icons": [("set", 5, 22)], "nm_medal": [("one", 1, 22)], "nm_gem": [("one", 1, 18)],
+}
 import numpy as np
 from PIL import Image
 from scipy import ndimage
@@ -72,11 +118,31 @@ def load(path):
     border = np.concatenate([a[:4].reshape(-1, 3), a[-4:].reshape(-1, 3), a[:, :4].reshape(-1, 3), a[:, -4:].reshape(-1, 3)])
     bgc = np.median(border, 0)
     dist = np.sqrt(((a - bgc) ** 2).sum(2))
+    if (bgc > 235).all():
+        # a white background: only the white that touches the border is background, so white or
+        # pale parts inside the outline (faces, an egg, a snake's belly) stay
+        near = dist < 60
+        lab, k = ndimage.label(near)
+        edge = set(np.unique(np.concatenate([lab[0], lab[-1], lab[:, 0], lab[:, -1]]))) - {0}
+        bg = np.isin(lab, list(edge))
+        return a, ~bg
     return a, dist > 110
 
 
-def frames(path,n):
+def frames(path,n,row=None,rows=None):
     a,m=load(path)
+    if rows:
+        # several heroes in rows: cut the picture at the empty bands between them
+        on=m.sum(1)>2; bands=[];s0=None
+        for y,v in enumerate(on):
+            if v and s0 is None: s0=y
+            if not v and s0 is not None: bands.append((s0,y)); s0=None
+        if s0 is not None: bands.append((s0,len(on)))
+        bands=[b for b in bands if b[1]-b[0]>20]
+        while len(bands)>rows:
+            gaps=[bands[i+1][0]-bands[i][1] for i in range(len(bands)-1)]
+            i=int(np.argmin(gaps)); bands[i]=(bands[i][0],bands[i+1][1]); del bands[i+1]
+        y0,y1=bands[row]; a=a[y0:y1]; m=m[y0:y1]
     cols=m.sum(0); on=cols>2; runs=[];s=None
     for x,v in enumerate(on):
         if v and s is None:s=x
@@ -180,9 +246,10 @@ HD = 3
 
 def process_hd(name, specs):
     out = {}
-    for kind, n, H in specs:
-        src, files = (HW_SRC, HW_FILES) if name in HW_FILES else (SRC, FILES)
-        fr = frames(os.path.join(src, files[name][kind]), n)
+    for spec in specs:
+        kind, n, H = spec[:3]
+        src, files = (HW_SRC, HW_FILES) if name in HW_FILES else (NM_SRC, NM_FILES) if name in NM_FILES else (SRC, FILES)
+        fr = frames(os.path.join(src, files[name][kind]), n, *spec[3:5])
         hmax = max(m.shape[0] for a, m in fr)
         fs = []
         for a, m in fr:
@@ -283,11 +350,50 @@ def decor():
     print("hw_decor   %d props %dx%d" % (len(frames_), fw, fh))
 
 
+# NEM OKÉ: the Forest School props, cut from one sheet, each at its own height (game pixels),
+# kept at three times the size like the figures (manifest "hd": 3)
+NM_DECOR_FILE = "Forest School Pixel Art Props.png"
+NM_DECOR = [56, 20, 14, 22, 7, 18, 8, 13, 20, 28, 11, 24]   # left to right
+
+
+def nm_decor():
+    path = os.path.join(NM_SRC, NM_DECOR_FILE)
+    if not os.path.exists(path):
+        return
+    a, m = load(path)
+    lab, n = ndimage.label(ndimage.binary_dilation(m, iterations=4))
+    boxes = [(sl[0].start, sl[1].start, sl[0].stop, sl[1].stop) for sl in ndimage.find_objects(lab)
+             if (sl[0].stop - sl[0].start) * (sl[1].stop - sl[1].start) > 600]
+    boxes.sort(key=lambda b: b[1])
+    print("nm_decor  found %d props" % len(boxes))
+    fs = []
+    for b, H in zip(boxes, NM_DECOR):
+        aa = a[b[0]:b[2], b[1]:b[3]]; mm = m[b[0]:b[2], b[1]:b[3]]
+        ys, xs = np.where(mm)
+        aa, mm = aa[ys.min():ys.max() + 1, xs.min():xs.max() + 1], mm[ys.min():ys.max() + 1, xs.min():xs.max() + 1]
+        Ht = H * HD; Wt = max(1, round(mm.shape[1] * Ht / mm.shape[0]))
+        inner = ndimage.binary_erosion(mm, iterations=3)
+        if not inner.any(): inner = mm
+        _, (iy, ix) = ndimage.distance_transform_edt(~inner, return_indices=True)
+        rgb = Image.fromarray(aa[iy, ix].astype(np.uint8)).resize((Wt, Ht), Image.BOX)
+        al = np.asarray(Image.fromarray((mm * 255).astype(np.uint8)).resize((Wt, Ht), Image.BOX)) > 127
+        img = np.zeros((Ht, Wt, 4), np.uint8); img[..., :3] = np.asarray(rgb); img[..., 3] = al * 255
+        fs.append(Image.fromarray(img))
+    fw = max(f.width for f in fs); fw = -(-fw // HD) * HD
+    fh = max(f.height for f in fs)
+    strip = Image.new("RGBA", (fw * len(fs), fh))
+    for i, f in enumerate(fs):
+        strip.alpha_composite(f, (i * fw + (fw - f.width) // 2, fh - f.height))
+    os.makedirs(NM_DST, exist_ok=True)
+    strip.save(os.path.join(NM_DST, "nm_decor.png"))
+    print("nm_decor   %d props %dx%d" % (len(fs), fw, fh))
+
+
 def main():
     args = [n for n in sys.argv[1:] if not n.startswith('--')]
-    names = [n for n in args if n != 'hw_decor'] if args else list(CFG) + [n for n in HW_CFG if all(os.path.exists(os.path.join(HW_SRC, f)) for f in HW_FILES[n].values())]
+    names = [n for n in args if n not in ('hw_decor', 'nm_decor')] if args else list(CFG) + [n for n in HW_CFG if all(os.path.exists(os.path.join(HW_SRC, f)) for f in HW_FILES[n].values())] + [n for n in NM_CFG if all(os.path.exists(os.path.join(NM_SRC, f)) for f in NM_FILES[n].values())]
     for n in names:
-        cfg, dst = (HW_CFG[n], HW_DST) if n in HW_CFG else (CFG[n], DST)
+        cfg, dst = (HW_CFG[n], HW_DST) if n in HW_CFG else (NM_CFG[n], NM_DST) if n in NM_CFG else (CFG[n], DST)
         os.makedirs(dst, exist_ok=True)
         for kind, fs in (process(n, cfg) if '--lowres' in sys.argv else process_hd(n, cfg)).items():
             st, fw, fh = pack(fs, 1 if '--lowres' in sys.argv else HD)
@@ -295,6 +401,8 @@ def main():
             print("%-10s %-5s %d frames %dx%d" % (n, kind, len(fs), fw, fh))
     if not args or "hw_decor" in args:
         decor()
+    if not args or "nm_decor" in args:
+        nm_decor()
 
 
 if __name__ == "__main__":
