@@ -566,7 +566,7 @@ BK.BagScene = class extends BK.OverlayBase {
 BK.SettingsScene = class extends BK.OverlayBase {
   constructor() { super('Settings'); }
   create() {
-    this.frame(BK.T.settings, 356, 200);
+    this.frame(BK.T.settings, 356, 212);
     this.draw();
   }
   // Two columns: on/off switches on the left, choices (cycle through) on the right
@@ -576,18 +576,20 @@ BK.SettingsScene = class extends BK.OverlayBase {
     var toggles = [
       ['keyboard', BK.T.keyboardHints], ['fingers', BK.T.fingerColours], ['music', BK.T.music],
       ['sfx', BK.T.sound], ['speedRun', BK.T.speedRun], ['rest', BK.L('Pihenő', 'Rest stop')], ['shiftTip', BK.L('Shift-tipp', 'Shift tip')],
+      ['voice', BK.L('Felolvasás', 'Voices')],
     ];
-    var STEP = 18;
+    var STEP = 16;
     toggles.forEach(function (r, i) {
       var y = b.y + 56 + i * STEP;
       s.keepD(BK.ui.text(s, b.x + 20, y, r[1], { outline: false, origin: [0, 0.5], fit: 118 }));
-      var on = r[0] === 'rest' || r[0] === 'shiftTip' ? P.settings[r[0]] !== false : !!P.settings[r[0]];
+      var on = r[0] === 'rest' || r[0] === 'shiftTip' || r[0] === 'voice' ? P.settings[r[0]] !== false : !!P.settings[r[0]];
       s.keepD(BK.ui.button(s, b.x + 158, y, on ? BK.T.on : BK.T.off, function () {
         P.settings[r[0]] = P.settings[r[0]] === false ? true : !P.settings[r[0]];
         BK.save.persist();
         BK.audio.apply(P.settings);
+        if (P.settings.voice === false) BK.voice.stop();
         s.draw();
-      }, { w: 34, h: 16, color: on ? 0x2e7d3e : 0x8a3a2a }));
+      }, { w: 34, h: 14, color: on ? 0x2e7d3e : 0x8a3a2a }));
     });
     var font = BK.FONTS.filter(function (f) { return f.id === BK.fontId; })[0] || BK.FONTS[0];
     var lay = BK.layoutOf(P);
@@ -611,6 +613,11 @@ BK.SettingsScene = class extends BK.OverlayBase {
       [BK.L('Szint', 'Level'), P.grade === '5-6' ? BK.T.grade56 : BK.T.grade34, function () {
         P.grade = P.grade === '5-6' ? '3-4' : '5-6'; BK.save.persist(); s.draw();
       }],
+      // reading the words to type aloud: never, after two wrong keys, or every time
+      [BK.L('Szavak hangja', 'Read words'), { off: BK.L('Soha', 'Never'), miss: BK.L('Hibánál', 'On mistakes'), always: BK.L('Mindig', 'Always') }[P.settings.readAloud || 'miss'], function () {
+        var o = ['miss', 'always', 'off'], k = o.indexOf(P.settings.readAloud || 'miss');
+        P.settings.readAloud = o[(k + 1) % o.length]; BK.save.persist(); s.draw();
+      }],
       [BK.L('Jelek súgója', 'Mark hints'), hset.name, function () {
         var sets = BK.KEY_HINT_SETS, k = sets.indexOf(hset);
         P.settings.kbHint = sets[(k + 1) % sets.length].id; BK.save.persist(); s.draw();
@@ -619,7 +626,7 @@ BK.SettingsScene = class extends BK.OverlayBase {
     choices.forEach(function (c, i) {
       var y = b.y + 56 + i * STEP;
       s.keepD(BK.ui.text(s, b.x + 186, y, c[0], { outline: false, origin: [0, 0.5], fit: 82 }));
-      s.keepD(BK.ui.button(s, b.x + b.w - 50, y, c[1], c[2], { w: 70, h: 16 }));
+      s.keepD(BK.ui.button(s, b.x + b.w - 50, y, c[1], c[2], { w: 70, h: 14 }));
     });
     // the warm-up test once more (for a child who skipped it, or has improved a lot)
     if (this.data0.from === 'Map') {
@@ -629,7 +636,7 @@ BK.SettingsScene = class extends BK.OverlayBase {
         BK.save.persist();
         s.scene.stop('Map');
         s.scene.start('Placement');
-      }, { w: 70, h: 16 }));
+      }, { w: 70, h: 14 }));
     }
   }
 };

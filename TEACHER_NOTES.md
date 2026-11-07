@@ -268,6 +268,12 @@ Assets: `tools/build_assets.py` copies what the game uses from the Game Assets l
 - Castle: Karou, the frog and the bat are all on the first screen; the rest of the hall is free for furniture. Invited guests stop and look around, and sometimes bump into a thing on the floor.
 - NEM OKÉ backdrops: drawn parallax pieces in art/nemoke_bd (sky_*.png, far_*.png, mid_*.png, near_*.png) are picked at random, one of each, for every NEM OKÉ level once they exist (tools/build_assets.py --local adds them).
 
+## Voices (since v0.16)
+
+The narrators and the characters speak: Karou, Mrs Owl, Batty, Hedgy, Magpie and the Pumpkin King, in Hungarian (Piper voices Berta, Anna and Imre, trained on CC0 data) and in English (Kokoro, Apache-2.0). The words and sentences the child types can be read out too (Azure neural voice Noémi, or Piper until those are made). Settings on the map: "Felolvasás" switches the voices of the narrators and characters on or off; "Szavak hangja" decides when the word to type is read: Hibánál (after two wrong keys, the default), Mindig, or Soha. Reading every word aloud means children stop looking, so Hibánál is the gentle middle. The Important! cards read the lesson aloud at the end of a chapter and have a speaker button on the chapter list. The tales are not voiced yet.
+
+How it is made (all in tools/voice, the models stay on the teacher's Mac and are not in git): extract_lines.js lists every line (voice/lines.json); cast.json says who speaks with which voice, pitch, speed and effect; render_all.py renders them (Piper, also in the Linux VM; Kokoro on the Mac); azure_tts.py makes the typing words with Azure (key in voice/azure.env, never in git); voice/out/review.html is the page to listen through and flag bad ones; build_voice.py copies the finished files to assets/voice and writes data/voice_index.js. After changing a text in data/*.js: extract_lines.js, the renderer(s), build_voice.py. Only changed lines are re-rendered.
+
 ## Shift tip
 
 When a child keeps using the Shift on the same hand as the capital letter, a friendly tip asks for the other Shift. It now comes only after three such capitals in a row and at most once a level, and can be switched off in Settings (Shift-tipp).

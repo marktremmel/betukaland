@@ -44,6 +44,8 @@ BK.Narrator = class {
       self.startPage();
     } });
     BK.audio.sfx('ui', { volume: 0.4 });
+    // the recorded voice reads the whole text (the blips stay quiet meanwhile)
+    this.spoken = o.text && BK.voice ? BK.voice.say(o.text, o.lang) : false;
     this.onKey = function (e) {
       if (e.key !== 'Enter' && e.key !== ' ') return;
       e.preventDefault(); e.stopPropagation();
@@ -81,6 +83,7 @@ BK.Narrator = class {
 
   // a blip pitched by the vowel nearest this letter: it sounds a little like talking
   voice(ch) {
+    if (this.spoken && BK.voice.speaking()) return;
     var c = ch.toLowerCase(), base = this.o.voice || 640;
     var semi = { a: 0, á: 1, e: 3, é: 4, i: 7, í: 8, o: -2, ó: -1, ö: 2, ő: 2, u: -4, ú: -3, ü: 5, ű: 5 }[c];
     if (semi === undefined) semi = (c.charCodeAt(0) % 5) - 2;
@@ -105,6 +108,7 @@ BK.Narrator = class {
   finish() {
     var self = this, s = this.scene;
     this.done = true;
+    if (this.spoken) BK.voice.stop();
     window.removeEventListener('keydown', this.onKey, true);
     s.tweens.killTweensOf(this.spr);
     s.tweens.add({ targets: this.spr, x: BK.W + 30, y: this.spr.y - 30, duration: 500, ease: 'Quad.easeIn' });
@@ -112,6 +116,7 @@ BK.Narrator = class {
   }
 
   destroy() {
+    if (this.spoken && !this.done) BK.voice.stop();
     window.removeEventListener('keydown', this.onKey, true);
     if (this.timer) this.timer.remove();
     this.objs.forEach(function (o) { if (o && o.destroy) o.destroy(); });

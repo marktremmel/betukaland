@@ -720,6 +720,7 @@ BK.LevelScene = class extends Phaser.Scene {
       return { o: o, key: key, hit: hit, tick: tick, k: k };
     });
     var replyY = 52 + c.options.length * 15 + 3;
+    BK.voice.say(c.q);
     var hint = keep(BK.ui.text(this, BK.W / 2, 165, story.choiceHint, { outline: false, origin: [0.5, 0.5], px: 8, color: 0x9a8a80 }));
     var open = function (r) { return picked.indexOf(r.k) < 0; };
     var show = function () {
@@ -730,6 +731,7 @@ BK.LevelScene = class extends Phaser.Scene {
     };
     var say = function (o) {
       if (reply) reply.destroy();
+      BK.voice.say(o.reply);
       reply = keep(BK.ui.text(s, BK.W / 2, replyY, o.reply, { outline: false, origin: [0.5, 0], width: BK.W - 90, align: 1, px: 9, color: o.again ? 0x9a3d1a : 0x2e6a3e }));
     };
     var button = function (label, fn) {
@@ -738,6 +740,7 @@ BK.LevelScene = class extends Phaser.Scene {
       return b;
     };
     var finish = function () {
+      BK.voice.stop();
       window.removeEventListener('keydown', onKey, true);
       objs.forEach(function (x) { if (x.active) x.destroy(); });
       done(picked.map(function (k) { return c.options[k]; }));

@@ -105,9 +105,16 @@ BK.nemokeCard = function (scene, i, onClose, opts) {
   keep(BK.ui.text(scene, BK.W / 2, 56, (i + 1) + '. ' + ch.card, { outline: false, origin: [0.5, 0.5], bold: true, color: 0x2e6a3e, fit: BK.W - 100 }));
   keep(BK.ui.text(scene, 54, 66, ch.lesson, { outline: false, width: BK.W - 108, px: 9, color: 0x4a2c1c }));
   if (opts.got) keep(BK.ui.text(scene, BK.W / 2, 152, st.cardGot + ': ' + (i + 1) + ' / 5', { outline: false, origin: [0.5, 0.5], px: 8, color: 0x9a3d1a }));
+  // the lesson read aloud: at once at the end of a chapter, on the speaker button on the list
+  if (BK.voice.has(ch.lesson)) {
+    var spk = keep(BK.ui.button(scene, BK.W - 56, 34, '🔊', function () { BK.voice.say(ch.lesson); }, { w: 22, h: 18 }));
+    if (spk.zone) { spk.zone.setDepth(D + 1); objs.push(spk.zone); }
+    if (opts.got) scene.time.delayedCall(600, function () { if (!closed) BK.voice.say(ch.lesson); });
+  }
   var closed = false;
   var close = function () {
     if (closed) return; closed = true;
+    BK.voice.stop();
     objs.forEach(function (o) { if (o.active) o.destroy(); });
     if (onClose) onClose();
   };

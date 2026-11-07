@@ -83,5 +83,8 @@ BK.audio = (function () {
     },
 
     stopMusic: function () { this.music(null); },
+
+    // quieter music while someone speaks (BK.voice)
+    duck: function (on) { if (musicEl) musicEl.volume = on ? VOL * 0.35 : VOL; },
   };
 })();

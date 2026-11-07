@@ -46,7 +46,8 @@ CTX = tls()
 
 
 def speak(text, voice, rate, mp3, key, region):
-    ssml = ("<speak version='1.0' xml:lang='hu-HU'><voice name='%s'><prosody rate='%s'>%s</prosody></voice></speak>"
+    # a short silence first: without it Noémi sometimes clips the first sound (the k of "kék")
+    ssml = ("<speak version='1.0' xml:lang='hu-HU'><voice name='%s'><break time='150ms'/><prosody rate='%s'>%s</prosody></voice></speak>"
             % (voice, rate, escape(text)))
     req = urllib.request.Request("https://%s.tts.speech.microsoft.com/cognitiveservices/v1" % region, data=ssml.encode("utf-8"), headers={
         "Ocp-Apim-Subscription-Key": key, "Content-Type": "application/ssml+xml",
@@ -61,6 +62,8 @@ def speak(text, voice, rate, mp3, key, region):
 
 
 VOICES = {"N": "hu-HU-NoemiNeural", "T": "hu-HU-TamasNeural"}
+# words where Tamás was clearly better than Noémi in the word lab (gy, ly, the k at the start)
+TAMAS_WORDS = {"kék", "hely", "jegy", "adj", "ujj", "cukor"}
 
 # the best Piper take of each hard word so far (word labs 1 and 2), to compare with
 PIPER_BEST = {"fék": "wordlab/D", "kék": "wordlab/D", "séf": "wordlab/E", "laska": "wordlab/E", "adj": "wordlab2/E",
@@ -110,10 +113,11 @@ def words(voice="N", rate="-10%"):
     idx = json.load(open(ip, encoding="utf-8")) if os.path.exists(ip) else {}
     todo = [l for l in LINES if l["lang"] == "hu" and l["group"] in ("words", "sentences")]
     for k, l in enumerate(todo):
-        h = hashlib.md5(("azure" + VOICES[voice] + rate + l["text"]).encode()).hexdigest()[:10]
+        v = "T" if l["group"] == "words" and l["text"] in TAMAS_WORDS else voice
+        h = hashlib.md5(("azure2" + VOICES[v] + rate + l["text"]).encode()).hexdigest()[:10]
         f = render_all.fname(l["id"]); fp = os.path.join(out, f)
         if idx.get(l["id"], {}).get("h") == h and os.path.exists(fp): continue
-        speak(l["text"], VOICES[voice], rate if l["group"] == "words" else "0%", fp, key, region)
+        speak(l["text"], VOICES[v], rate if l["group"] == "words" else "0%", fp, key, region)
         idx[l["id"]] = {"f": f, "h": h, "s": render_all.dur(fp), "g": l["group"], "c": "reader", "e": "azure"}
         if k % 25 == 0:
             print("%d / %d" % (k + 1, len(todo)), flush=True)
@@ -125,4 +129,4 @@ def words(voice="N", rate="-10%"):
 if __name__ == "__main__":
     mode = sys.argv[1] if len(sys.argv) > 1 else "lab"
     if mode == "lab": lab()
-    else: words(*(sys.argv[2:4]))
+    else: words(*(sys.argv[2:4] or ["N", "-10%"]))

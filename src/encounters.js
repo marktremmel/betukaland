@@ -41,6 +41,12 @@ BK.Encounter = class {
     var half = this.bubble.w / 2 + 4;
     // and below the top bar (tall two-line bubbles)
     this.bubble.moveTo(BK.util.clamp(bx, half, BK.W - half), Math.max(this.bubbleY(), this.bubble.h + 20));
+    this.misses = 0;
+    // a character's own line (the Pumpkin King) is spoken; the rest by the Settings choice.
+    // A story character's line (sayLine) is still being spoken: the word waits for a mistake.
+    var lang = (BK.state.profile && BK.state.profile.lang) || 'hu';
+    if (BK.voice.charOf(text, lang) === 'king') BK.voice.say(text, lang);
+    else if (!this.spokeLine || !BK.voice.speaking()) BK.voice.typed(text, lang, 'show');
   }
   get next() { return this.bubble ? this.bubble.next : null; }
   // a story character's line (NEM OKÉ): a subtitle at the top while the child types the answer
@@ -57,12 +63,17 @@ BK.Encounter = class {
     [g, tx].forEach(function (o) { o.setAlpha(0); s.tweens.add({ targets: o, alpha: 1, duration: 250 }); });
     // the subtitle stays in place while the world scrolls, so it is not one of the parts
     this.sayObjs = [g, tx];
-    BK.audio.sfx('ui', { volume: 0.4 });
+    if (!BK.voice.say(d.say)) BK.audio.sfx('ui', { volume: 0.4 });
+    this.spokeLine = true;
   }
   // returns 'bad' | 'ok' | 'chunk' | 'done'
   type(ch) {
     if (!this.bubble) return 'bad';
-    if (!this.bubble.type(ch)) { this.onWrong(); return 'bad'; }
+    if (!this.bubble.type(ch)) {
+      this.onWrong();
+      if (++this.misses === 2) BK.voice.typed(this.texts[this.chunk], (BK.state.profile && BK.state.profile.lang) || 'hu', 'miss');
+      return 'bad';
+    }
     this.onCorrect();
     if (!this.bubble.done) return 'ok';
     this.chunk++;
