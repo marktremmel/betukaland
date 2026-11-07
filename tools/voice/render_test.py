@@ -30,13 +30,21 @@ def register(name, engine, langs, note):
     json.dump(v, open(p, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
 
 
+sys.path.insert(0, HERE)
+from normalize import normalize
+
+
 def todo(name, langs):
+    """the lines this voice still has to read: missing, or their (cleaned) text has changed"""
     d = os.path.join(OUT, name); os.makedirs(d, exist_ok=True)
-    for l in LINES:
-        if l["lang"] in langs:
-            f = os.path.join(d, l["id"] + ".wav")
-            if not os.path.exists(f):
+    for l0 in LINES:
+        if l0["lang"] in langs:
+            l = dict(l0, text=normalize(l0["text"], l0["lang"]))
+            f = os.path.join(d, l["id"] + ".wav"); side = f[:-4] + ".txt"
+            same = os.path.exists(side) and open(side, encoding="utf-8").read() == l["text"]
+            if not (os.path.exists(f) and (same or not os.path.exists(side) and l["text"] == l0["text"])):
                 yield l, f
+                if os.path.exists(f): open(side, "w", encoding="utf-8").write(l["text"])
 
 
 def to_wav(src, dst):
@@ -93,7 +101,7 @@ def piper():
                 log("download", fn); urllib.request.urlretrieve(HF % (v, q, fn), dst)
         card = open(os.path.join(MODELS, "piper", base + ".MODEL_CARD.txt"), encoding="utf-8", errors="replace").read()
         key = "piper-" + v
-        register(key, "Piper", ["hu"], "Piper voice. Model card: " + " ".join(card.split())[:400])
+        register(key, "Piper", ["hu"], "Piper voice, trained on a CC0 dataset (fine to publish). " + " ".join(card.split())[:200])
         voice = PiperVoice.load(mp)
         for l, f in todo(key, ["hu"]):
             def run(l, f):
