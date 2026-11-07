@@ -563,6 +563,16 @@ BK.LevelScene = class extends Phaser.Scene {
     BK.audio.sfx('word_done', { volume: 0.5 });
     this.hero.cheer();
     BK.ui.toast(this, this.hero.x + 10, this.hero.y - 52, BK.pick(BK.T.praise), 0xfff2a0);
+    // NEM OKÉ: a 4.A classmate says its own tip as it goes
+    if (this.practiceMode === 'nemoke' && enc.spr && enc.kindKey && enc.kindKey.indexOf('h4') === 0) {
+      var hh = BK.H4.find(function (h) { return 'h4' + h.id === enc.kindKey; });
+      if (hh) {
+        var tx = BK.util.clamp(enc.spr.x, 100, BK.W - 100), ty = Math.max(46, enc.spr.y - enc.spr.displayHeight - 8);
+        var tt = BK.ui.text(this, tx, ty, BK.L(hh.name, hh.en) + ': ' + BK.L(hh.tip[0], hh.tip[1]),
+          { origin: [0.5, 1], width: 190, align: 1, px: 9, color: 0xb8f0a0 }).setDepth(500);
+        this.tweens.add({ targets: tt, y: ty - 14, alpha: 0, delay: 1700, duration: 900, ease: 'Cubic.easeIn', onComplete: function () { tt.destroy(); } });
+      }
+    }
     if (this.wordsDone % 6 === 0) BK.audio.sfx(BK.pick(['v_great', 'v_woo', 'v_wow', 'v_great_m', 'v_woo_m']), { volume: 0.6 });
     enc.finish().then(function () {
       enc.destroy();
@@ -665,6 +675,9 @@ BK.LevelScene = class extends Phaser.Scene {
   // then the chapter's Fontos! card; after the last one the ending and who to turn to
   nemokeStory() { return BK.NEMOKE_STORY[BK.uiLang === 'en' ? 'en' : 'hu']; }
   nemokeNarrate(text, done) {
+    // the last chapter is told by the teacher, once she is drawn
+    if (this.plan.stage === 4 && BK_MANIFEST.sprites.nm_owl_idle)
+      return new BK.Narrator(this, { sprite: 'nm_owl_idle', name: BK.L('Bagoly tanító néni', 'Mrs Owl'), voice: 480, text: text, onDone: done });
     return new BK.Narrator(this, { sprite: 'karou_sit', name: 'Karou', voice: 620, text: text, onDone: done });
   }
   nemokeIntro() {
@@ -761,7 +774,8 @@ BK.LevelScene = class extends Phaser.Scene {
     keep(BK.ui.text(this, BK.W / 2, 40, st.title, { outline: false, origin: [0.5, 0.5], bold: true, color: 0x2e6a3e, fit: BK.W - 90 }));
     keep(BK.ui.text(this, BK.W / 2, 50, st.end, { outline: false, origin: [0.5, 0], width: BK.W - 96, align: 1, px: 9, color: 0x4a2c1c }));
     // the classmates together
-    var S = BK_MANIFEST.sprites, kids = ['nm_hedgy_walk', 'nm_magpie_walk', 'frog_taunt', 'karou_sit', 'mush_walk', 'crab_walk', 'gull_fly'].filter(function (k) { return S[k]; });
+    var S = BK_MANIFEST.sprites, kids = ['nm_hedgy_walk', 'nm_magpie_walk', 'nm_owl_idle', 'karou_sit', 'h4_lime_walk', 'h4_bean_walk', 'h4_globe_walk', 'h4_turtle_walk'].filter(function (k) { return S[k]; });
+    if (kids.length < 5) kids = kids.concat(['frog_taunt', 'mush_walk', 'crab_walk', 'gull_fly']).slice(0, 7);
     kids.forEach(function (k, i) {
       var x = 70 + i * (244 / Math.max(1, kids.length - 1)), g = keep(s.add.sprite(x, 116, k).setOrigin(0.5, 1));
       g.play(k);

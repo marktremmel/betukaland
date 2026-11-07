@@ -237,6 +237,7 @@ CREDITS = [
     ["Hangok", "Super Dialogue: Dillon Becker, CC BY 4.0"],
     ["Motor", "Phaser 3 (phaser.io), MIT licence"],
     ["Figurák", "Új állatok: a 4.B osztály ötletei. Köszönjük!", "New animals: ideas from class 4.B. Thank you!"],
+    ["Figurák", "Digitális hősök: a 4.A osztály rajzai alapján. Köszönjük!", "Digital heroes: drawn by class 4.A. Thank you!"],
 ]
 
 for _n in NEW_FIGURES:
@@ -253,6 +254,17 @@ for _k, (_n, _fps) in HALLOWEEN_SPRITES.items():
     if os.path.exists(os.path.join(ROOT, "art", "halloween", _k + ".png")):
         SPRITES[_k] = dict(local=("art/halloween/%s.png" % _k, _n), fps=_fps)
         if _k != "hw_decor": SPRITES[_k]["hd"] = 3          # drawn at three times the game size
+# NEM OKÉ characters, the 4.A digital heroes, icons and the Forest School props
+# (ChatGPT, cleaned by tools/clean_ai_sprites.py into art/nemoke): used when the file exists
+NEMOKE_SPRITES = {"nm_hedgy_walk": (6, 9), "nm_magpie_walk": (6, 9), "nm_owl_idle": (4, 4), "nm_decor": (12, 1),
+                  "nm_icons_set": (5, 1), "nm_medal_one": (1, 1), "nm_gem_one": (1, 1),
+                  "h4_bat_fly": (6, 10), "h4_lora_fly": (6, 9)}
+for _n in ["lime", "globe", "cat", "banana", "potato", "turtle", "robot", "bacon", "pickle", "cheese", "pea", "bean",
+           "snake", "block", "suitb", "suitr", "burpi", "blob", "egg"]:
+    NEMOKE_SPRITES["h4_%s_walk" % _n] = (6, 9)
+for _k, (_n, _fps) in NEMOKE_SPRITES.items():
+    if os.path.exists(os.path.join(ROOT, "art", "nemoke", _k + ".png")):
+        SPRITES[_k] = dict(local=("art/nemoke/%s.png" % _k, _n), fps=_fps, hd=3)
 # the Halloween figures can wear the outfit colours too (not the King, not the props)
 HW_OUTFITS = ["hw_ghost_float", "hw_bat_fly", "hw_cat_walk", "hw_pumpkin_walk", "hw_mummy_walk"]
 

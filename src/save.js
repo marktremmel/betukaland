@@ -292,7 +292,7 @@ BK.save = (function () {
     // them in a few rounds) and trailing zeros are dropped. Version 1 codes still load.
     var b = new Bits();
     b.put(0, 3);                            // 0 = look at the next 5 bits (versions 8 and up)
-    b.put(12, 5);
+    b.put(13, 5);
     b.put(p.avatar & 7, 3);
     b.put(p.grade === '5-6' ? 1 : 0, 1);
     b.put(p.lang === 'en' ? 1 : 0, 1);
@@ -363,6 +363,9 @@ BK.save = (function () {
     // v12 (v0.13): NEM OKÉ stars per chapter, and its two figures
     for (var ni = 0; ni < 5; ni++) b.put(Math.min(3, ((p.nemoke && p.nemoke.stars) || [])[ni] || 0), 2);
     ['nmhedgy', 'nmmagpie'].forEach(function (id) { b.put((p.figures || []).indexOf(id) >= 0 ? 1 : 0, 1); });
+    // v13 (v0.14): more figures than 32 (the 4.A heroes), and which of them are owned
+    b.put((p.avatar >> 5) & 3, 2);
+    (BK.H4 || []).forEach(function (h) { b.put((p.figures || []).indexOf('h4' + h.id) >= 0 ? 1 : 0, 1); });
     storyOrder().forEach(function (k) { b.put(Math.min(3, (p.stories || {})[k] || 0), 2); });
     while (b.a.length > 5 && b.a.lastIndexOf(1) < b.a.length - 5) b.a.length -= 5;   // drop trailing zero groups
     while (b.a.length % 5) b.a.push(0);
@@ -388,7 +391,7 @@ BK.save = (function () {
     var rd = new Reader(body);
     var ver = rd.get(3);
     if (ver === 0) ver = rd.get(5);          // version 8 and up
-    if (ver < 1 || ver > 12) throw new Error('version');
+    if (ver < 1 || ver > 13) throw new Error('version');
     var avatar = rd.get(3), grade = rd.get(1) ? '5-6' : '3-4', lang = rd.get(1) ? 'en' : 'hu', placed = rd.get(3) || null;
     var nl = rd.get(4), nick = '';
     for (i = 0; i < nl; i++) nick += NICK[rd.get(7)] || '';
@@ -478,6 +481,11 @@ BK.save = (function () {
       if (ns.some(Boolean)) p.nemoke = { stars: ns };
       ['nmhedgy', 'nmmagpie'].forEach(function (id) { if (rd.get(1) && p.figures.indexOf(id) < 0) p.figures.push(id); });
     }
+    if (ver >= 13) {
+      p.avatar |= rd.get(2) << 5;
+      (BK.H4 || []).forEach(function (h) { if (rd.get(1) && p.figures.indexOf('h4' + h.id) < 0) p.figures.push('h4' + h.id); });
+    }
+    if (p.avatar >= BK.HEROES.length || !BK.heroOwned(p, BK.HEROES[p.avatar])) p.avatar = 0;
     storyOrder().forEach(function (k) { var v = rd.get(2); if (v) p.stories[k] = v; });
     return p;
   }

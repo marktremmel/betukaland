@@ -192,7 +192,9 @@ Hedgy (Süni), a quiet hedgehog who draws well, is new at the Forest School; Mag
 
 The ending shows who to turn to: class teacher, school psychologist, parents, and Kék Vonal 116 111 (free, day and night). Only name-calling, leaving out, a rumour and an online picture appear; there is no physical violence.
 
-Rewards: coins as in Halloween, a badge (Kiálló / Upstander), and for the whole story a rare treasure (a crystal) and Hedgy as a figure. Hedgy and Magpie need drawn sprites first (art/nemoke, image prompts below); until then the figure part is skipped and everything else works. Stars travel in the save code.
+Rewards: coins as in Halloween, a badge (Kiálló / Upstander, a gold medal), and for the whole story a rare treasure (a crystal, shown as the Friendship heart gem) and Hedgy as a figure. After the whole story the shop also sells Magpie and the 21 digital citizen heroes of class 4.A (40 coins each); each shows the class's own tip under it. Stars and figures travel in the save code.
+
+Since v0.14 the chapters use the drawn art: the Forest School props along the road (treehouse school, bench, chalkboard, drawings on a string...), the 4.A heroes as the classmates you meet (each says its tip when its word is typed), Mrs Owl telling the last chapter, a picture on every Important! card, and everyone dancing at the end. The art is in art/nemoke, cut from the ChatGPT sheets in "nemOké & 4a heroes" by tools/clean_ai_sprites.py (then tools/build_assets.py --local and tools/build_pack.py).
 
 Talking points for a class hour after playing: was it an argument or bullying, and how can you tell? Who was the audience? Which of the four ways would you find easiest, and which hardest? What do you do with a mean picture in a group chat? Can someone who hurt others change, and what helps?
 

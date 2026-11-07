@@ -126,7 +126,7 @@ BK.CastleScene = class extends Phaser.Scene {
       var bx = x - 24 + i * 24;
       var c = s.add.graphics(); c.fillStyle(0xffd23c, 1).fillCircle(bx, y, 10); c.fillStyle(0xc8962e, 1).fillCircle(bx, y + 1, 9); c.fillStyle(0xfff2c8, 1).fillCircle(bx, y - 1, 8);
       s.keepR(c);
-      s.keepR(s.add.image(bx, y - 1, 'icons_food', b.icon).setScale(0.75));
+      s.keepR(BK.badgeImage(s, bx, y - 1, b, 0.75));
     });
   }
   // the three helpers: what to do next

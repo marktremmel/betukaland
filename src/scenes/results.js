@@ -137,6 +137,11 @@ BK.ResultsScene = class extends Phaser.Scene {
       var rd = BK.RARES.find(function (x) { return x.id === r.newRare; });
       this.time.delayedCall(1600, function () {
         BK.ui.toast(s, 192, 160, BK.L('Ritka kincs: Barátság-', 'Rare treasure: Friendship ') + (rd ? rd.name.toLowerCase() : '') + '!', 0xd8a0ff, 1, 2400);
+        if (BK_MANIFEST.sprites.nm_gem_one) {
+          var gm = s.add.image(192, 132, 'nm_gem_one').setDepth(500).setScale(0.2);
+          s.tweens.add({ targets: gm, scale: 1.4, duration: 500, ease: 'Back.easeOut' });
+          s.tweens.add({ targets: gm, alpha: 0, delay: 2600, duration: 600 });
+        }
         BK.audio.sfx('level_up', { volume: 0.5 });
       });
       if (r.newFigure) {
