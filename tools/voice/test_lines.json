@@ -1,0 +1,20 @@
+[
+ {"id": "01_ekezet", "lang": "hu", "char": "reader", "text": "kor. kór. kör. kőr.", "why": "ékezetpárok: o, ó, ö, ő"},
+ {"id": "02_ekezet2", "lang": "hu", "char": "reader", "text": "sir. sír. tur. túr. tűz. füzet. fűzfa.", "why": "i/í, u/ú, ü/ű"},
+ {"id": "03_szavak", "lang": "hu", "char": "reader", "text": "kés. szekér. gyöngy. cserép. zsák. kutya.", "why": "egyes gépelendő szavak, sz/zs/gy/cs"},
+ {"id": "04_mondat", "lang": "hu", "char": "reader", "text": "a kutya kergeti a lepkét.", "why": "gépelendő mondat (kisbetűs, úgy, ahogy a játékban van)"},
+ {"id": "05_osszetett", "lang": "hu", "char": "reader", "text": "osztálycsoport, tortaszelet, szivárványhíd, legeslegszebb.", "why": "hosszú összetett szavak"},
+ {"id": "06_nevek", "lang": "hu", "char": "karou", "text": "Szia, Panni! Szia, Bence! Ma Zsófi és Gergő is velünk jön.", "why": "gyerekek nevei"},
+ {"id": "07_karou", "lang": "hu", "char": "karou", "text": "Az Erdei Iskolába új diák érkezett: Süni. Csendes, és gyönyörűen rajzol.", "why": "Karou mesél (narráció)"},
+ {"id": "08_szarka", "lang": "hu", "char": "magpie", "text": "Tüskés, ide ne ülj! Ez a hely foglalt!", "why": "Szarka: szemtelen, de nem gonosz"},
+ {"id": "09_suni", "lang": "hu", "char": "hedgy", "text": "Senki sem akar mellém ülni...", "why": "Süni: félénk, szomorú"},
+ {"id": "10_bagoly", "lang": "hu", "char": "owl", "text": "Mi történt, és ki hogyan érezte magát? Most mindenki elmondhatja.", "why": "Bagoly tanító néni: kérdés, nyugodt"},
+ {"id": "11_erzelem", "lang": "hu", "char": "karou", "text": "Süni felnézett, és egy pillanatra rád mosolygott. Már nem volt egyedül.", "why": "érzelmes mondat"},
+ {"id": "12_kerdes", "lang": "hu", "char": "karou", "text": "Te mit csinálsz, amikor ezt látod?", "why": "kérdő hanglejtés"},
+ {"id": "13_tokkiraly", "lang": "hu", "char": "king", "text": "Ki jár a kertemben? Ez az én kertem, menjetek haza!", "why": "Tökkirály: morcos"},
+ {"id": "14_mese", "lang": "hu", "char": "narrator", "text": "Egyszer volt, hol nem volt, volt egy kis leány. Ennek a kis leánynak nem volt sem apja, sem anyja.", "why": "Benedek Elek mese, régies szöveg"},
+ {"id": "15_szamok", "lang": "hu", "char": "karou", "text": "Ingyen, éjjel-nappal hívhatod a Kék Vonalat is: 116 111.", "why": "szám és kötőjel"},
+ {"id": "16_en_karou", "lang": "en", "char": "karou", "text": "A new pupil has come to the Forest School: Hedgy the hedgehog. She is quiet and draws beautifully.", "why": "English narration"},
+ {"id": "17_en_magpie", "lang": "en", "char": "magpie", "text": "Prickly, don't sit here! This seat is taken!", "why": "English Magpie"},
+ {"id": "18_en_word", "lang": "en", "char": "reader", "text": "friendship. courage. the dog chases the butterfly.", "why": "English typing words"}
+]

@@ -5,3 +5,9 @@ new_animals/*.png
 halloween/*.png
 mesek/
 /nemOk*heroes/
+/backups/
+
+# voice work: models, Python setups and test renders stay local
+/voice/models/
+/voice/env/
+/voice/test/
