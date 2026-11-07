@@ -196,6 +196,8 @@ Rewards: coins as in Halloween, a badge (Kiálló / Upstander, a gold medal), an
 
 Since v0.14 the chapters use the drawn art: the Forest School props along the road (treehouse school, bench, chalkboard, drawings on a string...), the 4.A heroes as the classmates you meet (each says its tip when its word is typed), Mrs Owl telling the last chapter, a picture on every Important! card, and everyone dancing at the end. The art is in art/nemoke, cut from the ChatGPT sheets in "nemOké & 4a heroes" by tools/clean_ai_sprites.py (then tools/build_assets.py --local and tools/build_pack.py).
 
+Since v0.15 the story is more present on the road and asks more of the child. Every chapter has two or three story moments: Hedgy, Magpie or Mrs Owl comes along and says a line (shown at the top, "Szarka: Tüskés, ide ne ülj!"), and the child types a kind answer ("ez nem oké.", "ülj ide mellém."); answers that need keys the child has not learnt yet are swapped for another kind sentence that fits. Every chapter now ends with a choice, and several answers can be picked one after the other (each gets its own outcome); Enter on an empty line goes on. Chapter 1 asks how Hedgy might feel (lonely, sad, scared; "it is only a joke" gets a gentle answer), chapter 2 what you do when others laugh (keep a straight face, sit with her, tell the teacher on duty), chapter 5 what Magpie can do to make it right (say sorry and mean it, help, be kind next time; "it does not matter now" gets a gentle answer). The new lines are in data/nemoke.js under beats and choice; worth showing Lea the additions too. Chapters 1 and 3 run in a forest, chapter 4 (the evening class chat) under the moon. The Friendship gem is a keepsake on the Bag's Shelf (it is never spent); the crystal that comes with it is an ordinary rare treasure that can be spent.
+
 Talking points for a class hour after playing: was it an argument or bullying, and how can you tell? Who was the audience? Which of the four ways would you find easiest, and which hardest? What do you do with a mean picture in a group chat? Can someone who hurt others change, and what helps?
 
 Background used: the NEM OKÉ campaign page and the District II pilot results (160 pupils: about 60% had been bullied, 140 had watched it happen, almost half did nothing; eduline.hu, June 2026); Kék Vonal's methodology pack on bullying (definition, roles, bystanders, 116 111); KiVa and Salmivalli's participant roles (the bystander focus behind the programmes with the best evidence; Gaffney et al. 2021, Campbell Systematic Reviews: school programmes cut bullying perpetration by about a fifth); the four upstander actions as taught to primary pupils (Bullying. No Way!, Australia); not labelling children "bullies" (StopBullying.gov, PACER); the growth mindset idea behind the Hős Iskola programme.
@@ -256,6 +258,15 @@ Word lists: `data/words_hu.js` and `data/words_en.js`. Add words separated by sp
 Child-facing text: `src/strings_hu.js` and `src/strings_en.js` (same keys); English names of regions, bosses, outfits and treasures: `src/i18n.js`. Numbers (star thresholds, speed targets, level length, prices): `src/config.js`.
 
 Assets: `tools/build_assets.py` copies what the game uses from the Game Assets library (it never changes the library), packs sprite strips and converts sounds to MP3. The fonts are not from the library; they live in `assets/fonts/`. Then `tools/build_pack.py` rebuilds the offline bundle.
+
+## Version 0.15 notes
+
+- Shop figures: the drawn figures are scaled to fit their slot, so the page arrows stay free.
+- Cut-outs: white gaps enclosed by the outline (between Burpi's legs, between the bacon's wand and body, inside Lora's rings) are removed; the per-figure rules are HOLES in tools/clean_ai_sprites.py.
+- Outfit colours for the drawn figures (4.A heroes, Hedgy, Magpie) are made in the browser the first time a child needs them, so the download does not grow.
+- Figures without a standing animation breathe and shift their weight while the child types. The frog figure now walks forwards and looks back over its shoulder now and then.
+- Castle: Karou, the frog and the bat are all on the first screen; the rest of the hall is free for furniture. Invited guests stop and look around, and sometimes bump into a thing on the floor.
+- NEM OKÉ backdrops: drawn parallax pieces in art/nemoke_bd (sky_*.png, far_*.png, mid_*.png, near_*.png) are picked at random, one of each, for every NEM OKÉ level once they exist (tools/build_assets.py --local adds them).
 
 ## Shift tip
 

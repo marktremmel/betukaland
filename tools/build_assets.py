@@ -368,6 +368,27 @@ def write_manifest(manifest):
         f.write("window.BK_CREDITS = " + json.dumps(CREDITS, ensure_ascii=False) + ";\n")
 
 
+def nemoke_backdrops(manifest):
+    """NEM OKÉ parallax pieces, cut by tools/clean_ai_sprites.py into art/nemoke_bd/:
+    sky_*.png (opaque, the back), far_*.png, mid_*.png, near_*.png (transparent, in front).
+    Each becomes a one-layer backdrop 'nm<kind>_<n>'; every NEM OKÉ level picks one of each
+    kind at random, so the pieces mix (BK.nemokeRegion)."""
+    import glob
+    d = os.path.join(ROOT, "art", "nemoke_bd")
+    for k in [k for k in manifest.get("backdrops", {}) if k.startswith("nm") and k[2:5] in ("sky", "far", "mid", "nea")]:
+        del manifest["backdrops"][k]
+    if not os.path.isdir(d):
+        return
+    os.makedirs(os.path.join(OUT, "bd"), exist_ok=True)
+    for kind in ("sky", "far", "mid", "near"):
+        for i, f in enumerate(sorted(glob.glob(os.path.join(d, kind + "_*.png")))):
+            img = Image.open(f).convert("RGBA")
+            name = "nm%s_%d" % (kind, i + 1)
+            img.save(os.path.join(OUT, "bd", name + ".png"))
+            manifest.setdefault("backdrops", {})[name] = [dict(url="assets/bd/%s.png" % name, w=img.width, h=img.height)]
+            log("nemoke backdrop", name, img.size)
+
+
 def local_only():
     """Rebuild only the sprites made in this project (art/), keep the rest of the manifest.
     Needs no asset library: used after tools/clean_ai_sprites.py."""
@@ -387,6 +408,7 @@ def local_only():
                 recolour(img, hue, sat, val).save(os.path.join(OUT, "sprites", nk + ".png"))
                 manifest["sprites"][nk] = dict(manifest["sprites"][key], url="assets/sprites/%s.png" % nk)
         log("local sprite %-16s %2d x %dx%d" % (key, n, fw, fh))
+    nemoke_backdrops(manifest)
     write_manifest(manifest)
     log("manifest written")
 

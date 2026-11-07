@@ -6,7 +6,7 @@
  */
 window.BK = window.BK || {};
 
-BK.VERSION = '0.14.0';
+BK.VERSION = '0.15.0';
 
 // Test mode for the teacher: open the game with ?debug at the end of the address.
 // Every region and level is open; in a level Tab finishes the current word and
@@ -223,10 +223,11 @@ BK.halloweenRegion = function (regionId, stage) {
 // The classmates on the road are the friendly creatures of the first regions.
 BK.NEMOKE = {
   chapters: [
-    { walkers: ['frog', 'mush'], flyers: ['gull'], sky: 1 },
+    // a forest morning, the dining-hall day, the forest at break, the evening of the class chat, a bright last day
+    { walkers: ['frog', 'mush'], flyers: ['gull'], sky: 1, backdrop: 'mountain', bdOffset: 76, ground: 'ground_moss' },
     { walkers: ['mush', 'crab'], flyers: ['gull'], sky: 5 },
-    { walkers: ['frog', 'sandbug', 'crab'], flyers: ['gull'], sky: 2, choice: true },
-    { walkers: ['starfish', 'mush', 'frog'], flyers: ['gull'], sky: 4, choice: true },
+    { walkers: ['frog', 'sandbug', 'crab'], flyers: ['gull'], sky: 2, backdrop: 'mountain', bdOffset: 70, ground: 'ground_moss' },
+    { walkers: ['starfish', 'mush', 'frog'], flyers: ['gull'], sky: 4, backdrop: 'moon', bdOffset: 24, ground: 'ground_moss' },
     { walkers: ['frog', 'mush', 'crab', 'sandbug'], flyers: ['gull'], sky: 1 },
   ],
   rare: 'crystal',        // the reward for the whole story: a rare treasure (Barátság-kristály)
@@ -235,7 +236,7 @@ BK.NEMOKE = {
 BK.nemokeRegion = function (regionId, ch) {
   var c = BK.NEMOKE.chapters[ch] || BK.NEMOKE.chapters[0], st = BK.NEMOKE_STORY[BK.uiLang === 'en' ? 'en' : 'hu'];
   var r = Object.assign({}, BK.REGIONS[regionId - 1]);
-  r.backdrop = null; r.bdOffset = 0; r.bdTint = null; r.ground = 'ground'; r.groundTint = null; r.decor = null; r.tint = null;
+  r.backdrop = null; r.bdOffset = 0; r.bdTint = null; r.ground = 'ground_moss'; r.groundTint = null; r.decor = null; r.tint = null;
   r.walkers = c.walkers.slice(); r.flyers = c.flyers.slice(); r.flyer = r.flyers[0]; r.tints = {};
   // the 4.A heroes are the classmates on the road, once drawn: a different few in every chapter
   var drawn = (BK.H4 || []).filter(function (h) { return h.drawn; });
@@ -246,6 +247,16 @@ BK.nemokeRegion = function (regionId, ch) {
     if (fly.length) { r.flyers = fly.map(function (h) { return 'h4' + h.id; }); r.flyer = r.flyers[0]; }
   }
   if (window.BK_MANIFEST && BK_MANIFEST.sprites.nm_decor) { r.decor = ['nm_decor']; r.decorChance = 0.85; }
+  // a drawn backdrop for some chapters (the NEM OKÉ backdrops, once they are made, come first)
+  var bds = window.BK_MANIFEST ? BK_MANIFEST.backdrops || {} : {};
+  var kind = function (k) { return Object.keys(bds).filter(function (n) { return n.indexOf('nm' + k + '_') === 0; }); };
+  var skies = kind('sky');
+  if (skies.length) {
+    // the drawn NEM OKÉ pieces, mixed: one sky, then one of each layer in front (when there is one)
+    var pick = function (l) { return l[Math.floor(Math.random() * l.length)]; };
+    r.bdLayers = [pick(skies)].concat(['far', 'mid', 'near'].map(kind).filter(function (l) { return l.length; }).map(pick));
+    r.backdrop = r.bdLayers[0]; r.bdOffset = 0;
+  } else if (c.backdrop && bds[c.backdrop]) { r.backdrop = c.backdrop; r.bdOffset = c.bdOffset || 0; if (c.ground) r.ground = c.ground; }
   r.sky = [c.sky]; r.music = ['m_chill']; r.capitals = false; r.stories = false;
   r.name = st.chapters[ch].name;
   r.theme = 'nemoke';
@@ -588,12 +599,51 @@ BK.heroOf = function (p) { var h = BK.HEROES[(p && p.avatar) || 0] || BK.HEROES[
 // key of an animation in the profile's outfit colour
 BK.outfitKey = function (key, p) {
   var k = (p && p.outfit && p.outfit !== 'base') ? key + '_' + p.outfit : key;
-  return window.BK_MANIFEST && !BK_MANIFEST.sprites[k] ? key : k;   // figures without outfit colours (Halloween ones) stay as they are
+  if (k !== key && window.BK_MANIFEST && !BK_MANIFEST.sprites[k]) BK.makeOutfit(key, p.outfit);
+  return window.BK_MANIFEST && !BK_MANIFEST.sprites[k] ? key : k;   // figures without outfit colours stay as they are
+};
+
+/*
+ * Outfit colours made in the browser, the first time they are needed: the drawn figures (NEM OKÉ
+ * and 4.A) are big HD sheets, and five ready-made colours of each would make the game much
+ * bigger. Same colours as tools/build_assets.py OUTFIT_COLOURS: hue turn, saturation, value;
+ * outlines and greys stay.
+ */
+BK.OUTFIT_HSV = { blue: [200, 1.0, 1.0], mint: [110, 0.9, 1.05], pink: [320, 0.9, 1.1], gold: [25, 1.35, 1.15], night: [230, 0.45, 0.8] };
+BK.makeOutfit = function (key, suf) {
+  var c = BK.OUTFIT_HSV[suf], G = window.BK_GAME;
+  if (!c || !G || !/^(h4_|nm_hedgy_walk|nm_magpie_walk)/.test(key) || !G.textures.exists(key)) return false;
+  var spec = BK_MANIFEST.sprites[key]; if (!spec) return false;
+  var nk = key + '_' + suf;
+  try {
+    var img = G.textures.get(key).getSourceImage(), cv = document.createElement('canvas');
+    cv.width = img.width; cv.height = img.height;
+    var ctx = cv.getContext('2d'); ctx.drawImage(img, 0, 0);
+    var d = ctx.getImageData(0, 0, cv.width, cv.height), a = d.data;
+    for (var i = 0; i < a.length; i += 4) {
+      if (!a[i + 3]) continue;
+      var r = a[i] / 255, g = a[i + 1] / 255, b = a[i + 2] / 255;
+      var mx = Math.max(r, g, b), mn = Math.min(r, g, b), v = mx, s = mx ? (mx - mn) / mx : 0, h = 0;
+      if (s < 0.15 || v < 0.18) continue;
+      var dd = mx - mn;
+      h = mx === r ? ((g - b) / dd + (g < b ? 6 : 0)) : mx === g ? ((b - r) / dd + 2) : ((r - g) / dd + 4);
+      h = (h / 6 + c[0] / 360) % 1; s = Math.min(1, s * c[1]); v = Math.min(1, v * c[2]);
+      var k6 = Math.floor(h * 6), f = h * 6 - k6, P = v * (1 - s), Q = v * (1 - f * s), T = v * (1 - (1 - f) * s);
+      var rgb = [[v, T, P], [Q, v, P], [P, v, T], [P, Q, v], [T, P, v], [v, P, Q]][k6 % 6];
+      a[i] = rgb[0] * 255; a[i + 1] = rgb[1] * 255; a[i + 2] = rgb[2] * 255;
+    }
+    ctx.putImageData(d, 0, 0);
+    G.textures.addSpriteSheet(nk, cv, { frameWidth: spec.fw, frameHeight: spec.fh });
+    if (spec.hd) BK.hdTexture(G.textures.get(nk), spec.hd);
+    BK_MANIFEST.sprites[nk] = Object.assign({}, spec, { url: null, made: true });
+    if (!G.anims.exists(nk)) G.anims.create({ key: nk, frames: G.anims.generateFrameNumbers(nk, { start: 0, end: spec.frames - 1 }), frameRate: spec.fps, repeat: -1 });
+    return true;
+  } catch (e) { console.warn('outfit colour failed', key, e); return false; }
 };
 
 // Which way the creatures look in the source art. Enemies must face left
 // (towards the hero), pets must face right. true = faces left already.
-BK.FACES_LEFT = { crow: true, babydragon: false, slime: false, bunny: false, frog: false, mush: false, toad: false, bigbird: false, sandbug: false,
+BK.FACES_LEFT = { crow: true, babydragon: false, slime: false, bunny: false, frog: true, mush: false, toad: false, bigbird: false, sandbug: false,
   crab: false, crabkid: false, gull: true, frogknight: true, dragon: true, starfish: false, octopus: false, shell: false, karou: false };
 
 // Names shown when a mini-boss appears ("X állja az utat!")

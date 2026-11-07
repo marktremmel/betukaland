@@ -81,9 +81,12 @@ BK.LevelScene = class extends Phaser.Scene {
     this.skyLayers = [];
     if (reg.backdrop) {
       // parallax backdrop (beach, mountains, canyon, moonlit forest): far layers move slowest
-      var L = BK_MANIFEST.backdrops[reg.backdrop], nL = L.length;
+      // (or a list of one-layer backdrops mixed together: the NEM OKÉ pieces)
+      var keys = reg.bdLayers ? reg.bdLayers.map(function (k) { return 'bd_' + k + '_1'; })
+        : BK_MANIFEST.backdrops[reg.backdrop].map(function (l, j) { return 'bd_' + reg.backdrop + '_' + (j + 1); });
+      var nL = keys.length;
       for (var j = 0; j < nL; j++) {
-        var b = this.add.tileSprite(0, 0, BK.W, BK.KB_TOP, 'bd_' + reg.backdrop + '_' + (j + 1)).setOrigin(0, 0).setDepth(j + 1);
+        var b = this.add.tileSprite(0, 0, BK.W, BK.KB_TOP, keys[j]).setOrigin(0, 0).setDepth(j + 1);
         b.tilePositionY = reg.bdOffset || 0;
         b.speed = nL > 1 ? 0.04 + 0.5 * Math.pow(j / (nL - 1), 1.5) : 0;
         if (this.plan.bdTint) b.setTint(this.plan.bdTint);
@@ -695,8 +698,9 @@ BK.LevelScene = class extends Phaser.Scene {
     var after = function () { s.nemokeNarrate(ch.after, card); };
     if (ch.choice) this.nemokeChoice(ch.choice, after); else after();
   }
-  // a choice: the child types the grey word of an option (accents do not matter); "again" options
-  // get a gentle answer and the question comes back
+  // a choice: the child types the grey word of an option (accents do not matter). Several good
+  // options can be picked one after the other (each gets its answer); Enter on an empty line goes
+  // on once at least one is picked. "again" options get a gentle answer and are not counted.
   nemokeChoice(c, done) {
     var s = this, objs = [], D = 940, story = this.nemokeStory();
     var keep = function (o) { if (o.setDepth) o.setDepth(D + objs.length * 0.01); objs.push(o); return o; };
@@ -704,61 +708,81 @@ BK.LevelScene = class extends Phaser.Scene {
     keep(this.add.rectangle(BK.W / 2, BK.H / 2, BK.W, BK.H, 0x000000, 0.45).setInteractive());
     keep(BK.ui.nine(this, 24, 8, BK.W - 48, 194, 'ui_panel2'));
     keep(BK.ui.text(this, BK.W / 2, 40, c.q, { outline: false, origin: [0.5, 0.5], bold: true, color: 0x2e6a3e, fit: BK.W - 90 }));
+    var picked = [], typed = '', busy = false, reply = null, goBtn = null, againBtn = null;
     var rows = c.options.map(function (o, k) {
-      var y = 54 + k * 16;
+      var y = 52 + k * 15;
+      var tick = keep(BK.ui.text(s, 42, y, '', { outline: false, px: 10, bold: true, color: 0x2e7d3e }));
       var key = keep(BK.ui.text(s, 52, y, o.key, { outline: false, px: 10, bold: true, color: 0x9a8a80 }));
       var hit = keep(BK.ui.text(s, 52, y, '', { outline: false, px: 10, bold: true, color: 0x2e7d3e }));
       keep(BK.ui.text(s, 118, y, o.label, { outline: false, px: 9, color: 0x4a2c1c, fit: BK.W - 168 }));
-      var z = keep(s.add.zone(BK.W / 2, y + 6, BK.W - 80, 16).setInteractive({ useHandCursor: true }));
-      z.on('pointerup', function () { if (!busy) choose(k); });
-      return { o: o, key: key, hit: hit };
+      var z = keep(s.add.zone(BK.W / 2, y + 6, BK.W - 80, 15).setInteractive({ useHandCursor: true }));
+      z.on('pointerup', function () { if (!busy && picked.indexOf(k) < 0) choose(k); });
+      return { o: o, key: key, hit: hit, tick: tick, k: k };
     });
-    var hint = keep(BK.ui.text(this, BK.W / 2, 54 + c.options.length * 16 + 6, story.choiceHint, { outline: false, origin: [0.5, 0], px: 8, color: 0x9a8a80 }));
-    var typed = '', busy = false;
+    var replyY = 52 + c.options.length * 15 + 3;
+    var hint = keep(BK.ui.text(this, BK.W / 2, 165, story.choiceHint, { outline: false, origin: [0.5, 0.5], px: 8, color: 0x9a8a80 }));
+    var open = function (r) { return picked.indexOf(r.k) < 0; };
     var show = function () {
       rows.forEach(function (r) {
-        var on = typed && plain(r.o.key).indexOf(plain(typed)) === 0;
+        var on = typed && open(r) && plain(r.o.key).indexOf(plain(typed)) === 0;
         r.hit.setText(on ? r.o.key.slice(0, typed.length) : '');
       });
     };
-    var choose = function (k) {
-      busy = true;
-      var o = c.options[k];
-      BK.audio.sfx(o.again ? 'ui' : 'chime');
-      rows.forEach(function (r, j) { r.key.setAlpha(j === k ? 1 : 0.35); });
-      var reply = keep(BK.ui.text(s, BK.W / 2, 54 + c.options.length * 16 + 4, o.reply, { outline: false, origin: [0.5, 0], width: BK.W - 90, align: 1, px: 9, color: o.again ? 0x9a3d1a : 0x2e6a3e }));
-      hint.setVisible(false);
-      var b = BK.ui.button(s, BK.W / 2, 188, o.again ? BK.L('Újra (Enter)', 'Again (Enter)') : BK.T.next + ' (Enter)', function () { next(); }, { w: 96, h: 18 });
+    var say = function (o) {
+      if (reply) reply.destroy();
+      reply = keep(BK.ui.text(s, BK.W / 2, replyY, o.reply, { outline: false, origin: [0.5, 0], width: BK.W - 90, align: 1, px: 9, color: o.again ? 0x9a3d1a : 0x2e6a3e }));
+    };
+    var button = function (label, fn) {
+      var b = BK.ui.button(s, BK.W / 2, 188, label, fn, { w: 96, h: 18 });
       keep(b); if (b.zone) { b.zone.setDepth(D + 1); objs.push(b.zone); }
-      var next = function () {
-        if (!busy) return;
-        if (o.again) {
-          reply.destroy(); b.destroy(); if (b.zone) b.zone.destroy();
-          hint.setVisible(true); typed = ''; show(); busy = false;
-          rows.forEach(function (r) { r.key.setAlpha(1); });
-          return;
-        }
-        window.removeEventListener('keydown', onKey, true);
-        objs.forEach(function (x) { if (x.active) x.destroy(); });
-        done();
-      };
-      s.choiceNext = next;
+      return b;
+    };
+    var finish = function () {
+      window.removeEventListener('keydown', onKey, true);
+      objs.forEach(function (x) { if (x.active) x.destroy(); });
+      done(picked.map(function (k) { return c.options[k]; }));
+    };
+    var choose = function (k) {
+      var o = c.options[k];
+      typed = ''; show();
+      say(o);
+      if (o.again) {
+        busy = true; hint.setVisible(false);
+        BK.audio.sfx('ui');
+        rows.forEach(function (r, j) { r.key.setAlpha(j === k ? 1 : 0.35); });
+        if (goBtn) goBtn.setVisible(false);
+        againBtn = button(BK.L('Újra (Enter)', 'Again (Enter)'), function () { s.choiceNext(); });
+        s.choiceNext = function () {
+          busy = false; reply.destroy(); reply = null; hint.setVisible(true);
+          againBtn.destroy(); if (againBtn.zone) againBtn.zone.destroy(); againBtn = null;
+          rows.forEach(function (r) { r.key.setAlpha(open(r) ? 1 : 0.6); });
+          if (goBtn) goBtn.setVisible(true);
+        };
+        return;
+      }
+      BK.audio.sfx('chime');
+      picked.push(k);
+      rows[k].tick.setText('✓'); rows[k].key.setTint(0x2e7d3e).setAlpha(0.6);
+      var left = rows.some(function (r) { return open(r) && !r.o.again; });
+      hint.setText(left ? story.moreHint : '');
+      if (!goBtn) goBtn = button(BK.T.next + ' (Enter)', function () { if (!busy) finish(); });
     };
     var onKey = function (e) {
       e.stopPropagation();
       if (busy) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); s.choiceNext(); } return; }
       if (e.key === 'Backspace') { typed = typed.slice(0, -1); show(); e.preventDefault(); return; }
       if (e.key === 'Enter') {
-        var m = rows.findIndex(function (r) { return plain(r.o.key) === plain(typed); });
-        if (m < 0) m = rows.findIndex(function (r) { return typed && plain(r.o.key).indexOf(plain(typed)) === 0; });
+        if (!typed && picked.length) { finish(); return; }
+        var m = rows.findIndex(function (r) { return open(r) && plain(r.o.key) === plain(typed); });
+        if (m < 0) m = rows.findIndex(function (r) { return typed && open(r) && plain(r.o.key).indexOf(plain(typed)) === 0; });
         if (m >= 0) choose(m); else BK.audio.sfx('key_bad', { volume: 0.3 });
         return;
       }
       if (e.key.length !== 1) return;
       var t2 = typed + e.key;
-      if (rows.some(function (r) { return plain(r.o.key).indexOf(plain(t2)) === 0; })) {
+      if (rows.some(function (r) { return open(r) && plain(r.o.key).indexOf(plain(t2)) === 0; })) {
         typed = t2; BK.audio.sfx('key_ok', { volume: 0.5 }); show();
-        var full = rows.findIndex(function (r) { return plain(r.o.key) === plain(typed); });
+        var full = rows.findIndex(function (r) { return open(r) && plain(r.o.key) === plain(typed); });
         if (full >= 0) s.time.delayedCall(250, function () { if (!busy && plain(rows[full].o.key) === plain(typed)) choose(full); });
       } else BK.audio.sfx('key_bad', { volume: 0.25 });
     };

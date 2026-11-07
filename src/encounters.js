@@ -43,6 +43,22 @@ BK.Encounter = class {
     this.bubble.moveTo(BK.util.clamp(bx, half, BK.W - half), Math.max(this.bubbleY(), this.bubble.h + 20));
   }
   get next() { return this.bubble ? this.bubble.next : null; }
+  // a story character's line (NEM OKÉ): a subtitle at the top while the child types the answer
+  sayLine() {
+    var d = this.def, s = this.scene;
+    if (!d.say || this.said) return;
+    this.said = true;
+    var str = (d.who ? d.who + ': ' : '') + d.say;
+    var tx = BK.ui.text(s, BK.W / 2, 36, str, { outline: false, origin: [0.5, 0.5], px: 9, bold: true, color: 0x4a2c1c, width: 300, align: 1 }).setDepth(460);
+    var w = Math.min(310, tx.displayWidth + 14), h = tx.displayHeight + 8;
+    var g = s.add.graphics().setDepth(459);
+    g.fillStyle(0x5a3426, 1).fillRoundedRect(BK.W / 2 - w / 2 - 1, 36 - h / 2 - 1, w + 2, h + 2, 5);
+    g.fillStyle(0xfffaeb, 1).fillRoundedRect(BK.W / 2 - w / 2, 36 - h / 2, w, h, 4);
+    [g, tx].forEach(function (o) { o.setAlpha(0); s.tweens.add({ targets: o, alpha: 1, duration: 250 }); });
+    // the subtitle stays in place while the world scrolls, so it is not one of the parts
+    this.sayObjs = [g, tx];
+    BK.audio.sfx('ui', { volume: 0.4 });
+  }
   // returns 'bad' | 'ok' | 'chunk' | 'done'
   type(ch) {
     if (!this.bubble) return 'bad';
@@ -68,6 +84,7 @@ BK.Encounter = class {
   finish() { return Promise.resolve(); }
   hitPos() { return { x: this.x, y: BK.GROUND_Y - 14 }; }
   destroy() {
+    if (this.sayObjs) { this.sayObjs.forEach(function (o) { if (o.active) o.destroy(); }); this.sayObjs = null; }
     if (this.bubble) this.bubble.destroy(false);
     this.parts.forEach(function (p) { if (p && p.destroy) p.destroy(); });
     this.parts = [];
@@ -112,6 +129,7 @@ BK.Walker = class extends BK.Encounter {
     // a frog taunts; the others keep stepping on the spot, slower (a frozen mid-step frame looked stuck)
     if (this.kindKey === 'frog') this.spr.play('frog_taunt');
     else this.spr.anims.timeScale = 0.45;
+    this.sayLine();
     super.activate();
   }
   onWrong() {
@@ -135,7 +153,7 @@ BK.Flyer = class extends BK.Walker {
   }
   walkSpeed() { return 22; }
   update(dt) { this.t += dt; this.spr.y = this.baseY + Math.sin(this.t / 220) * 4; }
-  activate() { BK.Encounter.prototype.activate.call(this); }
+  activate() { this.sayLine(); BK.Encounter.prototype.activate.call(this); }
   bubbleY() { return this.baseY - 30; }
 };
 

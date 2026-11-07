@@ -44,6 +44,35 @@ BK.Hero = class {
   }
   update(dt) {
     this.t += dt;
+    var sp = this.sprite;
+    // figures with no standing animation (most drawn ones) breathe and shift their weight now and
+    // then, so they do not stand frozen while the child types
+    if (!this.def.flies && this.def.idle === this.def.run) {
+      if (!this.bs) this.bs = { x: sp.scaleX, y: sp.scaleY };
+      if (this.state === 'idle') {
+        var br = Math.sin(this.t / 420);
+        sp.setScale(this.bs.x * (1 - br * 0.012), this.bs.y * (1 + br * 0.025));
+        this.fidget = (this.fidget || 2500 + Math.random() * 2500) - dt;
+        if (this.fidget <= 0) {
+          // two steps of the walk, then back to standing
+          this.fidget = 3500 + Math.random() * 4000;
+          var self = this, f = 1 + Math.floor(Math.random() * 2);
+          sp.setFrame(f);
+          this.scene.time.delayedCall(140, function () { if (self.state === 'idle' && sp.active) sp.setFrame(f + 1); });
+          this.scene.time.delayedCall(300, function () { if (self.state === 'idle' && sp.active) sp.setFrame(0); });
+        }
+      } else if (sp.scaleY !== this.bs.y) sp.setScale(this.bs.x, this.bs.y);
+    }
+    // the frog looks back over its shoulder now and then
+    if (this.def.id === 'frog') {
+      this.look = (this.look || 4000 + Math.random() * 4000) - dt;
+      if (this.look <= 0) {
+        this.look = 5000 + Math.random() * 5000;
+        var face = BK.FACES_LEFT.frog === true;
+        sp.setFlipX(!face);
+        this.scene.time.delayedCall(700, function () { if (sp.active) sp.setFlipX(face); });
+      }
+    }
     if (this.def.flies && !this.scene.tweens.isTweening(this.sprite)) this.sprite.y = this.groundY + Math.round(Math.sin(this.t / 260) * 2);
     if (this.pet) {
       if (this.petDef.flies) this.pet.y = this.pet.baseY + Math.sin(this.t / 260) * 3;

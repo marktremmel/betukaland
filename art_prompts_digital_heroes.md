@@ -80,3 +80,60 @@ These two belong to the Forest School story, so they should look like they come 
 3. **Five Important! card icons** (one image): "Five separate 32x32 pixel art icons in one row on plain white with gaps: a speech bubble with a stop hand; an audience of three small faces, one turning away; four arrows pointing out from a heart; a phone with a chat bubble and a small shield; two hands making a heart with a plaster on it. Bright, friendly, no text."
 4. **Kiálló badge.** "A single 32x32 pixel art badge: a round gold medal with a small standing figure holding up a hand, a red ribbon, friendly. Plain white background, no text."
 5. **Barátság-kristály.** "A single 32x32 pixel art gem: a pink-and-turquoise heart-shaped crystal with a sparkle. Plain white background."
+
+## NEM OKÉ backgrounds (parallax pieces)
+
+The levels felt empty because the background is one fixed picture. These pieces are made separately so the game can stack them (sky at the back, then far, middle and near layers, each scrolling at its own speed) and pick a different mix every level. Four kinds:
+
+- **sky**: the whole picture, no transparency. Only sky and clouds, nothing on the ground.
+- **far**: distant hills, mountains or a far line of trees, only in the lower half; above it plain magenta.
+- **mid**: the main scenery (school building, big trees, a pond), standing on the bottom edge; above and between plain magenta.
+- **near**: low things right next to the path (bushes, flowers, a fence), only in the bottom third; the rest plain magenta.
+
+Rules that save the most time:
+
+- Landscape 1536 x 1024 (ChatGPT's wide size), one picture per piece.
+- Everything except the sky on a flat, pure magenta background (#FF00FF), no gradient, no shadow on the background. Magenta works better than white here because clouds and windows are white.
+- The left and right edges must continue into each other (the picture repeats sideways). Say it in the prompt; if the seam still shows, I fix it when cutting.
+- Nothing stands out at the very left or right edge (no building cut in half).
+- Same style as the characters: 16-bit pixel art, soft colours, a clean dark outline only on the near and mid pieces; far pieces paler and bluer, without outlines, so they look far away.
+- No text, no people or animals (the characters come from the game).
+- Save them in the art folder in a subfolder `backgrounds`, named by kind first: `sky - sunny morning.png`, `far - rolling hills.png`, `mid - treehouse school.png`, `near - wildflower bushes.png`.
+
+### STYLE block for backgrounds (paste first)
+
+> Pixel art background layer for a cute 16-bit side-scrolling game, like a friendly 1990s console platformer. Soft, warm colours, readable shapes, gentle shading. Wide landscape format. The left and right edges must join seamlessly so the picture can repeat sideways. No text, no characters, no animals.
+
+### Skies (5 to 6; the game picks one)
+
+1. "Sky layer: a bright sunny morning sky, light blue fading to pale yellow near the bottom, a few fluffy white clouds. Only sky, no ground, fills the whole picture."
+2. "Sky layer: a golden afternoon sky, warm peach and light blue, long soft clouds lit from below. Only sky."
+3. "Sky layer: a pink and violet sunset sky with a low orange sun near the bottom edge and thin glowing clouds. Only sky."
+4. "Sky layer: an evening sky, deep blue to purple, the first small stars and a thin crescent moon. Only sky." (for the class chat chapter)
+5. "Sky layer: a soft cloudy autumn sky, grey-blue with big friendly clouds and a few patches of blue. Only sky."
+6. "Sky layer: a fresh spring sky after rain, clear blue with a faint rainbow arching across and small white clouds. Only sky."
+
+### Far layers (3 to 4)
+
+1. "Far layer: gentle rolling green hills with a tiny village and a church tower far away, pale and slightly blue from the distance, only in the lower half, the rest flat pure magenta #FF00FF."
+2. "Far layer: a soft line of distant forest, rounded tree tops in pale blue-green, misty, only in the lower half, the rest flat pure magenta #FF00FF."
+3. "Far layer: distant mountains with snowy tops, pale lilac-blue, only in the lower half, the rest flat pure magenta #FF00FF."
+4. "Far layer: a far city skyline of a small town with a castle on a hill, pale and hazy, lower half only, the rest flat pure magenta #FF00FF."
+
+### Middle layers (5 to 6; the most important ones)
+
+1. "Middle layer: the Forest School, a cosy two-storey treehouse school built around a big oak tree, wooden balconies, round windows, a little bell, a rope ladder, standing on the bottom edge, everything else flat pure magenta #FF00FF."
+2. "Middle layer: a schoolyard with a small playground (slide, swing, sandpit), a low wooden fence behind it and two trees, standing on the bottom edge, everything else flat pure magenta #FF00FF."
+3. "Middle layer: big old forest trees, oaks and beeches with thick trunks and full green crowns, some roots and ferns at the bottom, standing on the bottom edge, everything else flat pure magenta #FF00FF."
+4. "Middle layer: a calm pond with reeds, lily pads and a small wooden jetty, willows behind it, along the bottom edge, everything else flat pure magenta #FF00FF."
+5. "Middle layer: an autumn birch grove with yellow and orange leaves, a wooden bench and a lantern post, standing on the bottom edge, everything else flat pure magenta #FF00FF."
+6. "Middle layer: a little village street with a library, a bakery and a school gate, small houses with colourful roofs, standing on the bottom edge, everything else flat pure magenta #FF00FF."
+
+### Near layers (3 to 4)
+
+1. "Near layer: low leafy bushes with small wildflowers (daisies, poppies, cornflowers), only in the bottom third, gaps between the bushes, everything else flat pure magenta #FF00FF."
+2. "Near layer: a short wooden picket fence with tall grass and a few mushrooms, bottom third only, with gaps, everything else flat pure magenta #FF00FF."
+3. "Near layer: piles of autumn leaves, small pumpkins and pine cones scattered low along the bottom edge, everything else flat pure magenta #FF00FF."
+4. "Near layer: a low green hedge with small round gaps and a few stones, bottom third only, everything else flat pure magenta #FF00FF."
+
+If a piece comes out on white or with a gradient, ask: "Same picture, but the background must be one flat pure magenta colour #FF00FF, no gradient, no shadow."

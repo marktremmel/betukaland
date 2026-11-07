@@ -207,6 +207,25 @@ BK.levelgen = {
     plan.sky = reg.sky[0];
     plan.weather = rng.pick(['clear', 'clear', 'leaves', 'blow']);
     plan.music = 'm_chill';
+    // the story's own moments on the road: Hedgy, Magpie or Mrs Owl comes along, says a line,
+    // and the child types a kind answer (one that fits the keys, or a kind sentence that does)
+    var story = BK.NEMOKE_STORY[BK.uiLang === 'en' ? 'en' : 'hu'], beats = (story.chapters[ch].beats || []);
+    var lang = (profile && profile.lang) === 'en' ? 'en' : 'hu', band = (profile && profile.grade) || '3-4';
+    var picker = BK.levelgen.themed(new BK.wordbank.Picker(regionId, lang, band, rng, profile), lang, rng, 'nemoke');
+    var who = { hedgy: ['Süni', 'Hedgy', 'nm_hedgy_walk'], magpie: ['Szarka', 'Magpie', 'nm_magpie_walk'], owl: ['Bagoly tanító néni', 'Mrs Owl', 'nm_owl_idle'] };
+    var n = plan.encounters.length, used = [];
+    beats.forEach(function (bt, j) {
+      var w = who[bt.who] || who.hedgy;
+      if (!BK_MANIFEST.sprites[w[2]]) return;
+      BK.CREATURES['nm' + bt.who] = w[2];
+      var langT = (BK.NEMOKE_STORY[lang].chapters[ch].beats || [])[j];
+      var txt = ((langT && langT.type) || bt.type || []).map(BK.util.norm).filter(function (x) { return BK.wordbank.fits(x, picker.set) && used.indexOf(x) < 0; })[0];
+      for (var tries = 0; !txt && tries < 6; tries++) { var c2 = picker.sentence(); if (used.indexOf(c2) < 0) txt = c2; }
+      txt = txt || picker.get('pairs');
+      used.push(txt);
+      var def = { kind: bt.who === 'owl' ? 'flyer' : 'walker', creature: 'nm' + bt.who, texts: [txt], coins: 2, who: BK.L(w[0], w[1]), say: bt.say, beat: true };
+      plan.encounters.splice(Math.round((j + 1) * (n + j) / (beats.length + 1)), 0, def);
+    });
     return plan;
   },
 
