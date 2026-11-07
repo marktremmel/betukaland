@@ -44,7 +44,8 @@ def main(lang, groups):
         if idx.get(l["id"], {}).get("h") == h and os.path.exists(fp): continue
         if idx.get(l["id"], {}).get("e") == "azure" and os.path.exists(fp) and "--piper" not in sys.argv: continue   # made by azure_tts.py
         try:
-            cast_test.render(ch["variants"]["A"], text, fp)
+            # the tales are long (two hours a language): a lower bitrate keeps the game small
+            cast_test.render(ch["variants"]["A"], text, fp, 32 if l["group"] == "tales" else 64)
             idx[l["id"]] = {"f": f, "h": h, "s": dur(fp), "g": l["group"], "c": l["char"]}
             n += 1
             if n % 25 == 0:

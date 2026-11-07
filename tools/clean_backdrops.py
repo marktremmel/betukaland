@@ -20,8 +20,21 @@ BD = {
 }
 
 
-PAD = {("mid", "Pixel Art Treehouse School on Magenta"): 1.2, ("mid", "Pixel Art Playground Park"): 0.8,
-       ("mid", "Pixel Art Willow Pond with Dock"): 0.6, ("mid", "Autumn Birch Grove Bench Scene"): 0.5}
+# single scenes get empty space around them (so a school does not come round twice on one
+# screen) and their sides fade out softly, so the scene does not end with a hard edge; the
+# willow pond and the birch grove are strips, they simply repeat
+PAD = {("mid", "Pixel Art Treehouse School on Magenta"): 1.2, ("mid", "Pixel Art Playground Park"): 0.8}
+FADE = 0.14     # part of the scene's width that fades in on the left and out on the right
+
+
+def fade_sides(im, frac=FADE):
+    a = np.asarray(im).astype(np.float32)
+    w = a.shape[1]; n = int(w * frac)
+    ramp = np.ones(w, np.float32)
+    ramp[:n] = np.linspace(0, 1, n) ** 1.5
+    ramp[w - n:] = np.linspace(1, 0, n) ** 1.5
+    a[..., 3] *= ramp[None, :]
+    return Image.fromarray(a.astype(np.uint8), "RGBA")
 
 
 def key_magenta(a):
@@ -75,9 +88,14 @@ def main(src):
             # a single scene (a school, a playground): empty space around it, so it does not
             # come round again on the same screen
             if (kind, n) in PAD:
+                im = fade_sides(im)
                 c = Image.new("RGBA", (int(im.width * (1 + PAD[(kind, n)])), H), (0, 0, 0, 0))
                 c.paste(im, ((c.width - im.width) // 2, 0)); im = c
-            im = seamless(im, 0.12 if (kind, n) not in PAD else 0.04)
+                im = seamless(im, 0.04)
+            else:
+                # a strip: followed by its mirror image, so both joins match exactly (no seam,
+                # no see-through "ghost" from blending) and it comes round half as often
+                c = Image.new("RGBA", (im.width * 2, H)); c.paste(im, (0, 0)); c.paste(im.transpose(Image.FLIP_LEFT_RIGHT), (im.width, 0)); im = c
             out = os.path.join(DST, "%s_%d.png" % (kind, i + 1))
             im.save(out, optimize=True)
             print(kind, i + 1, n, im.size)

@@ -2392,7 +2392,7 @@ window.BK_MANIFEST = {
   "nmsky_1": [
    {
     "url": "assets/bd/nmsky_1.png",
-    "w": 998,
+    "w": 2268,
     "h": 378,
     "hd": 3
    }
@@ -2400,7 +2400,7 @@ window.BK_MANIFEST = {
   "nmsky_2": [
    {
     "url": "assets/bd/nmsky_2.png",
-    "w": 998,
+    "w": 2268,
     "h": 378,
     "hd": 3
    }
@@ -2408,7 +2408,7 @@ window.BK_MANIFEST = {
   "nmsky_3": [
    {
     "url": "assets/bd/nmsky_3.png",
-    "w": 998,
+    "w": 2268,
     "h": 378,
     "hd": 3
    }
@@ -2416,7 +2416,7 @@ window.BK_MANIFEST = {
   "nmsky_4": [
    {
     "url": "assets/bd/nmsky_4.png",
-    "w": 998,
+    "w": 2268,
     "h": 378,
     "hd": 3
    }
@@ -2424,7 +2424,7 @@ window.BK_MANIFEST = {
   "nmsky_5": [
    {
     "url": "assets/bd/nmsky_5.png",
-    "w": 998,
+    "w": 2268,
     "h": 378,
     "hd": 3
    }
@@ -2432,7 +2432,7 @@ window.BK_MANIFEST = {
   "nmfar_1": [
    {
     "url": "assets/bd/nmfar_1.png",
-    "w": 998,
+    "w": 2268,
     "h": 378,
     "hd": 3
    }
@@ -2440,7 +2440,7 @@ window.BK_MANIFEST = {
   "nmfar_2": [
    {
     "url": "assets/bd/nmfar_2.png",
-    "w": 998,
+    "w": 2268,
     "h": 378,
     "hd": 3
    }
@@ -2448,7 +2448,7 @@ window.BK_MANIFEST = {
   "nmfar_3": [
    {
     "url": "assets/bd/nmfar_3.png",
-    "w": 998,
+    "w": 2268,
     "h": 378,
     "hd": 3
    }
@@ -2456,7 +2456,7 @@ window.BK_MANIFEST = {
   "nmfar_4": [
    {
     "url": "assets/bd/nmfar_4.png",
-    "w": 998,
+    "w": 2268,
     "h": 378,
     "hd": 3
    }
@@ -2464,7 +2464,7 @@ window.BK_MANIFEST = {
   "nmmid_1": [
    {
     "url": "assets/bd/nmmid_1.png",
-    "w": 1633,
+    "w": 2268,
     "h": 378,
     "hd": 3
    }
@@ -2488,7 +2488,7 @@ window.BK_MANIFEST = {
   "nmmid_4": [
    {
     "url": "assets/bd/nmmid_4.png",
-    "w": 998,
+    "w": 2268,
     "h": 378,
     "hd": 3
    }
@@ -2496,7 +2496,7 @@ window.BK_MANIFEST = {
   "nmmid_5": [
    {
     "url": "assets/bd/nmmid_5.png",
-    "w": 1742,
+    "w": 2268,
     "h": 378,
     "hd": 3
    }
@@ -2504,7 +2504,7 @@ window.BK_MANIFEST = {
   "nmmid_6": [
    {
     "url": "assets/bd/nmmid_6.png",
-    "w": 998,
+    "w": 2268,
     "h": 378,
     "hd": 3
    }
@@ -2512,7 +2512,7 @@ window.BK_MANIFEST = {
   "nmnear_1": [
    {
     "url": "assets/bd/nmnear_1.png",
-    "w": 798,
+    "w": 1812,
     "h": 378,
     "hd": 3
    }
@@ -2520,7 +2520,7 @@ window.BK_MANIFEST = {
   "nmnear_2": [
    {
     "url": "assets/bd/nmnear_2.png",
-    "w": 798,
+    "w": 1812,
     "h": 378,
     "hd": 3
    }
@@ -2528,7 +2528,7 @@ window.BK_MANIFEST = {
   "nmnear_3": [
    {
     "url": "assets/bd/nmnear_3.png",
-    "w": 798,
+    "w": 1812,
     "h": 378,
     "hd": 3
    }
@@ -2536,7 +2536,7 @@ window.BK_MANIFEST = {
   "nmnear_4": [
    {
     "url": "assets/bd/nmnear_4.png",
-    "w": 798,
+    "w": 1812,
     "h": 378,
     "hd": 3
    }

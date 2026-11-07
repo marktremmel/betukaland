@@ -71,7 +71,7 @@ def trim(a, sr):
     return a[max(0, idx[0] - int(sr * 0.03)): idx[-1] + int(sr * 0.15)] if len(idx) else a
 
 
-def render(spec0, text, mp3):
+def render(spec0, text, mp3, kbps=64):
     import numpy as np
     spec = dict(DEFAULTS, **spec0)
     eng, voice = spec["voice"].split("-", 1)
@@ -107,7 +107,7 @@ def render(spec0, text, mp3):
     if spec.get("fx"): chain.append(spec["fx"])
     if spec.get("gain"): chain.append("volume=%sdB" % spec["gain"])
     chain.append("alimiter=limit=0.95")          # a fixed gain, no loudnorm "riding" the volume
-    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", wav, "-af", ",".join(chain), "-ar", "24000", "-ac", "1", "-b:a", "64k", mp3], check=True)
+    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", wav, "-af", ",".join(chain), "-ar", "24000", "-ac", "1", "-b:a", "%dk" % kbps, mp3], check=True)
     os.remove(wav)
 
 

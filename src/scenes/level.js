@@ -579,6 +579,8 @@ BK.LevelScene = class extends Phaser.Scene {
         this.tweens.add({ targets: tt, y: ty - 14, alpha: 0, delay: 1700, duration: 900, ease: 'Cubic.easeIn', onComplete: function () { tt.destroy(); } });
       }
     }
+    // a story or a tale: the line just typed is read out, so the child hears the story go on
+    if ((this.practiceMode === 'tale' || this.practiceMode === 'story') && enc.texts) BK.voice.say(enc.texts.join(' '), this.profile.lang || 'hu');
     if (this.wordsDone % 6 === 0) BK.audio.sfx(BK.pick(['v_great', 'v_woo', 'v_wow', 'v_great_m', 'v_woo_m']), { volume: 0.6 });
     enc.finish().then(function () {
       enc.destroy();

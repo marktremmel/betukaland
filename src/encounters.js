@@ -46,7 +46,7 @@ BK.Encounter = class {
     // A story character's line (sayLine) is still being spoken: the word waits for a mistake.
     var lang = (BK.state.profile && BK.state.profile.lang) || 'hu';
     if (BK.voice.charOf(text, lang) === 'king') BK.voice.say(text, lang);
-    else if (!this.spokeLine || !BK.voice.speaking()) BK.voice.typed(text, lang, 'show');
+    else if (!BK.voice.speaking()) BK.voice.typed(text, lang, 'show');     // never over someone still talking
   }
   get next() { return this.bubble ? this.bubble.next : null; }
   // a story character's line (NEM OKÉ): a subtitle at the top while the child types the answer
