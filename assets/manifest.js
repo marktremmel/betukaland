@@ -1674,7 +1674,7 @@ window.BK_MANIFEST = {
   },
   "h4_bacon_walk": {
    "url": "assets/sprites/h4_bacon_walk.png",
-   "fw": 102,
+   "fw": 108,
    "fh": 126,
    "frames": 6,
    "fps": 9,

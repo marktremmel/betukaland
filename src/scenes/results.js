@@ -136,7 +136,8 @@ BK.ResultsScene = class extends Phaser.Scene {
       BK.fx.confetti(this, 192, 60);
       var rd = BK.RARES.find(function (x) { return x.id === r.newRare; });
       this.time.delayedCall(1600, function () {
-        BK.ui.toast(s, 192, 160, BK.L('Ritka kincs: Barátság-', 'Rare treasure: Friendship ') + (rd ? rd.name.toLowerCase() : '') + '!', 0xd8a0ff, 1, 2400);
+        BK.ui.toast(s, 192, 160, BK.L('Barátság-kristály + egy ritka ', 'Friendship gem + a rare ') + (rd ? rd.name.toLowerCase() : '') + '!', 0xd8a0ff, 1, 2400);
+        BK.ui.toast(s, 192, 172, BK.L('A Táska Polcán megtalálod.', 'You find it on the Bag\'s Shelf.'), 0xffffff, 1, 2400);
         if (BK_MANIFEST.sprites.nm_gem_one) {
           var gm = s.add.image(192, 132, 'nm_gem_one').setDepth(500).setScale(0.2);
           s.tweens.add({ targets: gm, scale: 1.4, duration: 500, ease: 'Back.easeOut' });

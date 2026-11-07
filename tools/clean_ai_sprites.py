@@ -106,7 +106,18 @@ import numpy as np
 from PIL import Image
 from scipy import ndimage
 from sklearn.cluster import KMeans
-def load(path):
+# White gaps that the outline closes in (between legs, a wand and the body, inside Lora's
+# rings) look like the background but are not connected to it. Per figure, a rule picks the
+# enclosed white patches that are background after all: f(area, w, h, top) -> True to clear.
+# Eyes, gloves and signs stay.
+HOLES = {
+    "h4_burpi": lambda area, w, h, top: top > 450 and area > 150,
+    "h4_bacon": lambda area, w, h, top: area > 1500 and h > 3 * w,
+    "h4_lora": lambda area, w, h, top: area > 250,
+}
+
+
+def load(path, holes=None):
     """picture -> (rgb, figure mask). Works with a transparent PNG, or any flat background
     colour (magenta, green...): the colour is read from the picture's border."""
     im = Image.open(path)
@@ -125,12 +136,20 @@ def load(path):
         lab, k = ndimage.label(near)
         edge = set(np.unique(np.concatenate([lab[0], lab[-1], lab[:, 0], lab[:, -1]]))) - {0}
         bg = np.isin(lab, list(edge))
+        if holes:
+            inner = (dist < 40) & ~bg
+            lab2, k2 = ndimage.label(inner)
+            for i, sl in enumerate(ndimage.find_objects(lab2)):
+                if sl is None: continue
+                comp = lab2[sl] == i + 1
+                if holes(int(comp.sum()), sl[1].stop - sl[1].start, sl[0].stop - sl[0].start, sl[0].start):
+                    bg[sl] |= comp
         return a, ~bg
     return a, dist > 110
 
 
-def frames(path,n,row=None,rows=None):
-    a,m=load(path)
+def frames(path,n,row=None,rows=None,holes=None):
+    a,m=load(path,holes)
     if rows:
         # several heroes in rows: cut the picture at the empty bands between them
         on=m.sum(1)>2; bands=[];s0=None
@@ -249,7 +268,7 @@ def process_hd(name, specs):
     for spec in specs:
         kind, n, H = spec[:3]
         src, files = (HW_SRC, HW_FILES) if name in HW_FILES else (NM_SRC, NM_FILES) if name in NM_FILES else (SRC, FILES)
-        fr = frames(os.path.join(src, files[name][kind]), n, *spec[3:5])
+        fr = frames(os.path.join(src, files[name][kind]), n, *spec[3:5], holes=HOLES.get(name))
         hmax = max(m.shape[0] for a, m in fr)
         fs = []
         for a, m in fr:

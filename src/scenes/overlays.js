@@ -64,8 +64,7 @@ BK.ShopScene = class extends BK.OverlayBase {
       var x = b.x + (b.w - 270) / 2 + col * 92, y = b.y + 58 + row * 56;
       s.keepD(BK.ui.nine(s, x, y, 86, 54, 'ui_slot'));
       var hero = BK.heroOf(P);
-      var key = s.tab === 0 ? (it.id === 'base' ? hero.idle : hero.idle + '_' + it.id) : it.sprite;
-      if (!s.textures.exists(key)) key = s.tab === 0 ? hero.idle : key;      // a figure without outfit colours
+      var key = s.tab === 0 ? BK.outfitKey(hero.idle, { outfit: it.id }) : it.sprite;
       var spr = s.keepD(s.add.sprite(x + 20, y + 51, key).setOrigin(0.5, 1).play(key));
       if (spr.height > 36) spr.setScale(spr.height > 60 ? 0.5 : 36 / spr.height);
       if (s.tab === 1) spr.setFlipX(BK.FACES_LEFT[key.split('_')[0]] === true);
@@ -339,32 +338,34 @@ BK.ShopScene = class extends BK.OverlayBase {
     this.figPage = Math.max(0, Math.min(pages - 1, this.figPage));
     if (pages > 1) {
       var pg = function (d) { s.figPage = (s.figPage + d + pages) % pages; BK.audio.sfx('ui'); s.draw(); };
-      this.keepD(BK.ui.button(this, b.x + 12, b.y + 88, '<', function () { pg(-1); }, { w: 14, h: 30 }));
-      this.keepD(BK.ui.button(this, b.x + b.w - 12, b.y + 88, '>', function () { pg(1); }, { w: 14, h: 30 }));
+      this.keepD(BK.ui.button(this, b.x + 11, b.y + 88, '<', function () { pg(-1); }, { w: 14, h: 30 }));
+      this.keepD(BK.ui.button(this, b.x + b.w - 11, b.y + 88, '>', function () { pg(1); }, { w: 14, h: 30 }));
       this.keepD(BK.ui.text(this, b.x + b.w / 2, b.y + 126, (this.figPage + 1) + ' / ' + pages, { outline: false, origin: [0.5, 0.5], px: 8, color: 0x9a8a80 }));
     }
     BK.HEROES.forEach(function (h, i) {
       if (Math.floor(i / PER) !== s.figPage) return;
       var j = i % PER;
-      var x = b.x + (b.w - 324) / 2 + 27 + (j % 6) * 54, y = b.y + 72 + Math.floor(j / 6) * 31;
+      var x = b.x + (b.w - 288) / 2 + 24 + (j % 6) * 48, y = b.y + 72 + Math.floor(j / 6) * 31;
       var cur = i === (P.avatar || 0), owned = BK.heroOwned(P, h), open = BK.heroUnlocked(P, h);
-      s.keepD(BK.ui.nine(s, x - 25, y - 15, 50, 30, cur ? 'ui_slot_sel' : open ? 'ui_slot' : 'ui_slot_off'));
+      s.keepD(BK.ui.nine(s, x - 23, y - 15, 46, 30, cur ? 'ui_slot_sel' : open ? 'ui_slot' : 'ui_slot_off'));
       var spr = s.keepD(BK.avatarSprite(s, x, y + 14, i, P));
-      spr.setScale(h.id === 'crab' ? 1.4 : Math.min(1, 26 / spr.height));
+      // the drawn (HD) figures are busy pictures: keep them well inside the slot
+      var hd = spr.texture.hd;
+      spr.setScale(h.id === 'crab' ? 1.4 : Math.min(1, (hd ? 23 : 26) / spr.height, (hd ? 38 : 44) / spr.width));
       if (!open) spr.setTint(0x302838).setAlpha(0.7);
       if (!owned) {
         // a small price tag (or a lock) in the corner
         if (open) {
-          s.keepD(s.add.rectangle(x + 14, y - 9, 20, 9, 0xffe9a0, 0.95).setStrokeStyle(1, 0x5a3426));
-          s.keepD(BK.ui.text(s, x + 14, y - 9, String(h.price), { outline: false, origin: [0.5, 0.5], px: 7, bold: true, color: 0x9a3d1a }));
+          s.keepD(s.add.rectangle(x + 13, y - 9, 18, 9, 0xffe9a0, 0.95).setStrokeStyle(1, 0x5a3426));
+          s.keepD(BK.ui.text(s, x + 13, y - 9, String(h.price), { outline: false, origin: [0.5, 0.5], px: 7, bold: true, color: 0x9a3d1a }));
         } else {
           var lk = s.keepD(s.add.graphics());           // a little padlock
           lk.lineStyle(1.5, 0x6a2a8a, 1).strokeCircle(x + 16, y - 9, 2.5);
           lk.fillStyle(0x6a2a8a, 1).fillRect(x + 12.5, y - 8, 7, 5);
         }
       }
-      if (i === sel) s.keepD(s.add.rectangle(x, y, 54, 34).setStrokeStyle(2, 0xffffff));
-      var z = s.keepD(s.add.zone(x, y, 50, 30).setInteractive({ useHandCursor: true }));
+      if (i === sel) s.keepD(s.add.rectangle(x, y, 50, 34).setStrokeStyle(2, 0xffffff));
+      var z = s.keepD(s.add.zone(x, y, 46, 30).setInteractive({ useHandCursor: true }));
       z.on('pointerup', function () {
         if (owned) {
           s.figSel = undefined;
@@ -519,13 +520,28 @@ BK.BagScene = class extends BK.OverlayBase {
     }, { w: 72, h: 16, disabled: !have }));
     var total = BK.RECIPES.reduce(function (a, r) { return a + (P.dishes[r.id] || 0); }, 0);
     this.keepD(BK.ui.button(this, b.x + 262, b.y + 110, BK.L('2 étel = 1 ◆', '2 dishes = 1 ◆'), function () { s.trade(); }, { w: 76, h: 16, disabled: total < 2 }));
-    this.keepD(BK.ui.text(this, b.x + 16, b.y + 126, BK.L('Ritka kincsek (bármelyik 2 étel = 1 ritka kincs)', 'Rare treasures (any 2 dishes = 1 rare treasure)'), { outline: false, px: 9, color: 0x6b3a20, fit: 290 }));
+    var gemTxt = P.nemoke && P.nemoke.stars && P.nemoke.stars[4] > 0 ? BK.L('Barátság-kristály: a NEM OKÉ emléke, sosem fogy el', 'Friendship gem: a NEM OKÉ keepsake, never spent')
+      : BK.L('Barátság-kristály: a NEM OKÉ történet végén jár', 'Friendship gem: at the end of the NEM OKÉ story');
+    this.keepD(BK.ui.text(this, b.x + 16, b.y + 126, this.gemNote ? gemTxt : BK.L('Ritka kincsek (bármelyik 2 étel = 1 ritka kincs)', 'Rare treasures (any 2 dishes = 1 rare treasure)'), { outline: false, px: 9, color: this.gemNote ? 0x8a3ab0 : 0x6b3a20, fit: 290 }));
     BK.RARES.forEach(function (r, i) {
-      var x = b.x + 34 + i * 46, y = b.y + 150, n = P.rares[r.id] || 0;
+      var x = b.x + 30 + i * 40, y = b.y + 150, n = P.rares[r.id] || 0;
       s.keepD(BK.ui.nine(s, x - 13, y - 13, 26, 26, n ? 'ui_slot_sel' : 'ui_slot_off'));
       s.icon(x, y, r.frame, 'icons_gear', n);
       if (n) s.keepD(BK.ui.text(s, x + 11, y + 3, 'x' + n, { origin: [1, 0], px: 8, color: 0xffffff }));
     });
+    // the Friendship gem of the NEM OKÉ story: a keepsake, never spent (the rare crystal that
+    // came with it is the one that can be spent)
+    var gx = b.x + b.w - 40, gy = b.y + 150, gem = P.nemoke && P.nemoke.stars && P.nemoke.stars[4] > 0;
+    if (gem || BK.save.nemoke()) {
+      this.keepD(BK.ui.nine(this, gx - 15, gy - 15, 30, 30, gem ? 'ui_slot_sel' : 'ui_slot_off'));
+      var gi = this.keepD(BK_MANIFEST.sprites.nm_gem_one ? this.add.image(gx, gy, 'nm_gem_one').setScale(0.95) : this.add.image(gx, gy, 'icons_gear', 81));
+      if (!gem) gi.setTint(0x302828).setAlpha(0.55);
+      else this.tweens.add({ targets: gi, scale: { from: 0.95, to: 1.08 }, duration: 700, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+      var gz = this.keepD(this.add.zone(gx, gy, 30, 30).setInteractive({ useHandCursor: true }));
+      gz.on('pointerup', function () {
+        BK.audio.sfx('ui'); s.gemNote = !s.gemNote; s.draw();
+      });
+    }
   }
   // any two dishes (the ones the child has most of) become one rare treasure
   trade() {

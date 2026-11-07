@@ -137,11 +137,11 @@ BK.CastleScene = class extends Phaser.Scene {
     var tl = P.tales || {}, cur = BK.TALES.find(function (t) { var x = tl[t.id]; return x && x.at > 0 && x.at < t.lines.length; });
     var openStory = BK.wordbank.storyLibrary(P.lang || 'hu').filter(function (st) { return BK.save.regionOpen(P, st.region) && !(P.stories || {})[BK.save.storyKey(P, st.id)]; });
     var helpers = [
-      { key: 'karou_sit', x: 326, y: FLOOR + 30, say: done < 3 ? BK.L('Mai célok: ', 'Today: ') + done + '/3. ' + BK.L('Gyere, segítek!', 'Come on!') : BK.L('Mára mind kész, szuper!', 'All done today, great!'),
+      { key: 'karou_sit', x: 300, y: FLOOR + 30, say: done < 3 ? BK.L('Mai célok: ', 'Today: ') + done + '/3. ' + BK.L('Gyere, segítek!', 'Come on!') : BK.L('Mára mind kész, szuper!', 'All done today, great!'),
         go: function () { s.scene.start('Practice', { tab: 'today' }); } },
-      { key: 'hw_bat_fly', x: 560, y: 92, fly: true, say: cur ? BK.L('Folytassuk: ', 'Let us go on: ') + cur.title + '!' : BK.L('Mesélek, ha kéred!', 'I can tell you a tale!'),
+      { key: 'hw_bat_fly', x: 344, y: 92, fly: true, say: cur ? BK.L('Folytassuk: ', 'Let us go on: ') + cur.title + '!' : BK.L('Mesélek, ha kéred!', 'I can tell you a tale!'),
         go: function () { s.scene.start('Practice', { tab: 'tales' }); } },
-      { key: 'frog_walk', x: 596, y: FLOOR + 30, say: openStory.length ? openStory.length + BK.L(' történet vár rád.', ' stories are waiting.') : BK.L('Minden történet kész!', 'Every story done!'),
+      { key: 'frog_walk', x: 214, y: FLOOR + 30, say: openStory.length ? openStory.length + BK.L(' történet vár rád.', ' stories are waiting.') : BK.L('Minden történet kész!', 'Every story done!'),
         go: function () { s.scene.start('Practice', { tab: 'story' }); } },
     ];
     helpers.forEach(function (h, i) {
@@ -151,7 +151,7 @@ BK.CastleScene = class extends Phaser.Scene {
       if (h.key === 'frog_walk') spr.anims.pause();
       if (h.fly) spr.setFlipX(true);
       if (h.fly) s.tweens.add({ targets: spr, y: h.y - 5, duration: 700, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
-      var bub = s.keepR(BK.ui.text(s, BK.util.clamp(h.x, 50, BK.CASTLE_W - 50), h.y - spr.displayHeight - 8, h.say, { outline: true, origin: [0.5, 1], px: 8, color: 0xfff2dc, width: 96, align: 1 }));
+      var bub = s.keepR(BK.ui.text(s, BK.util.clamp(h.x, 50, BK.CASTLE_W - 50), h.y - spr.displayHeight - 8, h.say, { outline: true, origin: [0.5, 1], px: 8, color: 0xfff2dc, width: 80, align: 1 }));
       s.tweens.add({ targets: bub, y: bub.y - 2, duration: 900, yoyo: true, repeat: -1, delay: i * 200 });
       spr.setInteractive({ useHandCursor: true }).on('pointerup', function () { if (!s.picker.length) { BK.audio.sfx('chime'); BK.save.persist(); h.go(); } });
     });
@@ -374,9 +374,30 @@ BK.CastleScene = class extends Phaser.Scene {
       var walk = function () {
         if (!spr.active) return;
         // they stay mostly on the first screen, near the door, where the child is
-        var nx = BK.util.clamp(spr.x + (Math.random() - 0.5) * 140, 40, Math.random() < 0.15 ? BK.CASTLE_W - 40 : 300);
-        spr.setFlipX(nx < spr.x ? BK.FACES_LEFT[h.id] !== true : BK.FACES_LEFT[h.id] === true);
-        s.tweens.add({ targets: [spr, tag], x: nx, duration: Math.abs(nx - spr.x) * 25 + 300, ease: 'Linear', onComplete: function () { s.time.delayedCall(800 + Math.random() * 2500, walk); } });
+        var nx = BK.util.clamp(spr.x + (Math.random() - 0.5) * 160, 40, Math.random() < 0.15 ? BK.CASTLE_W - 40 : 330);
+        var dir = nx < spr.x ? -1 : 1, faceL = BK.FACES_LEFT[h.id] === true;
+        spr.setFlipX(dir < 0 ? !faceL : faceL);
+        // a thing on the floor in the way: they walk up to it and bump into it
+        var bump = (s.C.placed || []).filter(function (pl) { return pl.y > 150 && (pl.x - spr.x) * dir > 14 && (nx - pl.x) * dir > 0; })
+          .sort(function (a, b) { return Math.abs(a.x - spr.x) - Math.abs(b.x - spr.x); })[0];
+        if (bump && Math.random() < 0.6) nx = bump.x - dir * 12; else bump = null;
+        spr.anims.resume();
+        s.tweens.add({ targets: [spr, tag], x: nx, duration: Math.abs(nx - spr.x) * 25 + 300, ease: 'Linear', onComplete: function () {
+          // standing: the walk stops; sometimes they look around
+          spr.anims.pause(); spr.setFrame(spr.anims.currentAnim ? spr.anims.currentAnim.frames[0].frame.name : 0);
+          if (bump) {
+            s.tweens.add({ targets: [spr, tag], x: spr.x - dir * 6, y: '-=3', duration: 120, yoyo: false, ease: 'Quad.easeOut', onComplete: function () {
+              s.tweens.add({ targets: [spr, tag], y: '+=3', duration: 120 });
+            } });
+            var oops = BK.ui.text(s, spr.x, 192 - spr.displayHeight - 12, '!', { origin: [0.5, 1], px: 10, color: 0xffd23c }).setDepth(47);
+            s.roomC.add(oops);
+            s.tweens.add({ targets: oops, y: oops.y - 6, alpha: 0, delay: 500, duration: 500, onComplete: function () { oops.destroy(); } });
+          } else if (Math.random() < 0.5) {
+            s.time.delayedCall(700, function () { if (spr.active) spr.setFlipX(!spr.flipX); });
+            s.time.delayedCall(1500, function () { if (spr.active) spr.setFlipX(!spr.flipX); });
+          }
+          s.time.delayedCall(1200 + Math.random() * 3500, walk);
+        } });
       };
       s.time.delayedCall(500 + i * 400, walk);
       spr.setInteractive({ useHandCursor: true }).on('pointerup', function () { if (!s.picker.length) s.chat(q); });
