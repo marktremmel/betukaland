@@ -71,7 +71,10 @@ def render(spec0, text, mp3):
         sp = spec
         # a very short sentence inside a longer line ("Elhallgatott.") is said more slowly
         if len(ss) > 1 and len(s.split()) <= 2: sp = dict(spec, speed=spec["speed"] * 0.85)
-        if spec.get("word") == "slow" and len(ss) == 1 and len(s.split()) <= 2: sp = dict(spec, speed=spec["speed"] * 0.8)
+        if spec.get("word") == "slow" and len(ss) == 1 and len(s.split()) <= 2:
+            # the shorter the word, the more it is drawn out ("ujj", "szia" were too quick)
+            n = len(s.strip(".!? "))
+            sp = dict(spec, speed=spec["speed"] * (0.6 if n <= 2 else 0.65 if n <= 4 else 0.72 if n <= 6 else 0.8))
         a, sr = raw(voice, s, sp)
         a = trim(np.asarray(a, dtype=np.float32), sr)
         rms = float(np.sqrt(np.mean(a ** 2))) or 1.0
@@ -99,7 +102,7 @@ def main(langs):
                 d = os.path.join(OUT, "%s-%s-%s" % (lang, ch, vk)); os.makedirs(d, exist_ok=True)
                 for lid in c["lines"]:
                     text = normalize(LINES[lid]["text"], lang)
-                    h = hashlib.md5((json.dumps(dict(DEFAULTS, **spec), sort_keys=True) + text + "v3").encode()).hexdigest()[:10]
+                    h = hashlib.md5((json.dumps(dict(DEFAULTS, **spec), sort_keys=True) + text + "v4").encode()).hexdigest()[:10]
                     mp3 = os.path.join(d, lid + ".mp3"); side = mp3 + ".hash"
                     if os.path.exists(mp3) and os.path.exists(side) and open(side).read() == h: continue
                     try:

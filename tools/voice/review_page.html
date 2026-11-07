@@ -1,0 +1,66 @@
+<!doctype html><html lang="hu"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Betűkaland hangellenőrzés</title>
+<style>
+:root{--bg:#f6f1e7;--card:#fffaf0;--ink:#3a2a20;--mute:#8a7a6a;--line:#e3d6c0;--bad:#d83c3c;--sel:#ffd23c}
+@media (prefers-color-scheme:dark){:root{--bg:#1d1a17;--card:#27231f;--ink:#efe6d8;--mute:#a89a88;--line:#3b342c;--bad:#ff7a7a;--sel:#b89020}}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.4 -apple-system,system-ui,sans-serif}
+main{max-width:1100px;margin:0 auto;padding:16px}
+h1{font-size:22px;margin:4px 0}.mute{color:var(--mute);font-size:13px}
+.bar{position:sticky;top:0;background:var(--bg);padding:8px 0;border-bottom:1px solid var(--line);display:flex;gap:6px;flex-wrap:wrap;align-items:center;z-index:2}
+button{font:inherit;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:6px;padding:3px 9px;cursor:pointer}
+button.on{background:var(--sel);color:#000}
+.words{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.w{border:1px solid var(--line);background:var(--card);border-radius:6px;padding:4px 8px;cursor:pointer;user-select:none}
+.w.bad{border-color:var(--bad);color:var(--bad);text-decoration:line-through}
+.w.playing{background:var(--sel);color:#000}
+.row{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 10px;margin:6px 0;display:flex;gap:10px;align-items:flex-start}
+.row.bad{border-color:var(--bad)}.row.playing{box-shadow:0 0 0 2px var(--sel)}
+.row .t{flex:1}.row .who{font-size:12px;color:var(--mute)}
+</style></head><body><main>
+<h1>Hangellenőrzés</h1>
+<div class="mute">Kattints egy szóra vagy sorra: lejátssza. Ha rossz, kattints rá még egyszer, amíg szól (vagy a ✗ gombra): pirosra vált. A végén Export: a megjelöltek listáját add oda Claude-nak, és azokat javítjuk.</div>
+<div class="bar"><span id="langs"></span><span class="mute">|</span><span id="groups"></span><span style="flex:1"></span><button id="seq">▶ végig mind</button><button id="stop">■</button><span id="cnt" class="mute"></span><button id="exp">Export</button></div>
+<div id="list"></div>
+</main><audio id="au"></audio><script>
+const D = __DATA__, au = document.getElementById('au');
+let B = {}; try { B = JSON.parse(localStorage.getItem('bk-review') || '{}'); } catch (e) {}
+const save = () => { try { localStorage.setItem('bk-review', JSON.stringify(B)); } catch (e) {} };
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const NAMES = { nemoke: 'NEM OKÉ', halloween: 'Halloween', stories: 'Történetek', sentences: 'Mondatok', words: 'Szavak', tales: 'Mesék' };
+let lang = Object.keys(D)[0] || 'hu', group = 'words', playingId = null, seq = null;
+function items() { return (D[lang] || []).filter(x => x[2] === group); }
+function play(x, el, then) {
+  document.querySelectorAll('.playing').forEach(e => e.classList.remove('playing'));
+  if (el) { el.classList.add('playing'); el.scrollIntoView({ block: 'nearest' }); }
+  playingId = x[0]; au.src = lang + '/' + x[1]; au.onended = () => { el && el.classList.remove('playing'); playingId = null; then && setTimeout(then, 250); }; au.play().catch(() => then && then());
+}
+function toggle(x) { B[lang + '|' + x[0]] = !B[lang + '|' + x[0]]; if (!B[lang + '|' + x[0]]) delete B[lang + '|' + x[0]]; save(); }
+function render() {
+  document.getElementById('langs').innerHTML = Object.keys(D).map(l => `<button data-l="${l}" class="${l === lang ? 'on' : ''}">${l}</button>`).join(' ');
+  const gs = [...new Set((D[lang] || []).map(x => x[2]))];
+  if (!gs.includes(group)) group = gs[0];
+  document.getElementById('groups').innerHTML = gs.map(g => `<button data-g="${g}" class="${g === group ? 'on' : ''}">${NAMES[g] || g} (${(D[lang] || []).filter(x => x[2] === g).length})</button>`).join(' ');
+  document.querySelectorAll('[data-l]').forEach(b => b.onclick = () => { lang = b.dataset.l; render(); });
+  document.querySelectorAll('[data-g]').forEach(b => b.onclick = () => { group = b.dataset.g; render(); });
+  const L = document.getElementById('list'), its = items();
+  if (group === 'words') {
+    L.innerHTML = '<div class="words"></div>';
+    its.forEach(x => { const e = document.createElement('span'); e.className = 'w' + (B[lang + '|' + x[0]] ? ' bad' : ''); e.textContent = x[4]; e.dataset.id = x[0];
+      e.onclick = () => { if (playingId === x[0]) { toggle(x); e.classList.toggle('bad'); count(); } else play(x, e); }; L.firstChild.appendChild(e); });
+  } else {
+    L.innerHTML = '';
+    its.forEach(x => { const e = document.createElement('div'); e.className = 'row' + (B[lang + '|' + x[0]] ? ' bad' : ''); e.dataset.id = x[0];
+      e.innerHTML = `<button class="p">▶</button><div class="t">${esc(x[4])}<div class="who">${esc(x[3])} · ${esc(x[0])} · ${x[5]} mp</div></div><button class="x">✗</button>`;
+      e.querySelector('.p').onclick = () => play(x, e); e.querySelector('.x').onclick = () => { toggle(x); e.classList.toggle('bad'); count(); };
+      L.appendChild(e); });
+  }
+  count();
+}
+function count() { document.getElementById('cnt').textContent = Object.keys(B).length + ' megjelölve'; }
+document.getElementById('seq').onclick = () => { const its = items(), els = [...document.querySelectorAll('[data-id]')]; let i = 0; seq = true;
+  const next = () => { if (!seq || i >= its.length) return; const x = its[i], el = els[i]; i++; play(x, el, next); }; next(); };
+document.getElementById('stop').onclick = () => { seq = false; au.pause(); };
+document.getElementById('exp').onclick = () => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(Object.keys(B).map(k => { const [l, id] = k.split('|'); const x = (D[l] || []).find(y => y[0] === id); return { lang: l, id, text: x ? x[4] : '' }; }), null, 1)], { type: 'application/json' })); a.download = 'voice_flags.json'; a.click(); };
+document.addEventListener('keydown', e => { if (e.key === 'x' && playingId) { const x = (D[lang] || []).find(y => y[0] === playingId); const el = document.querySelector(`[data-id="${CSS.escape(playingId)}"]`); if (x) { toggle(x); el && el.classList.toggle('bad'); count(); } } });
+render();
+</script></body></html>

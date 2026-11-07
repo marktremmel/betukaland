@@ -7,8 +7,22 @@
 import re
 
 
+# words the voice says wrong, spelled the way they should sound (only for the voice, never shown);
+# whole words, any case. Add to this list when the review page flags a word.
+RESPELL = {
+    "hu": {"szia": "szija", "sziasztok": "szijasztok"},
+    "en": {},
+}
+
+
+def respell(t, lang):
+    for w, say in RESPELL.get(lang, {}).items():
+        t = re.sub(r"(?<![\wáéíóöőúüű])" + w + r"(?![\wáéíóöőúüű])", lambda m: say if m.group(0).islower() else say.capitalize(), t, flags=re.I)
+    return t
+
+
 def normalize(text, lang="hu"):
-    t = text.strip()
+    t = respell(text.strip(), lang)
     t = re.sub(r"^[-–—]\s+", "", t)                         # dialogue dash at the start
     t = re.sub(r"\s[-–—]\s", ", ", t)                         # a dash between words: a pause
     t = re.sub(r"”\s+(?=\w)", ", ", t)                      # „...” írtad: a pause after the quote

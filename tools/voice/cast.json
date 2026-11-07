@@ -112,18 +112,6 @@
      "voice": "piper-berta",
      "pitch": 0,
      "speed": 0.85,
-     "word": "plain"
-    },
-    "B": {
-     "voice": "piper-berta",
-     "pitch": 0,
-     "speed": 0.85,
-     "word": "period"
-    },
-    "C": {
-     "voice": "piper-berta",
-     "pitch": 0,
-     "speed": 0.85,
      "word": "slow"
     }
    }
