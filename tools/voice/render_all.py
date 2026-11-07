@@ -42,6 +42,7 @@ def main(lang, groups):
         h = hashlib.md5((json.dumps(spec, sort_keys=True) + text + "v4").encode()).hexdigest()[:10]
         f = fname(l["id"]); fp = os.path.join(out, f)
         if idx.get(l["id"], {}).get("h") == h and os.path.exists(fp): continue
+        if idx.get(l["id"], {}).get("e") == "azure" and os.path.exists(fp) and "--piper" not in sys.argv: continue   # made by azure_tts.py
         try:
             cast_test.render(ch["variants"]["A"], text, fp)
             idx[l["id"]] = {"f": f, "h": h, "s": dur(fp), "g": l["group"], "c": l["char"]}
@@ -71,5 +72,5 @@ def review():
 
 if __name__ == "__main__":
     lang = sys.argv[1] if len(sys.argv) > 1 else "hu"
-    groups = sys.argv[2:] or ["nemoke", "halloween", "stories", "sentences", "words"]
+    groups = [g for g in sys.argv[2:] if not g.startswith("--")] or ["nemoke", "halloween", "stories", "sentences", "words"]
     main(lang, groups)
