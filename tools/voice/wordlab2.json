@@ -1,0 +1,516 @@
+{
+ "_about": "Word lab 2: D/E as before, G/H with the phoneme fix (main stress on the first syllable, soft end consonant held longer).",
+ "hu": {
+  "adj": {
+   "name": "adj",
+   "lines": [
+    "w.hu.adj"
+   ],
+   "variants": {
+    "D": {
+     "voice": "piper-anna",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "E": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "G": {
+     "voice": "piper-anna",
+     "speed": 0.85,
+     "word": "mild",
+     "ph": 1
+    },
+    "H": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "mild",
+     "ph": 1
+    }
+   }
+  },
+  "lakj": {
+   "name": "lakj",
+   "lines": [
+    "w.hu.lakj"
+   ],
+   "variants": {
+    "D": {
+     "voice": "piper-anna",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "E": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "G": {
+     "voice": "piper-anna",
+     "speed": 0.85,
+     "word": "mild",
+     "ph": 1
+    },
+    "H": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "mild",
+     "ph": 1
+    }
+   }
+  },
+  "tart": {
+   "name": "tart",
+   "lines": [
+    "w.hu.tart"
+   ],
+   "variants": {
+    "D": {
+     "voice": "piper-anna",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "E": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "G": {
+     "voice": "piper-anna",
+     "speed": 0.85,
+     "word": "mild",
+     "ph": 1
+    },
+    "H": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "mild",
+     "ph": 1
+    }
+   }
+  },
+  "jegy": {
+   "name": "jegy",
+   "lines": [
+    "w.hu.jegy"
+   ],
+   "variants": {
+    "D": {
+     "voice": "piper-anna",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "E": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "G": {
+     "voice": "piper-anna",
+     "speed": 0.85,
+     "word": "mild",
+     "ph": 1
+    },
+    "H": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "mild",
+     "ph": 1
+    }
+   }
+  },
+  "báty": {
+   "name": "báty",
+   "lines": [
+    "w.hu.báty"
+   ],
+   "variants": {
+    "D": {
+     "voice": "piper-anna",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "E": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "G": {
+     "voice": "piper-anna",
+     "speed": 0.85,
+     "word": "mild",
+     "ph": 1
+    },
+    "H": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "mild",
+     "ph": 1
+    }
+   }
+  },
+  "anya": {
+   "name": "anya",
+   "lines": [
+    "w.hu.anya"
+   ],
+   "variants": {
+    "D": {
+     "voice": "piper-anna",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "E": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "G": {
+     "voice": "piper-anna",
+     "speed": 0.85,
+     "word": "mild",
+     "ph": 1
+    },
+    "H": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "mild",
+     "ph": 1
+    }
+   }
+  },
+  "öcs": {
+   "name": "öcs",
+   "lines": [
+    "w.hu.öcs"
+   ],
+   "variants": {
+    "D": {
+     "voice": "piper-anna",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "E": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "G": {
+     "voice": "piper-anna",
+     "speed": 0.85,
+     "word": "mild",
+     "ph": 1
+    },
+    "H": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "mild",
+     "ph": 1
+    }
+   }
+  },
+  "tej": {
+   "name": "tej",
+   "lines": [
+    "w.hu.tej"
+   ],
+   "variants": {
+    "D": {
+     "voice": "piper-anna",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "E": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "G": {
+     "voice": "piper-anna",
+     "speed": 0.85,
+     "word": "mild",
+     "ph": 1
+    },
+    "H": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "mild",
+     "ph": 1
+    }
+   }
+  },
+  "hely": {
+   "name": "hely",
+   "lines": [
+    "w.hu.hely"
+   ],
+   "variants": {
+    "D": {
+     "voice": "piper-anna",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "E": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "G": {
+     "voice": "piper-anna",
+     "speed": 0.85,
+     "word": "mild",
+     "ph": 1
+    },
+    "H": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "mild",
+     "ph": 1
+    }
+   }
+  },
+  "hegyi": {
+   "name": "hegyi",
+   "lines": [
+    "w.hu.hegyi"
+   ],
+   "variants": {
+    "D": {
+     "voice": "piper-anna",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "E": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "G": {
+     "voice": "piper-anna",
+     "speed": 0.85,
+     "word": "mild",
+     "ph": 1
+    },
+    "H": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "mild",
+     "ph": 1
+    }
+   }
+  },
+  "add": {
+   "name": "add",
+   "lines": [
+    "w.hu.add"
+   ],
+   "variants": {
+    "D": {
+     "voice": "piper-anna",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "E": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "G": {
+     "voice": "piper-anna",
+     "speed": 0.85,
+     "word": "mild",
+     "ph": 1
+    },
+    "H": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "mild",
+     "ph": 1
+    }
+   }
+  },
+  "sakkal": {
+   "name": "sakkal",
+   "lines": [
+    "w.hu.sakkal"
+   ],
+   "variants": {
+    "D": {
+     "voice": "piper-anna",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "E": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "G": {
+     "voice": "piper-anna",
+     "speed": 0.85,
+     "word": "mild",
+     "ph": 1
+    },
+    "H": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "mild",
+     "ph": 1
+    }
+   }
+  },
+  "pipa": {
+   "name": "pipa",
+   "lines": [
+    "w.hu.pipa"
+   ],
+   "variants": {
+    "D": {
+     "voice": "piper-anna",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "E": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "G": {
+     "voice": "piper-anna",
+     "speed": 0.85,
+     "word": "mild",
+     "ph": 1
+    },
+    "H": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "mild",
+     "ph": 1
+    }
+   }
+  },
+  "ló": {
+   "name": "ló",
+   "lines": [
+    "w.hu.ló"
+   ],
+   "variants": {
+    "D": {
+     "voice": "piper-anna",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "E": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "G": {
+     "voice": "piper-anna",
+     "speed": 0.85,
+     "word": "mild",
+     "ph": 1
+    },
+    "H": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "mild",
+     "ph": 1
+    }
+   }
+  },
+  "cukor": {
+   "name": "cukor",
+   "lines": [
+    "w.hu.cukor"
+   ],
+   "variants": {
+    "D": {
+     "voice": "piper-anna",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "E": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "G": {
+     "voice": "piper-anna",
+     "speed": 0.85,
+     "word": "mild",
+     "ph": 1
+    },
+    "H": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "mild",
+     "ph": 1
+    }
+   }
+  },
+  "rizs": {
+   "name": "rizs",
+   "lines": [
+    "w.hu.rizs"
+   ],
+   "variants": {
+    "D": {
+     "voice": "piper-anna",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "E": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "G": {
+     "voice": "piper-anna",
+     "speed": 0.85,
+     "word": "mild",
+     "ph": 1
+    },
+    "H": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "mild",
+     "ph": 1
+    }
+   }
+  },
+  "kés": {
+   "name": "kés",
+   "lines": [
+    "w.hu.kés"
+   ],
+   "variants": {
+    "D": {
+     "voice": "piper-anna",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "E": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "mild"
+    },
+    "G": {
+     "voice": "piper-anna",
+     "speed": 0.85,
+     "word": "mild",
+     "ph": 1
+    },
+    "H": {
+     "voice": "piper-imre",
+     "speed": 0.85,
+     "word": "mild",
+     "ph": 1
+    }
+   }
+  }
+ },
+ "en": {}
+}

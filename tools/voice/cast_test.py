@@ -33,11 +33,23 @@ def sentences(text):
     return [p for p in parts if p.strip()]
 
 
+def fix_phonemes(ph):
+    """help the Hungarian Piper voices with single words: the first syllable always gets the main
+    stress (espeak gives some words only a weak one: tart, kés, hely), and a soft consonant at the
+    end (gy, ty, ny, j, ly, cs, zs, s) is held a little longer so it is heard at all"""
+    import re
+    ph = ph.replace("ˌ", "ˈ", 1) if "ˈ" not in ph else ph
+    ph = re.sub(r"(ɟ|c|ɲ|j|ʎ|tʃ|ʒ|ʃ|s)(?!ː)([.!?]?)$", r"\1ː\2", ph)
+    return ph
+
+
 def raw_piper(voice, text, spec):
     import numpy as np
     from piper import PiperVoice, SynthesisConfig
     if voice not in _piper: _piper[voice] = PiperVoice.load(os.path.join(MODELS, "piper", "hu_HU-%s-medium.onnx" % voice))
     v = _piper[voice]
+    if spec.get("ph") and len(text.split()) <= 2:
+        text = "[[ " + fix_phonemes("".join(v.phonemize(text)[0])) + " ]]"
     cfg = SynthesisConfig(length_scale=1.0 / spec["speed"], noise_scale=spec["noise"], noise_w_scale=spec["noise_w"])
     a = np.concatenate([c.audio_float_array for c in v.synthesize(text, syn_config=cfg)])
     return a, v.config.sample_rate
