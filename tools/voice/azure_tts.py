@@ -103,6 +103,15 @@ def lab():
     print("voice/wordlab3/index.html")
 
 
+def trim(mp3):
+    """Azure leaves about half a second of silence at the end: cut it (keeps 60/120 ms)"""
+    tmp = mp3 + ".tmp.mp3"
+    af = ("silenceremove=start_periods=1:start_threshold=-45dB:start_silence=0.06,areverse,"
+          "silenceremove=start_periods=1:start_threshold=-45dB:start_silence=0.12,areverse")
+    r = subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", mp3, "-af", af, "-ar", "24000", "-ac", "1", "-b:a", "48k", tmp])
+    if r.returncode == 0 and os.path.getsize(tmp) > 500: os.replace(tmp, mp3)
+
+
 def words(voice="N", rate="-10%"):
     """every word and typing sentence with one Azure voice, into the same place as render_all.py"""
     key, region = creds()
@@ -118,7 +127,8 @@ def words(voice="N", rate="-10%"):
         f = render_all.fname(l["id"]); fp = os.path.join(out, f)
         if idx.get(l["id"], {}).get("h") == h and os.path.exists(fp): continue
         speak(l["text"], VOICES[v], rate if l["group"] == "words" else "0%", fp, key, region)
-        idx[l["id"]] = {"f": f, "h": h, "s": render_all.dur(fp), "g": l["group"], "c": "reader", "e": "azure"}
+        trim(fp)
+        idx[l["id"]] = {"f": f, "h": h, "s": render_all.dur(fp), "g": l["group"], "c": "reader", "e": "azure", "trim": 1}
         if k % 25 == 0:
             print("%d / %d" % (k + 1, len(todo)), flush=True)
             json.dump(idx, open(ip, "w", encoding="utf-8"), ensure_ascii=False)
