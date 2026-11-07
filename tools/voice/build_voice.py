@@ -1,17 +1,33 @@
 """
-Puts the finished recordings into the game: voice/out/<lang>/*.mp3 -> assets/voice/<lang>/ and
-data/voice_index.js (text -> [file, seconds, who]). The game looks a line up by its text, so the
-text in data/*.js and in voice/lines.json must match (run extract_lines.js after editing texts,
-then the renderers, then this).
+Puts the finished recordings into the game. itch.io takes at most about 1000 files in an HTML
+game, and there are some 5,500 lines, so the lines are joined into a few long files ("bundles":
+one per group and language, one per tale), with a short silence between lines, and
+data/voice_index.js says where each line starts and ends:
+    text -> [bundle file in assets/voice/<lang>/, start s, end s, who]
+The game seeks to the start and stops at the end (src/voice.js). Bundles whose lines did not
+change are kept. The text in data/*.js and voice/lines.json must match (run extract_lines.js
+after editing texts, then the renderers, then this).
     python3 tools/voice/build_voice.py
 """
-import json, os, re, shutil
+import json, os, re, subprocess, hashlib, array
 HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.abspath(os.path.join(HERE, "..", ".."))
 LINES = {l["id"]: l for l in json.load(open(os.path.join(ROOT, "voice", "lines.json"), encoding="utf-8"))}
+SR, GAP = 24000, 0.4          # sample rate of the bundles, silence between two lines (s)
 
 
 def key(t):   # the same as BK.voice in src/voice.js
     return re.sub(r"\s+", " ", re.sub(r"[\"„”“()]", "", t)).strip().lower()
+
+
+def pcm(mp3):
+    r = subprocess.run(["ffmpeg", "-v", "error", "-i", mp3, "-f", "s16le", "-ac", "1", "-ar", str(SR), "-"], capture_output=True, check=True)
+    return r.stdout
+
+
+def bundle_of(i, l):
+    if l["group"] == "tales":            # tale.<lang>.<taleid>.<n>
+        return "tale_" + re.sub(r"[^a-z0-9]+", "", i.split(".")[2].lower())
+    return l["group"]
 
 
 out = {}
@@ -20,21 +36,46 @@ for lang in ("hu", "en"):
     if not os.path.exists(ip): continue
     idx = json.load(open(ip, encoding="utf-8"))
     dst = os.path.join(ROOT, "assets", "voice", lang); os.makedirs(dst, exist_ok=True)
-    keep, size = set(), 0
-    out[lang] = {}
+    groups = {}
     for i, v in idx.items():
         l = LINES.get(i); src = os.path.join(ROOT, "voice", "out", lang, v["f"])
-        if not l or not os.path.exists(src): continue
-        k = key(l["text"])
-        if k in out[lang] and out[lang][k][2] != "reader": continue      # a character's line wins over the same text read out
-        out[lang][k] = [v["f"], v["s"], l["char"]]
-        d = os.path.join(dst, v["f"]); keep.add(v["f"])
-        if not os.path.exists(d) or os.path.getsize(d) != os.path.getsize(src) or os.path.getmtime(d) < os.path.getmtime(src):
-            shutil.copy2(src, d)
-        size += os.path.getsize(src)
+        if l and os.path.exists(src): groups.setdefault(bundle_of(i, l), []).append((i, l, src, v))
+    out[lang] = {}
+    mp = os.path.join(dst, "bundles.json")
+    made = json.load(open(mp)) if os.path.exists(mp) else {}
+    keep = set(["bundles.json"])
+    for b, items in sorted(groups.items()):
+        items.sort(key=lambda x: x[0])
+        sig = hashlib.md5("".join(i + v.get("h", "") + str(os.path.getsize(s)) for i, l, s, v in items).encode()).hexdigest()
+        fn = b + ".mp3"; keep.add(fn)
+        if made.get(b, {}).get("sig") == sig and os.path.exists(os.path.join(dst, fn)):
+            spans = made[b]["spans"]
+        else:
+            raw, spans, t = bytearray(), {}, 0.0
+            gap = b"\x00\x00" * int(SR * GAP)
+            raw += gap; t += GAP
+            for i, l, s, v in items:
+                p = pcm(s); d = len(p) / 2 / SR
+                spans[i] = [round(t, 3), round(t + d, 3)]
+                raw += p + gap; t += d + GAP
+            kbps = "32k" if b.startswith("tale_") else "48k"
+            # constant bitrate, so the browser can seek to a line exactly
+            subprocess.run(["ffmpeg", "-y", "-v", "error", "-f", "s16le", "-ar", str(SR), "-ac", "1", "-i", "-",
+                            "-codec:a", "libmp3lame", "-b:a", kbps, os.path.join(dst, fn)], input=bytes(raw), check=True)
+            made[b] = {"sig": sig, "spans": spans}
+            json.dump(made, open(mp, "w"))          # so a stopped run goes on from here
+            print("  bundle", lang, b, len(items), "lines, %.1f min" % (t / 60), flush=True)
+        for i, l, s, v in items:
+            if i not in spans: continue
+            k = key(l["text"])
+            if k in out[lang] and out[lang][k][3] != "reader": continue   # a character's line wins over the same text read out
+            out[lang][k] = [fn, spans[i][0], spans[i][1], l["char"]]
+    json.dump(made, open(mp, "w"))
     old = [f for f in os.listdir(dst) if f not in keep]
-    print(lang, len(out[lang]), "lines, %.1f MB" % (size / 1e6), ("(%d old files in assets/voice/%s are no longer used)" % (len(old), lang)) if old else "")
+    size = sum(os.path.getsize(os.path.join(dst, f)) for f in keep if os.path.exists(os.path.join(dst, f)))
+    print(lang, len(out[lang]), "lines in", len(groups), "bundles, %.1f MB" % (size / 1e6),
+          ("(%d single files in assets/voice/%s are no longer used: move them out of the folder)" % (len(old), lang)) if old else "")
 with open(os.path.join(ROOT, "data", "voice_index.js"), "w", encoding="utf-8") as f:
-    f.write("// Generated by tools/voice/build_voice.py: spoken lines, text -> [file in assets/voice/<lang>/, seconds, who].\n")
+    f.write("// Generated by tools/voice/build_voice.py: spoken lines, text -> [bundle in assets/voice/<lang>/, start s, end s, who].\n")
     f.write("window.BK_VOICE = "); json.dump(out, f, ensure_ascii=False, separators=(",", ":")); f.write(";\n")
 print("data/voice_index.js")
