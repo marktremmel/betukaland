@@ -2,7 +2,7 @@
 
 Everything for the page is in this folder:
 
-- `betukaland-itch-0.16.3.zip`: the game (upload this)
+- `betukaland-itch-0.16.4.zip`: the game (upload this)
 - `cover_hu_630x500.png` / `cover_en_630x500.png`: cover image (pick one)
 - `screenshots/`: screenshots at 1152×648
 - `DEVLOG_0.16.md`: the devlog post for this update
@@ -20,7 +20,7 @@ itch.io → Dashboard → Create new project, then fill in:
 | Kind of project | HTML |
 | Release status | Released (or In development, if you still want to change things) |
 | Pricing | No payments |
-| Uploads | `betukaland-itch-0.16.3.zip`, tick "This file will be played in the browser" |
+| Uploads | `betukaland-itch-0.16.4.zip`, tick "This file will be played in the browser" |
 
 ## 2. Embed options
 

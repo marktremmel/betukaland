@@ -220,6 +220,8 @@ BK.levelgen = {
       BK.CREATURES['nm' + bt.who] = w[2];
       var langT = (BK.NEMOKE_STORY[lang].chapters[ch].beats || [])[j];
       var txt = ((langT && langT.type) || bt.type || []).map(BK.util.norm).filter(function (x) { return BK.wordbank.fits(x, picker.set) && used.indexOf(x) < 0; })[0];
+      // none of its own answers fits: another kind sentence of the story that fits, then the word bank
+      if (!txt) txt = (BK.NEMOKE_SENTENCES[lang] || []).map(BK.util.norm).filter(function (x) { return BK.wordbank.fits(x, picker.set) && used.indexOf(x) < 0; })[0];
       for (var tries = 0; !txt && tries < 6; tries++) { var c2 = picker.sentence(); if (used.indexOf(c2) < 0) txt = c2; }
       txt = txt || picker.get('pairs');
       used.push(txt);

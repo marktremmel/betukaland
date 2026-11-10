@@ -40,7 +40,10 @@ BK.Encounter = class {
     // keep wide bubbles on screen
     var half = this.bubble.w / 2 + 4;
     // and below the top bar (tall two-line bubbles)
-    this.bubble.moveTo(BK.util.clamp(bx, half, BK.W - half), Math.max(this.bubbleY(), this.bubble.h + 20));
+    var by = Math.max(this.bubbleY(), this.bubble.h + 20);
+    // a story line is shown at the top: the word bubble never goes under it
+    if (this.sayBottom && by - this.bubble.h < this.sayBottom + 4) by = this.sayBottom + 4 + this.bubble.h;
+    this.bubble.moveTo(BK.util.clamp(bx, half, BK.W - half), by);
     this.misses = 0;
     // a character's own line (the Pumpkin King) is spoken; the rest by the Settings choice.
     // A story character's line (sayLine) is still being spoken: the word waits for a mistake.
@@ -63,6 +66,7 @@ BK.Encounter = class {
     [g, tx].forEach(function (o) { o.setAlpha(0); s.tweens.add({ targets: o, alpha: 1, duration: 250 }); });
     // the subtitle stays in place while the world scrolls, so it is not one of the parts
     this.sayObjs = [g, tx];
+    this.sayBottom = 36 + h / 2 + 1;        // the word bubble is kept below this (showChunk)
     if (!BK.voice.say(d.say)) BK.audio.sfx('ui', { volume: 0.4 });
     this.spokeLine = true;
   }
@@ -158,14 +162,16 @@ BK.Flyer = class extends BK.Walker {
   spawn(x) {
     this.kindKey = this.def.creature && BK.CREATURES[this.def.creature] ? this.def.creature : 'gull';
     super.spawn(x);
-    this.spr.y = BK.GROUND_Y - 40;
+    // a story character that flies (Mrs Owl) stays low, beside the path, so its line and the
+    // word to type both fit above it
+    this.spr.y = this.def.say ? BK.GROUND_Y - 8 : BK.GROUND_Y - 40;
     this.baseY = this.spr.y;
     this.t = Math.random() * 1000;
   }
   walkSpeed() { return 22; }
   update(dt) { this.t += dt; this.spr.y = this.baseY + Math.sin(this.t / 220) * 4; }
   activate() { this.sayLine(); BK.Encounter.prototype.activate.call(this); }
-  bubbleY() { return this.baseY - 30; }
+  bubbleY() { return this.def.say ? this.baseY - this.spr.displayHeight - 10 : this.baseY - 30; }
 };
 
 /** A wooden gate made of planks; it sinks into the ground when the word is typed. */
